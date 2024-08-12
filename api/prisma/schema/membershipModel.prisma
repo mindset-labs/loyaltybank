@@ -1,0 +1,39 @@
+model Membership {
+    id          String   @id @default(uuid())
+    userId      String
+    communityId String
+    teir        MembershipTier @default(BASIC)
+    communityRole CommunityRole @default(MEMBER)
+    tags        String[] @default([])
+    nftTokenId  String?
+    nftMetadata Json?
+    membershipMetadata Json?
+    membershipStatus MembershipStatus @default(PENDING)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+    
+    // relationships
+    user      User      @relation(fields: [userId], references: [id])
+    community Community @relation(fields: [communityId], references: [id])
+}
+
+enum MembershipTier {
+    BASIC
+    PREMIUM
+    GOLD
+    PLATINUM
+}
+
+enum CommunityRole {
+    MEMBER
+    MODERATOR
+    ADMIN
+}
+
+enum MembershipStatus {
+    PENDING
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+    CANCELLED
+}

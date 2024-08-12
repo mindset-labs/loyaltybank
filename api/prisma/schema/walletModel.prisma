@@ -1,0 +1,19 @@
+model Wallet {
+    id          String   @id @default(uuid())
+    address     String   @unique
+    token       String   @default("POINTS")
+    communityId String?
+    balance     Float    @default(0)
+    ownerId     String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+
+    // relationships
+    owner User @relation(fields: [ownerId], references: [id])
+    sentTransactions Transaction[] @relation("senderWallet")
+    receivedTransactions Transaction[] @relation("receiverWallet")
+    community Community? @relation(fields: [communityId], references: [id])
+
+    // indices
+    @@unique([address, token])
+}

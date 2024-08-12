@@ -1,0 +1,25 @@
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String
+  phoneNumber     String?
+  is2FAEnabled    Boolean  @default(false)
+  twoFactorSecret String?
+  role            Role     @default(USER)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+
+  // relationships
+  myCommunities Community[]
+  memberships Membership[]
+  transactionsSent Transaction[] @relation("sender")
+  transactionsReceived Transaction[] @relation("receiver")
+  wallets Wallet[]
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
