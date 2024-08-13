@@ -74,6 +74,23 @@ class CommunityController {
             .then((community) => handleSuccessResponse({ community }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };
+
+    public joinCommunity: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .joinCommunity(req.params.id, req.userId!)
+            .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    };
+
+    public addMemberToCommunity: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .addMember(req.userId!, {
+                ...req.body,
+                communityId: req.params.id,
+            })
+            .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    };
 }
 
 export const communityController = new CommunityController()

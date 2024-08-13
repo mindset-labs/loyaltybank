@@ -2,7 +2,7 @@ import type { ServiceResponse } from "@/common/models/serviceResponse"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient, { prismaExclude } from "@/db"
 import { logger } from "@/server"
-import { PrismaClient, type Prisma, type Community } from "@prisma/client"
+import { PrismaClient, type Prisma, type Community, Membership, CommunityStatus } from "@prisma/client"
 import bcrypt from "bcrypt"
 
 type CommunityQuery = Prisma.CommunityGetPayload<{
@@ -53,6 +53,49 @@ export class CommunityService {
                 id,
             },
             data,
+        })
+    }
+
+    async addMember(userId: string, membershipData: Prisma.MembershipUncheckedCreateInput): Promise<Membership> {
+        // find the community
+        const community = await dbClient.community.findFirst({
+            where: {
+                id: membershipData.communityId,
+            }
+        })
+
+        if (!community) {
+            throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
+        } else if (community.createdById !== userId) {
+            throw new CustomError('Invalid authorization', CustomErrorCode.INVALID_ACCESS_CONTROL)
+        }
+
+        return dbClient.membership.create({
+            data: membershipData,
+        })
+    }
+
+    async joinCommunity(id: string, userId: string): Promise<Membership> {
+        // find the community
+        const community = await dbClient.community.findFirst({
+            where: {
+                id,
+            }
+        })
+
+        if (!community) {
+            throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
+        } else if (community.status !== CommunityStatus.ACTIVE) {
+            throw new CustomError('Community is not active', CustomErrorCode.COMMUNITY_NOT_ACTIVE)
+        } else if (!community.isPublic) {
+            throw new CustomError('Community is not public', CustomErrorCode.COMMUNITY_NOT_PUBLIC)
+        }
+
+        return dbClient.membership.create({
+            data: {
+                userId,
+                communityId: id,
+            }
         })
     }
 }
