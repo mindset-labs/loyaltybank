@@ -6,8 +6,12 @@ export enum CustomErrorCode {
   INVALID_CREDENTIALS = 103,
   INVALID_REQUEST_DATA = 104,
   INVALID_TOKEN = 105,
-  INVALID_COMMUNITY = 106,
-  INVALID_ACCESS_CONTROL = 107,
+  INVALID_ACCESS_CONTROL = 106,
+
+  // community errors
+  INVALID_COMMUNITY = 200,
+  COMMUNITY_NOT_ACTIVE = 201,
+  COMMUNITY_NOT_PUBLIC = 202,
 }
 
 export class CustomError extends Error {
