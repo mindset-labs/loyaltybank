@@ -2,7 +2,11 @@ model Community {
     id          String   @id @default(uuid())
     name        String
     description String?
+    imageUrl    String?
+    metadata    Json?
     pointsTokenName String?
+    isPublic    Boolean  @default(false)
+    status      CommunityStatus @default(DRAFT)
     createdById String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @default(now())
@@ -12,4 +16,11 @@ model Community {
     createdBy    User     @relation(fields: [createdById], references: [id])
     transactions Transaction[]
     wallets      Wallet[]
+}
+
+enum CommunityStatus {
+    DRAFT
+    ACTIVE
+    INACTIVE
+    ARCHIVED
 }
