@@ -16,7 +16,9 @@
     "lint:fix": "biome check src/ --fix",
     "format": "biome format src/",
     "test": "vitest run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:production": "prisma migrate production"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.0.0",
