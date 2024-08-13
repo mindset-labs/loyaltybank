@@ -133,6 +133,14 @@ export const CommunitySchema = z.object({
 export type Community = z.infer<typeof CommunitySchema>
 
 /////////////////////////////////////////
+// COMMUNITY PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const CommunityPartialSchema = CommunitySchema.partial()
+
+export type CommunityPartial = z.infer<typeof CommunityPartialSchema>
+
+/////////////////////////////////////////
 // MEMBERSHIP SCHEMA
 /////////////////////////////////////////
 
@@ -152,6 +160,14 @@ export const MembershipSchema = z.object({
 })
 
 export type Membership = z.infer<typeof MembershipSchema>
+
+/////////////////////////////////////////
+// MEMBERSHIP PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const MembershipPartialSchema = MembershipSchema.partial()
+
+export type MembershipPartial = z.infer<typeof MembershipPartialSchema>
 
 /////////////////////////////////////////
 // TRANSACTION SCHEMA
@@ -177,6 +193,14 @@ export const TransactionSchema = z.object({
 export type Transaction = z.infer<typeof TransactionSchema>
 
 /////////////////////////////////////////
+// TRANSACTION PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const TransactionPartialSchema = TransactionSchema.partial()
+
+export type TransactionPartial = z.infer<typeof TransactionPartialSchema>
+
+/////////////////////////////////////////
 // USER SCHEMA
 /////////////////////////////////////////
 
@@ -197,6 +221,14 @@ export const UserSchema = z.object({
 export type User = z.infer<typeof UserSchema>
 
 /////////////////////////////////////////
+// USER PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const UserPartialSchema = UserSchema.partial()
+
+export type UserPartial = z.infer<typeof UserPartialSchema>
+
+/////////////////////////////////////////
 // WALLET SCHEMA
 /////////////////////////////////////////
 
@@ -212,6 +244,14 @@ export const WalletSchema = z.object({
 })
 
 export type Wallet = z.infer<typeof WalletSchema>
+
+/////////////////////////////////////////
+// WALLET PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const WalletPartialSchema = WalletSchema.partial()
+
+export type WalletPartial = z.infer<typeof WalletPartialSchema>
 
 /////////////////////////////////////////
 // SELECT & INCLUDE
