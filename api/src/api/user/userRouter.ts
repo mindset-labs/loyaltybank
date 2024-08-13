@@ -1,18 +1,18 @@
-import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
-import express, { type Router } from "express";
-import { z } from "zod";
+import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi"
+import express, { type Router } from "express"
+import { z } from "zod"
 
-import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import { CreateUserSchema, GetUserSchema, LoginUserSchema } from "@/api/user/userRequestValidation";
-import verifyJWT from "@/common/middleware/verifyJWT";
-import { validateRequest } from "@/common/utils/httpHandlers";
-import { UserSchema } from "@zodSchema/index";
-import { userController } from "./userController";
+import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
+import { CreateUserSchema, GetUserSchema, LoginUserSchema, MeQuerySchema } from "@/api/user/userRequestValidation"
+import verifyJWT from "@/common/middleware/verifyJWT"
+import { validateRequest } from "@/common/utils/httpHandlers"
+import { UserSchema } from "@zodSchema/index"
+import { userController } from "./userController"
 
-export const userRegistry = new OpenAPIRegistry();
-export const userRouter: Router = express.Router();
+export const userRegistry = new OpenAPIRegistry()
+export const userRouter: Router = express.Router()
 
-userRegistry.register("User", UserSchema);
+userRegistry.register("User", UserSchema)
 
 // List all users
 userRegistry.registerPath({
@@ -20,9 +20,9 @@ userRegistry.registerPath({
   path: "/users",
   tags: ["User"],
   responses: createApiResponse(z.array(UserSchema), "Success"),
-});
+})
 
-userRouter.get("/", verifyJWT, userController.getUsers);
+userRouter.get("/", verifyJWT, userController.getUsers)
 
 // Get a user's own information
 userRegistry.registerPath({
@@ -30,9 +30,9 @@ userRegistry.registerPath({
   path: "/users/me",
   tags: ["User"],
   responses: createApiResponse(z.array(UserSchema), "Success"),
-});
+})
 
-userRouter.get("/me", verifyJWT, userController.myInfo);
+userRouter.get("/me", verifyJWT, validateRequest(MeQuerySchema), userController.myInfo)
 
 // Get a user by ID
 userRegistry.registerPath({
@@ -41,9 +41,9 @@ userRegistry.registerPath({
   tags: ["User"],
   request: { params: GetUserSchema.shape.params },
   responses: createApiResponse(UserSchema, "Success"),
-});
+})
 
-userRouter.get("/:id", validateRequest(GetUserSchema), userController.getUser);
+userRouter.get("/:id", validateRequest(GetUserSchema), userController.getUser)
 
 // Create a new user
 userRegistry.registerPath({
@@ -52,9 +52,9 @@ userRegistry.registerPath({
   tags: ["User"],
   request: { params: CreateUserSchema.shape.body },
   responses: createApiResponse(UserSchema, "Success"),
-});
+})
 
-userRouter.post("/", validateRequest(CreateUserSchema), userController.register);
+userRouter.post("/", validateRequest(CreateUserSchema), userController.register)
 
 // Login a user
 userRegistry.registerPath({
@@ -63,6 +63,6 @@ userRegistry.registerPath({
   tags: ["User"],
   request: { params: LoginUserSchema.shape.body },
   responses: createApiResponse(UserSchema, "Success"),
-});
+})
 
-userRouter.post("/login", validateRequest(LoginUserSchema), userController.login);
+userRouter.post("/login", validateRequest(LoginUserSchema), userController.login)
