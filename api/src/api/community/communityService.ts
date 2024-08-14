@@ -1,9 +1,6 @@
-import type { ServiceResponse } from "@/common/models/serviceResponse"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
-import dbClient, { prismaExclude } from "@/db"
-import { logger } from "@/server"
-import { PrismaClient, type Prisma, type Community, Membership, CommunityStatus } from "@prisma/client"
-import bcrypt from "bcrypt"
+import dbClient from "@/db"
+import { type Prisma, type Community, Membership, CommunityStatus } from "@prisma/client"
 
 type CommunityQuery = Prisma.CommunityGetPayload<{
     select: {
@@ -19,11 +16,12 @@ type QueryPaging = {
 }
 
 export class CommunityService {
-    findById(id: string): Promise<Community | null> {
+    findById(id: string, include?: Prisma.CommunityInclude): Promise<Community | null> {
         return dbClient.community.findFirst({
             where: {
                 id,
-            }
+            },
+            include,
         })
     }
 

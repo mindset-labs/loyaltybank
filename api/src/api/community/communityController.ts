@@ -6,7 +6,9 @@ import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
 import { communityService } from "./communityService"
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
-import { CommunityStatus } from '@prisma/client'
+import { CommunityStatus, Prisma } from '@prisma/client'
+import { logger } from '@/server'
+import { CommunityIncludeSchema } from '@zodSchema/index'
 
 class CommunityController {
     public communities: RequestHandler = async (req: Request, res: Response) => {
@@ -26,8 +28,20 @@ class CommunityController {
     };
 
     public getCommunityById: RequestHandler = async (req: Request, res: Response) => {
+        let include: Prisma.CommunityInclude = {}
+
+        if (req.query.include) {
+            try {
+                const parsed = JSON.parse(req.query.include as string)
+                CommunityIncludeSchema.parse(parsed)
+                include = parsed
+            } catch (error) {
+                logger.error('Failed to parse include query', error)
+            }
+        }
+
         return communityService
-            .findById(req.params.id)
+            .findById(req.params.id, include)
             .then((community) => handleSuccessResponse({ community }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };
