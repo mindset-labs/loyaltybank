@@ -1,8 +1,9 @@
-import { prismaExclude } from '@/db'
-import { Prisma } from '@prisma/client'
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import { z } from 'zod'
 
-export const CreateCommunitySchema = z.object({
+extendZodWithOpenApi(z)
+
+export const CreateOrUpdateCommunitySchema = z.object({
     body: z.object({
         name: z.string(),
         description: z.string().optional(),
@@ -11,16 +12,4 @@ export const CreateCommunitySchema = z.object({
         imageUrl: z.string().optional(),
         metadata: z.record(z.string()).optional(),
     })
-})
-
-// Input and Type validation for user creation
-export const UpdateCommunitySchema = z.object({
-    body: z.object({
-        name: z.string(),
-        description: z.string().optional(),
-        isPrivate: z.boolean().optional(),
-        pointsTokenName: z.string().optional(),
-        imageUrl: z.string().optional(),
-        metadata: z.record(z.string()).optional(),
-    }),
 })
