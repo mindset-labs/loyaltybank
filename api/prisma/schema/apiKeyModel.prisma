@@ -1,0 +1,26 @@
+model ApiKey {
+    id          String   @id @default(uuid())
+    key         String   @unique
+    description String?
+    metadata    Json?
+    status      ApiKeyStatus @default(ACTIVE)
+    accessLevel ApiKeyAccessLevel @default(READ_ONLY)
+    secret      String
+    createdById String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+
+    // relationships
+    createdBy User @relation(fields: [createdById], references: [id])
+}
+
+enum ApiKeyStatus {
+    ACTIVE
+    INACTIVE
+    ARCHIVED
+}
+
+enum ApiKeyAccessLevel {
+    READ_ONLY
+    READ_WRITE
+}

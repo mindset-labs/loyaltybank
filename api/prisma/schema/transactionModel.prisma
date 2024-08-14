@@ -10,6 +10,7 @@ model Transaction {
     senderWalletId String
     receiverWalletId String
     communityId String?
+    eventId     String?
     metadata    Json?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @default(now())
@@ -20,13 +21,14 @@ model Transaction {
     community Community? @relation(fields: [communityId], references: [id])
     senderWallet Wallet @relation("senderWallet", fields: [senderWalletId], references: [id])
     receiverWallet Wallet @relation("receiverWallet", fields: [receiverWalletId], references: [id])
+    event Event? @relation(fields: [eventId], references: [id])
 }
 
 enum TransactionType {
     DEPOSIT
     WITHDRAW
     TRANSFER
-    REWARDS
+    REWARD
 }
 
 enum TransactionSubtype {

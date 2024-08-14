@@ -8,6 +8,7 @@ model User {
   twoFactorSecret String?
   role            Role     @default(USER)
   resetPasswordToken String?
+  managedById     String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now())
 
@@ -17,10 +18,18 @@ model User {
   transactionsSent Transaction[] @relation("sender")
   transactionsReceived Transaction[] @relation("receiver")
   wallets Wallet[]
+  sharedWallets UserOnWallet[]
+  managedBy User? @relation("managedBy", fields: [managedById], references: [id])
+  managedByMe User[] @relation("managedBy")
+  events Event[]
+  apiKeys ApiKey[]
 }
 
 enum Role {
+  SYSTEM
+  SYSTEM_ADMIN
   ADMIN
   MANAGER
   USER
+  MANAGED_USER
 }

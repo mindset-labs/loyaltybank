@@ -1,0 +1,24 @@
+model UserOnWallet {
+    userId      String
+    walletId    String
+    role        WalletRole
+    dailyLimit  Float?
+    weeklyLimit Float?
+    monthlyLimit Float?
+    metadata    Json?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+    
+    // relationships
+    user User @relation(fields: [userId], references: [id])
+    wallet Wallet @relation(fields: [walletId], references: [id])
+
+    // composite PK
+    @@id([userId, walletId])
+}
+
+enum WalletRole {
+    OWNER
+    ADMIN
+    MEMBER
+}

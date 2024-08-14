@@ -1,9 +1,11 @@
 model Wallet {
     id          String   @id @default(uuid())
+    name        String
     address     String   @unique
     token       String   @default("POINTS")
     communityId String?
     balance     Float    @default(0)
+    isShared    Boolean  @default(false)
     ownerId     String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @default(now())
@@ -13,6 +15,7 @@ model Wallet {
     sentTransactions Transaction[] @relation("senderWallet")
     receivedTransactions Transaction[] @relation("receiverWallet")
     community Community? @relation(fields: [communityId], references: [id])
+    users UserOnWallet[]
 
     // indices
     @@unique([address, token])

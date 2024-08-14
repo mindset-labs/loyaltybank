@@ -16,6 +16,7 @@ model Community {
     createdBy    User     @relation(fields: [createdById], references: [id])
     transactions Transaction[]
     wallets      Wallet[]
+    events       Event[]
 }
 
 enum CommunityStatus {
