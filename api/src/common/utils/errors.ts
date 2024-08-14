@@ -7,6 +7,7 @@ export enum CustomErrorCode {
   INVALID_REQUEST_DATA = 104,
   INVALID_TOKEN = 105,
   INVALID_ACCESS_CONTROL = 106,
+  INVALID_API_KEY = 107,
 
   // community errors
   INVALID_COMMUNITY = 200,
