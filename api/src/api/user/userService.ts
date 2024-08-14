@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes"
 import type { CreateUserDataType, LoginUserDataType } from "./userRequestValidation"
 
 // Omit the password and twoFactorSecret fields from the User type
-const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret"])
+const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret", "resetPasswordToken"])
 type UserWithoutSecrets = Prisma.UserGetPayload<{
   select: typeof userOmitSecrets
 }>
@@ -98,23 +98,10 @@ export class UserService {
     throw new Error("Not implemented")
   }
 
-  async myInfo(userId: string): Promise<UserWithoutSecrets | null> {
+  async myInfo(userId: string, include?: Prisma.UserInclude): Promise<UserWithoutSecrets | null> {
     return dbClient.user.findFirst({
       where: { id: userId },
-      include: {
-        wallets: true,
-        memberships: {
-          include: {
-            community: {
-              select: {
-                id: true,
-                name: true,
-                description: true,
-              }
-            },
-          },
-        },
-      }
+      include,
     })
   }
 }

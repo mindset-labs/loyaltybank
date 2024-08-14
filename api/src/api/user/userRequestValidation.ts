@@ -34,6 +34,6 @@ export type LoginUserDataType = z.infer<typeof LoginUserSchema.shape.body>
 // Query parameter validation for /me endpoint
 export const MeQuerySchema = z.object({
   query: z.object({
-    includeDetails: z.boolean().optional(),
+    include: z.string().optional(),
   }),
 })

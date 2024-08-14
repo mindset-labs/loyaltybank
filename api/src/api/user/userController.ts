@@ -1,6 +1,8 @@
 import { userService } from "@/api/user/userService"
 import { env } from "@/common/utils/envConfig"
+import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { handleErrorResponse, handleSuccessResponse } from "@/common/utils/httpHandlers"
+import { UserIncludeSchema } from '@zodSchema/index'
 import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
@@ -35,9 +37,19 @@ class UserController {
   };
 
   public myInfo: RequestHandler = async (req: Request, res: Response) => {
-    if (req.query.includeDetails) {
+    if (req.query.include) {
+      let include: Record<string, unknown> = {}
+      try {
+        const parsed = JSON.parse(req.query.include as string)
+        UserIncludeSchema.parse(parsed)
+        include = parsed
+      } catch (err) {
+        const error = new CustomError("Invalid inputs", CustomErrorCode.INVALID_REQUEST_DATA, err)
+        return handleErrorResponse(error, res, StatusCodes.BAD_REQUEST)
+      }
+
       return userService
-        .myInfo(req.userId!)
+        .myInfo(req.userId!, include)
         .then((user) => handleSuccessResponse({ user }, res, StatusCodes.OK))
         .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     }
