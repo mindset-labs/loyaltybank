@@ -4,7 +4,7 @@ model Community {
     description     String?
     imageUrl        String?
     metadata        Json?
-    pointsTokenName String?
+    pointsTokenName String          @default("POINTS")
     isPublic        Boolean         @default(false)
     status          CommunityStatus @default(DRAFT)
     createdById     String

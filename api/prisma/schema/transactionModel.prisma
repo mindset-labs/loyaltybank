@@ -3,8 +3,10 @@ model Transaction {
     amount             Float
     transactionType    TransactionType
     transactionSubtype TransactionSubtype
-    transactionStatus  TransactionStatus  @default(PENDING)
+    status             TransactionStatus  @default(PENDING)
     description        String?
+    tags               String[]           @default([])
+    // invoiceId          String?
     senderId           String
     receiverId         String
     senderWalletId     String
@@ -24,6 +26,7 @@ model Transaction {
 }
 
 enum TransactionType {
+    PAYMENT
     DEPOSIT
     WITHDRAW
     TRANSFER

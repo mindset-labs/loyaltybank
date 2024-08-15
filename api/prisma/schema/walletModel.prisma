@@ -1,7 +1,7 @@
 model Wallet {
     id          String   @id @default(uuid())
     name        String
-    address     String   @unique
+    address     String   @unique @default(uuid())
     token       String   @default("POINTS")
     communityId String?
     balance     Float    @default(0)
