@@ -58,7 +58,7 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const AchievementScalarFieldEnumSchema = z.enum(['id','name','description','rewardType','rewardAmount','conditionType','conditionEventId','conditionEventValue','conditionValue','conditionMinValue','conditionMaxValue','conditionDateFrom','conditionDateTo','status','frequencyLimit','dateFrom','dateTo','communityId','createdById','metadata','createdAt','updatedAt']);
 
-export const AchievementRewardScalarFieldEnumSchema = z.enum(['id','achievementId','userId','walletId','createdAt']);
+export const AchievementRewardScalarFieldEnumSchema = z.enum(['id','achievementId','userId','walletId','createdAt','claimedAt']);
 
 export const ApiKeyScalarFieldEnumSchema = z.enum(['id','key','description','metadata','status','accessLevel','secret','createdById','createdAt','updatedAt']);
 
@@ -72,7 +72,7 @@ export const MembershipScalarFieldEnumSchema = z.enum(['id','userId','communityI
 
 export const TransactionScalarFieldEnumSchema = z.enum(['id','amount','transactionType','transactionSubtype','transactionStatus','description','senderId','receiverId','senderWalletId','receiverWalletId','communityId','metadata','createdAt','updatedAt']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','name','email','password','phoneNumber','is2FAEnabled','twoFactorSecret','role','resetPasswordToken','managedById','createdAt','updatedAt']);
+export const UserScalarFieldEnumSchema = z.enum(['id','username','name','email','password','phoneNumber','is2FAEnabled','twoFactorSecret','role','resetPasswordToken','managedById','createdAt','updatedAt']);
 
 export const UserOnWalletScalarFieldEnumSchema = z.enum(['userId','walletId','role','dailyLimit','weeklyLimit','monthlyLimit','metadata','createdAt','updatedAt']);
 
@@ -201,6 +201,7 @@ export const AchievementRewardSchema = z.object({
   userId: z.string(),
   walletId: z.string().nullable(),
   createdAt: z.coerce.date(),
+  claimedAt: z.coerce.date().nullable(),
 })
 
 export type AchievementReward = z.infer<typeof AchievementRewardSchema>
@@ -389,6 +390,7 @@ export type TransactionPartial = z.infer<typeof TransactionPartialSchema>
 export const UserSchema = z.object({
   role: RoleSchema,
   id: z.string(),
+  username: z.string().cuid(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -542,6 +544,7 @@ export const AchievementRewardSelectSchema: z.ZodType<Prisma.AchievementRewardSe
   userId: z.boolean().optional(),
   walletId: z.boolean().optional(),
   createdAt: z.boolean().optional(),
+  claimedAt: z.boolean().optional(),
   achievement: z.union([z.boolean(),z.lazy(() => AchievementArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   wallet: z.union([z.boolean(),z.lazy(() => WalletArgsSchema)]).optional(),
@@ -830,6 +833,7 @@ export const UserCountOutputTypeSelectSchema: z.ZodType<Prisma.UserCountOutputTy
 
 export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   id: z.boolean().optional(),
+  username: z.boolean().optional(),
   name: z.boolean().optional(),
   email: z.boolean().optional(),
   password: z.boolean().optional(),
@@ -1104,6 +1108,7 @@ export const AchievementRewardWhereInputSchema: z.ZodType<Prisma.AchievementRewa
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   walletId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  claimedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   achievement: z.union([ z.lazy(() => AchievementRelationFilterSchema),z.lazy(() => AchievementWhereInputSchema) ]).optional(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   wallet: z.union([ z.lazy(() => WalletNullableRelationFilterSchema),z.lazy(() => WalletWhereInputSchema) ]).optional().nullable(),
@@ -1115,6 +1120,7 @@ export const AchievementRewardOrderByWithRelationInputSchema: z.ZodType<Prisma.A
   userId: z.lazy(() => SortOrderSchema).optional(),
   walletId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
+  claimedAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   achievement: z.lazy(() => AchievementOrderByWithRelationInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   wallet: z.lazy(() => WalletOrderByWithRelationInputSchema).optional()
@@ -1132,6 +1138,7 @@ export const AchievementRewardWhereUniqueInputSchema: z.ZodType<Prisma.Achieveme
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   walletId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  claimedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   achievement: z.union([ z.lazy(() => AchievementRelationFilterSchema),z.lazy(() => AchievementWhereInputSchema) ]).optional(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   wallet: z.union([ z.lazy(() => WalletNullableRelationFilterSchema),z.lazy(() => WalletWhereInputSchema) ]).optional().nullable(),
@@ -1143,6 +1150,7 @@ export const AchievementRewardOrderByWithAggregationInputSchema: z.ZodType<Prism
   userId: z.lazy(() => SortOrderSchema).optional(),
   walletId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
+  claimedAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => AchievementRewardCountOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => AchievementRewardMaxOrderByAggregateInputSchema).optional(),
   _min: z.lazy(() => AchievementRewardMinOrderByAggregateInputSchema).optional()
@@ -1157,6 +1165,7 @@ export const AchievementRewardScalarWhereWithAggregatesInputSchema: z.ZodType<Pr
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   walletId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  claimedAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
 }).strict();
 
 export const ApiKeyWhereInputSchema: z.ZodType<Prisma.ApiKeyWhereInput> = z.object({
@@ -1767,6 +1776,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   OR: z.lazy(() => UserWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => UserWhereInputSchema),z.lazy(() => UserWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  username: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   email: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   password: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
@@ -1795,6 +1805,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  username: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
   email: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -1824,10 +1835,26 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
   z.object({
     id: z.string(),
+    username: z.string().cuid(),
     email: z.string()
   }),
   z.object({
     id: z.string(),
+    username: z.string().cuid(),
+  }),
+  z.object({
+    id: z.string(),
+    email: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+  }),
+  z.object({
+    username: z.string().cuid(),
+    email: z.string(),
+  }),
+  z.object({
+    username: z.string().cuid(),
   }),
   z.object({
     email: z.string(),
@@ -1835,6 +1862,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
 ])
 .and(z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   email: z.string().optional(),
   AND: z.union([ z.lazy(() => UserWhereInputSchema),z.lazy(() => UserWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => UserWhereInputSchema).array().optional(),
@@ -1866,6 +1894,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  username: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
   email: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -1887,6 +1916,7 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   OR: z.lazy(() => UserScalarWhereWithAggregatesInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => UserScalarWhereWithAggregatesInputSchema),z.lazy(() => UserScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  username: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   name: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   email: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   password: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
@@ -2292,6 +2322,7 @@ export const AchievementUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Achieve
 export const AchievementRewardCreateInputSchema: z.ZodType<Prisma.AchievementRewardCreateInput> = z.object({
   id: z.string().optional(),
   createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable(),
   achievement: z.lazy(() => AchievementCreateNestedOneWithoutAchievementRewardInputSchema),
   user: z.lazy(() => UserCreateNestedOneWithoutAchievementRewardInputSchema),
   wallet: z.lazy(() => WalletCreateNestedOneWithoutAchievementRewardInputSchema).optional()
@@ -2302,12 +2333,14 @@ export const AchievementRewardUncheckedCreateInputSchema: z.ZodType<Prisma.Achie
   achievementId: z.string(),
   userId: z.string(),
   walletId: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const AchievementRewardUpdateInputSchema: z.ZodType<Prisma.AchievementRewardUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   achievement: z.lazy(() => AchievementUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
   wallet: z.lazy(() => WalletUpdateOneWithoutAchievementRewardNestedInputSchema).optional()
@@ -2319,6 +2352,7 @@ export const AchievementRewardUncheckedUpdateInputSchema: z.ZodType<Prisma.Achie
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AchievementRewardCreateManyInputSchema: z.ZodType<Prisma.AchievementRewardCreateManyInput> = z.object({
@@ -2326,12 +2360,14 @@ export const AchievementRewardCreateManyInputSchema: z.ZodType<Prisma.Achievemen
   achievementId: z.string(),
   userId: z.string(),
   walletId: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const AchievementRewardUpdateManyMutationInputSchema: z.ZodType<Prisma.AchievementRewardUpdateManyMutationInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AchievementRewardUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AchievementRewardUncheckedUpdateManyInput> = z.object({
@@ -2340,6 +2376,7 @@ export const AchievementRewardUncheckedUpdateManyInputSchema: z.ZodType<Prisma.A
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ApiKeyCreateInputSchema: z.ZodType<Prisma.ApiKeyCreateInput> = z.object({
@@ -2959,6 +2996,7 @@ export const TransactionUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Transac
 
 export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -2986,6 +3024,7 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -3013,6 +3052,7 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3040,6 +3080,7 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3067,6 +3108,7 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -3082,6 +3124,7 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
 
 export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyMutationInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3096,6 +3139,7 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
 
 export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3719,7 +3763,8 @@ export const AchievementRewardCountOrderByAggregateInputSchema: z.ZodType<Prisma
   achievementId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   walletId: z.lazy(() => SortOrderSchema).optional(),
-  createdAt: z.lazy(() => SortOrderSchema).optional()
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  claimedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AchievementRewardMaxOrderByAggregateInputSchema: z.ZodType<Prisma.AchievementRewardMaxOrderByAggregateInput> = z.object({
@@ -3727,7 +3772,8 @@ export const AchievementRewardMaxOrderByAggregateInputSchema: z.ZodType<Prisma.A
   achievementId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   walletId: z.lazy(() => SortOrderSchema).optional(),
-  createdAt: z.lazy(() => SortOrderSchema).optional()
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  claimedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AchievementRewardMinOrderByAggregateInputSchema: z.ZodType<Prisma.AchievementRewardMinOrderByAggregateInput> = z.object({
@@ -3735,7 +3781,8 @@ export const AchievementRewardMinOrderByAggregateInputSchema: z.ZodType<Prisma.A
   achievementId: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   walletId: z.lazy(() => SortOrderSchema).optional(),
-  createdAt: z.lazy(() => SortOrderSchema).optional()
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  claimedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const EnumApiKeyStatusFilterSchema: z.ZodType<Prisma.EnumApiKeyStatusFilter> = z.object({
@@ -4320,6 +4367,7 @@ export const ApiKeyOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ApiKeyO
 
 export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  username: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
   email: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -4335,6 +4383,7 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
 
 export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  username: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
   email: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -4350,6 +4399,7 @@ export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderBy
 
 export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
+  username: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
   email: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -6628,6 +6678,7 @@ export const NestedEnumWalletRoleWithAggregatesFilterSchema: z.ZodType<Prisma.Ne
 
 export const UserCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserCreateWithoutAchievementsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -6654,6 +6705,7 @@ export const UserCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserCrea
 
 export const UserUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAchievementsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -6729,6 +6781,7 @@ export const CommunityCreateOrConnectWithoutAchievementsInputSchema: z.ZodType<P
 export const AchievementRewardCreateWithoutAchievementInputSchema: z.ZodType<Prisma.AchievementRewardCreateWithoutAchievementInput> = z.object({
   id: z.string().optional(),
   createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable(),
   user: z.lazy(() => UserCreateNestedOneWithoutAchievementRewardInputSchema),
   wallet: z.lazy(() => WalletCreateNestedOneWithoutAchievementRewardInputSchema).optional()
 }).strict();
@@ -6737,7 +6790,8 @@ export const AchievementRewardUncheckedCreateWithoutAchievementInputSchema: z.Zo
   id: z.string().optional(),
   userId: z.string(),
   walletId: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const AchievementRewardCreateOrConnectWithoutAchievementInputSchema: z.ZodType<Prisma.AchievementRewardCreateOrConnectWithoutAchievementInput> = z.object({
@@ -6790,6 +6844,7 @@ export const UserUpdateToOneWithWhereWithoutAchievementsInputSchema: z.ZodType<P
 
 export const UserUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUpdateWithoutAchievementsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -6816,6 +6871,7 @@ export const UserUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUpda
 
 export const UserUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAchievementsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -6914,6 +6970,7 @@ export const AchievementRewardScalarWhereInputSchema: z.ZodType<Prisma.Achieveme
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   walletId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  claimedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
 }).strict();
 
 export const EventUpsertWithoutAchievementInputSchema: z.ZodType<Prisma.EventUpsertWithoutAchievementInput> = z.object({
@@ -7006,6 +7063,7 @@ export const AchievementCreateOrConnectWithoutAchievementRewardInputSchema: z.Zo
 
 export const UserCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserCreateWithoutAchievementRewardInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -7032,6 +7090,7 @@ export const UserCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.Use
 
 export const UserUncheckedCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAchievementRewardInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -7174,6 +7233,7 @@ export const UserUpdateToOneWithWhereWithoutAchievementRewardInputSchema: z.ZodT
 
 export const UserUpdateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUpdateWithoutAchievementRewardInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7200,6 +7260,7 @@ export const UserUpdateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.Use
 
 export const UserUncheckedUpdateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAchievementRewardInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7271,6 +7332,7 @@ export const WalletUncheckedUpdateWithoutAchievementRewardInputSchema: z.ZodType
 
 export const UserCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserCreateWithoutApiKeysInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -7297,6 +7359,7 @@ export const UserCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserCreateWit
 
 export const UserUncheckedCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutApiKeysInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -7339,6 +7402,7 @@ export const UserUpdateToOneWithWhereWithoutApiKeysInputSchema: z.ZodType<Prisma
 
 export const UserUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUpdateWithoutApiKeysInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7365,6 +7429,7 @@ export const UserUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUpdateWit
 
 export const UserUncheckedUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutApiKeysInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7429,6 +7494,7 @@ export const MembershipCreateManyCommunityInputEnvelopeSchema: z.ZodType<Prisma.
 
 export const UserCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserCreateWithoutMyCommunitiesInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -7455,6 +7521,7 @@ export const UserCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserCre
 
 export const UserUncheckedCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutMyCommunitiesInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -7751,6 +7818,7 @@ export const UserUpdateToOneWithWhereWithoutMyCommunitiesInputSchema: z.ZodType<
 
 export const UserUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUpdateWithoutMyCommunitiesInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7777,6 +7845,7 @@ export const UserUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUpd
 
 export const UserUncheckedUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutMyCommunitiesInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7979,6 +8048,7 @@ export const EventLogScalarWhereInputSchema: z.ZodType<Prisma.EventLogScalarWher
 
 export const UserCreateWithoutEventLogInputSchema: z.ZodType<Prisma.UserCreateWithoutEventLogInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -8005,6 +8075,7 @@ export const UserCreateWithoutEventLogInputSchema: z.ZodType<Prisma.UserCreateWi
 
 export const UserUncheckedCreateWithoutEventLogInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutEventLogInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -8195,6 +8266,7 @@ export const UserUpdateToOneWithWhereWithoutEventLogInputSchema: z.ZodType<Prism
 
 export const UserUpdateWithoutEventLogInputSchema: z.ZodType<Prisma.UserUpdateWithoutEventLogInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -8221,6 +8293,7 @@ export const UserUpdateWithoutEventLogInputSchema: z.ZodType<Prisma.UserUpdateWi
 
 export const UserUncheckedUpdateWithoutEventLogInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutEventLogInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -8419,6 +8492,7 @@ export const EventUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.Even
 
 export const UserCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserCreateWithoutEventsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -8445,6 +8519,7 @@ export const UserCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserCreateWith
 
 export const UserUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutEventsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -8630,6 +8705,7 @@ export const UserUpdateToOneWithWhereWithoutEventsInputSchema: z.ZodType<Prisma.
 
 export const UserUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUpdateWithoutEventsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -8656,6 +8732,7 @@ export const UserUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUpdateWith
 
 export const UserUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutEventsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -8763,6 +8840,7 @@ export const AchievementUpdateManyWithWhereWithoutConditionEventInputSchema: z.Z
 
 export const UserCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreateWithoutMembershipsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -8789,6 +8867,7 @@ export const UserCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreat
 
 export const UserUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutMembershipsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -8874,6 +8953,7 @@ export const UserUpdateToOneWithWhereWithoutMembershipsInputSchema: z.ZodType<Pr
 
 export const UserUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUpdateWithoutMembershipsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -8900,6 +8980,7 @@ export const UserUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUpdat
 
 export const UserUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutMembershipsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -8975,6 +9056,7 @@ export const CommunityUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Pr
 
 export const UserCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserCreateWithoutTransactionsSentInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9001,6 +9083,7 @@ export const UserCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.User
 
 export const UserUncheckedCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTransactionsSentInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9032,6 +9115,7 @@ export const UserCreateOrConnectWithoutTransactionsSentInputSchema: z.ZodType<Pr
 
 export const UserCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserCreateWithoutTransactionsReceivedInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9058,6 +9142,7 @@ export const UserCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.
 
 export const UserUncheckedCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTransactionsReceivedInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9261,6 +9346,7 @@ export const UserUpdateToOneWithWhereWithoutTransactionsSentInputSchema: z.ZodTy
 
 export const UserUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUpdateWithoutTransactionsSentInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -9287,6 +9373,7 @@ export const UserUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.User
 
 export const UserUncheckedUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTransactionsSentInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -9324,6 +9411,7 @@ export const UserUpdateToOneWithWhereWithoutTransactionsReceivedInputSchema: z.Z
 
 export const UserUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUpdateWithoutTransactionsReceivedInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -9350,6 +9438,7 @@ export const UserUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.
 
 export const UserUncheckedUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTransactionsReceivedInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -9781,6 +9870,7 @@ export const UserOnWalletCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.Use
 
 export const UserCreateWithoutManagedByMeInputSchema: z.ZodType<Prisma.UserCreateWithoutManagedByMeInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9807,6 +9897,7 @@ export const UserCreateWithoutManagedByMeInputSchema: z.ZodType<Prisma.UserCreat
 
 export const UserUncheckedCreateWithoutManagedByMeInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutManagedByMeInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9838,6 +9929,7 @@ export const UserCreateOrConnectWithoutManagedByMeInputSchema: z.ZodType<Prisma.
 
 export const UserCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserCreateWithoutManagedByInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -9864,6 +9956,7 @@ export const UserCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserCreateW
 
 export const UserUncheckedCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutManagedByInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -10067,6 +10160,7 @@ export const EventLogCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.EventLo
 export const AchievementRewardCreateWithoutUserInputSchema: z.ZodType<Prisma.AchievementRewardCreateWithoutUserInput> = z.object({
   id: z.string().optional(),
   createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable(),
   achievement: z.lazy(() => AchievementCreateNestedOneWithoutAchievementRewardInputSchema),
   wallet: z.lazy(() => WalletCreateNestedOneWithoutAchievementRewardInputSchema).optional()
 }).strict();
@@ -10075,7 +10169,8 @@ export const AchievementRewardUncheckedCreateWithoutUserInputSchema: z.ZodType<P
   id: z.string().optional(),
   achievementId: z.string(),
   walletId: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const AchievementRewardCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.AchievementRewardCreateOrConnectWithoutUserInput> = z.object({
@@ -10229,6 +10324,7 @@ export const UserUpdateToOneWithWhereWithoutManagedByMeInputSchema: z.ZodType<Pr
 
 export const UserUpdateWithoutManagedByMeInputSchema: z.ZodType<Prisma.UserUpdateWithoutManagedByMeInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10255,6 +10351,7 @@ export const UserUpdateWithoutManagedByMeInputSchema: z.ZodType<Prisma.UserUpdat
 
 export const UserUncheckedUpdateWithoutManagedByMeInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutManagedByMeInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10300,6 +10397,7 @@ export const UserScalarWhereInputSchema: z.ZodType<Prisma.UserScalarWhereInput> 
   OR: z.lazy(() => UserScalarWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => UserScalarWhereInputSchema),z.lazy(() => UserScalarWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  username: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   email: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   password: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
@@ -10411,6 +10509,7 @@ export const AchievementRewardUpdateManyWithWhereWithoutUserInputSchema: z.ZodTy
 
 export const UserCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCreateWithoutSharedWalletsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -10437,6 +10536,7 @@ export const UserCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCre
 
 export const UserUncheckedCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSharedWalletsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -10518,6 +10618,7 @@ export const UserUpdateToOneWithWhereWithoutSharedWalletsInputSchema: z.ZodType<
 
 export const UserUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUpdateWithoutSharedWalletsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10544,6 +10645,7 @@ export const UserUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUpd
 
 export const UserUncheckedUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSharedWalletsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10615,6 +10717,7 @@ export const WalletUncheckedUpdateWithoutUsersInputSchema: z.ZodType<Prisma.Wall
 
 export const UserCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserCreateWithoutWalletsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -10641,6 +10744,7 @@ export const UserCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserCreateWit
 
 export const UserUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutWalletsInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -10876,6 +10980,7 @@ export const EventLogCreateManyWalletInputEnvelopeSchema: z.ZodType<Prisma.Event
 export const AchievementRewardCreateWithoutWalletInputSchema: z.ZodType<Prisma.AchievementRewardCreateWithoutWalletInput> = z.object({
   id: z.string().optional(),
   createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable(),
   achievement: z.lazy(() => AchievementCreateNestedOneWithoutAchievementRewardInputSchema),
   user: z.lazy(() => UserCreateNestedOneWithoutAchievementRewardInputSchema)
 }).strict();
@@ -10884,7 +10989,8 @@ export const AchievementRewardUncheckedCreateWithoutWalletInputSchema: z.ZodType
   id: z.string().optional(),
   achievementId: z.string(),
   userId: z.string(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const AchievementRewardCreateOrConnectWithoutWalletInputSchema: z.ZodType<Prisma.AchievementRewardCreateOrConnectWithoutWalletInput> = z.object({
@@ -10910,6 +11016,7 @@ export const UserUpdateToOneWithWhereWithoutWalletsInputSchema: z.ZodType<Prisma
 
 export const UserUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUpdateWithoutWalletsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -10936,6 +11043,7 @@ export const UserUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUpdateWit
 
 export const UserUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutWalletsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -11093,12 +11201,14 @@ export const AchievementRewardCreateManyAchievementInputSchema: z.ZodType<Prisma
   id: z.string().optional(),
   userId: z.string(),
   walletId: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const AchievementRewardUpdateWithoutAchievementInputSchema: z.ZodType<Prisma.AchievementRewardUpdateWithoutAchievementInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
   wallet: z.lazy(() => WalletUpdateOneWithoutAchievementRewardNestedInputSchema).optional()
 }).strict();
@@ -11108,6 +11218,7 @@ export const AchievementRewardUncheckedUpdateWithoutAchievementInputSchema: z.Zo
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AchievementRewardUncheckedUpdateManyWithoutAchievementInputSchema: z.ZodType<Prisma.AchievementRewardUncheckedUpdateManyWithoutAchievementInput> = z.object({
@@ -11115,6 +11226,7 @@ export const AchievementRewardUncheckedUpdateManyWithoutAchievementInputSchema: 
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const MembershipCreateManyCommunityInputSchema: z.ZodType<Prisma.MembershipCreateManyCommunityInput> = z.object({
@@ -11797,6 +11909,7 @@ export const UserOnWalletCreateManyUserInputSchema: z.ZodType<Prisma.UserOnWalle
 
 export const UserCreateManyManagedByInputSchema: z.ZodType<Prisma.UserCreateManyManagedByInput> = z.object({
   id: z.string().optional(),
+  username: z.string().cuid().optional(),
   name: z.string(),
   email: z.string(),
   password: z.string(),
@@ -11873,7 +11986,8 @@ export const AchievementRewardCreateManyUserInputSchema: z.ZodType<Prisma.Achiev
   id: z.string().optional(),
   achievementId: z.string(),
   walletId: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const CommunityUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUpdateWithoutCreatedByInput> = z.object({
@@ -12150,6 +12264,7 @@ export const UserOnWalletUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Pr
 
 export const UserUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUpdateWithoutManagedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -12176,6 +12291,7 @@ export const UserUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUpdateW
 
 export const UserUncheckedUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutManagedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -12202,6 +12318,7 @@ export const UserUncheckedUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.Us
 
 export const UserUncheckedUpdateManyWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyWithoutManagedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -12403,6 +12520,7 @@ export const EventLogUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma
 export const AchievementRewardUpdateWithoutUserInputSchema: z.ZodType<Prisma.AchievementRewardUpdateWithoutUserInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   achievement: z.lazy(() => AchievementUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
   wallet: z.lazy(() => WalletUpdateOneWithoutAchievementRewardNestedInputSchema).optional()
 }).strict();
@@ -12412,6 +12530,7 @@ export const AchievementRewardUncheckedUpdateWithoutUserInputSchema: z.ZodType<P
   achievementId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AchievementRewardUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.AchievementRewardUncheckedUpdateManyWithoutUserInput> = z.object({
@@ -12419,6 +12538,7 @@ export const AchievementRewardUncheckedUpdateManyWithoutUserInputSchema: z.ZodTy
   achievementId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const TransactionCreateManySenderWalletInputSchema: z.ZodType<Prisma.TransactionCreateManySenderWalletInput> = z.object({
@@ -12483,7 +12603,8 @@ export const AchievementRewardCreateManyWalletInputSchema: z.ZodType<Prisma.Achi
   id: z.string().optional(),
   achievementId: z.string(),
   userId: z.string(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
 export const TransactionUpdateWithoutSenderWalletInputSchema: z.ZodType<Prisma.TransactionUpdateWithoutSenderWalletInput> = z.object({
@@ -12667,6 +12788,7 @@ export const EventLogUncheckedUpdateManyWithoutWalletInputSchema: z.ZodType<Pris
 export const AchievementRewardUpdateWithoutWalletInputSchema: z.ZodType<Prisma.AchievementRewardUpdateWithoutWalletInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   achievement: z.lazy(() => AchievementUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional()
 }).strict();
@@ -12676,6 +12798,7 @@ export const AchievementRewardUncheckedUpdateWithoutWalletInputSchema: z.ZodType
   achievementId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AchievementRewardUncheckedUpdateManyWithoutWalletInputSchema: z.ZodType<Prisma.AchievementRewardUncheckedUpdateManyWithoutWalletInput> = z.object({
@@ -12683,6 +12806,7 @@ export const AchievementRewardUncheckedUpdateManyWithoutWalletInputSchema: z.Zod
   achievementId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 /////////////////////////////////////////
