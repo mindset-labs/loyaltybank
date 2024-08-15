@@ -1,0 +1,51 @@
+// Represents the definition of an achievement within a community
+// It contains the configs / rules and the reward for the achievement
+
+model Achievement {
+    id                  String                   @id @default(uuid())
+    name                String
+    description         String?
+    rewardType          AchievementRewardType    @default(SIMPLE)
+    rewardAmount        Float                    @default(0)
+    // achievement condition fields
+    conditionType       AchievementConditionType @default(EVENT)
+    conditionEventId    String? // FK - if the condition is based on an event occurance
+    conditionEventValue Float? // the value of the event itself (ex: the amount of the transaction)
+    conditionValue      Float // the value of the condition (ex: number of transactions required for achievement)
+    conditionMinValue   Float?
+    conditionMaxValue   Float?
+    conditionDateFrom   DateTime?
+    conditionDateTo     DateTime?
+    status              AchievementStatus        @default(ACTIVE)
+    frequencyLimit      Int                      @default(1) // 0 means no limit
+    dateFrom            DateTime?
+    dateTo              DateTime?
+    communityId         String?
+    createdById         String
+    metadata            Json?
+    createdAt           DateTime                 @default(now())
+    updatedAt           DateTime                 @default(now())
+
+    // relationships
+    createdBy         User                @relation(fields: [createdById], references: [id])
+    community         Community?          @relation(fields: [communityId], references: [id])
+    achievementReward AchievementReward[]
+    conditionEvent    Event?              @relation(fields: [conditionEventId], references: [id])
+}
+
+enum AchievementRewardType {
+    SIMPLE // simple reward with a specific amount
+    COUPON // reward with a coupon
+    COMPLEX // complex reward with a set of rules
+}
+
+enum AchievementStatus {
+    ACTIVE
+    INACTIVE
+    ARCHIVED
+}
+
+enum AchievementConditionType {
+    EVENT
+    TRANSACTION
+}

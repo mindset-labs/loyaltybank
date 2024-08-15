@@ -1,0 +1,27 @@
+model EventLog {
+    id            String    @id @default(uuid())
+    name          String
+    type          EventType @default(SYSTEM)
+    value         Float?
+    description   String?
+    userId        String
+    communityId   String?
+    walletId      String?
+    transactionId String?
+    eventId       String
+    metadata      Json?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @default(now())
+
+    // relationships
+    user        User         @relation(fields: [userId], references: [id])
+    community   Community?   @relation(fields: [communityId], references: [id])
+    transaction Transaction? @relation(fields: [transactionId], references: [id])
+    wallet      Wallet?      @relation(fields: [walletId], references: [id])
+    Event       Event        @relation(fields: [eventId], references: [id])
+}
+
+enum EventType {
+    SYSTEM
+    COMMUNITY
+}

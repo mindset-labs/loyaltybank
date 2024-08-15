@@ -11,11 +11,13 @@ model Wallet {
     updatedAt   DateTime @default(now())
 
     // relationships
-    owner User @relation(fields: [ownerId], references: [id])
-    sentTransactions Transaction[] @relation("senderWallet")
-    receivedTransactions Transaction[] @relation("receiverWallet")
-    community Community? @relation(fields: [communityId], references: [id])
-    users UserOnWallet[]
+    owner                User                @relation(fields: [ownerId], references: [id])
+    sentTransactions     Transaction[]       @relation("senderWallet")
+    receivedTransactions Transaction[]       @relation("receiverWallet")
+    community            Community?          @relation(fields: [communityId], references: [id])
+    users                UserOnWallet[]
+    EventLog             EventLog[]
+    AchievementReward    AchievementReward[]
 
     // indices
     @@unique([address, token])

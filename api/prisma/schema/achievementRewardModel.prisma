@@ -1,0 +1,16 @@
+// Represents the earning of an achievement by a user
+// It is also used to count the frequency
+
+model AchievementReward {
+    id            String    @id @default(uuid())
+    achievementId String
+    userId        String
+    walletId      String?
+    createdAt     DateTime  @default(now())
+    claimedAt     DateTime?
+
+    // relationships
+    achievement Achievement @relation(fields: [achievementId], references: [id])
+    user        User        @relation(fields: [userId], references: [id])
+    wallet      Wallet?     @relation(fields: [walletId], references: [id])
+}

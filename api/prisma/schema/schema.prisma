@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["prismaSchemaFolder", "omitApi"]
 }
 
@@ -17,4 +17,8 @@ datasource db {
 generator zod {
   provider           = "zod-prisma-types"
   createPartialTypes = true
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
 }

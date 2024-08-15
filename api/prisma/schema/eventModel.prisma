@@ -2,16 +2,14 @@ model Event {
     id          String   @id @default(uuid())
     name        String
     description String?
-    conditions  Json?
-    actions     Json?
-    createdById String
-    communityId String
-    version     Int      @default(1)
+    userId      String
+    communityId String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @default(now())
 
     // relationships
-    createdBy    User     @relation(fields: [createdById], references: [id])
-    community    Community @relation(fields: [communityId], references: [id])
-    transactions Transaction[]
+    user        User          @relation(fields: [userId], references: [id])
+    community   Community?    @relation(fields: [communityId], references: [id])
+    events      EventLog[]
+    Achievement Achievement[]
 }
