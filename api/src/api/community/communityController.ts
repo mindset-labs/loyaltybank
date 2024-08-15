@@ -91,7 +91,7 @@ class CommunityController {
 
     public joinCommunity: RequestHandler = async (req: Request, res: Response) => {
         return communityService
-            .joinCommunity(req.params.id, req.userId!)
+            .joinCommunity(req.params.id, req.userId!, req.query)
             .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };

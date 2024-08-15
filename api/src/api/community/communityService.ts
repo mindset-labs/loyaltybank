@@ -15,6 +15,11 @@ type QueryPaging = {
     skip?: number,
 }
 
+type JoinCommunityOptions = {
+    createWallet?: boolean,
+    walletName?: string,
+}
+
 export class CommunityService {
     findById(id: string, include?: Prisma.CommunityInclude): Promise<Community | null> {
         return dbClient.community.findFirst({
@@ -73,13 +78,15 @@ export class CommunityService {
         })
     }
 
-    async joinCommunity(id: string, userId: string): Promise<Membership> {
+    async joinCommunity(id: string, userId: string, options?: JoinCommunityOptions): Promise<Membership> {
         // find the community
         const community = await dbClient.community.findFirst({
             where: {
                 id,
             }
         })
+
+        // TODO: add ability to join community via invite code
 
         if (!community) {
             throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
@@ -89,11 +96,27 @@ export class CommunityService {
             throw new CustomError('Community is not public', CustomErrorCode.COMMUNITY_NOT_PUBLIC)
         }
 
-        return dbClient.membership.create({
-            data: {
-                userId,
-                communityId: id,
+        return dbClient.$transaction(async () => {
+            const membership = await dbClient.membership.create({
+                data: {
+                    userId,
+                    communityId: id,
+                }
+            })
+
+            // create a wallet for the user if requested
+            if (options?.createWallet) {
+                await dbClient.wallet.create({
+                    data: {
+                        name: options?.walletName || `${community.name} Wallet`,
+                        ownerId: userId,
+                        communityId: community.id,
+                        token: community.pointsTokenName,
+                    }
+                })
             }
+
+            return membership
         })
     }
 }

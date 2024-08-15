@@ -10,6 +10,13 @@ export const GetCommunitySchema = z.object({
     })
 })
 
+export const JoinCommunitySchema = z.object({
+    query: z.object({
+        createWallet: z.boolean().optional(),
+        walletName: z.string().optional(),
+    })
+})
+
 export const CreateOrUpdateCommunitySchema = z.object({
     body: z.object({
         name: z.string(),
