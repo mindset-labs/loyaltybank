@@ -19,6 +19,6 @@ generator zod {
   createPartialTypes = true
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+// }
