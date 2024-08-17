@@ -14,6 +14,7 @@ import { env } from "@/common/utils/envConfig"
 import { paymentRouter } from './api/payment/paymentRouter'
 import { transactionRouter } from './api/transaction/transactionRouter'
 import { walletRouter } from './api/wallet/walletRouter'
+import { eventRouter } from './api/event/eventRouter'
 
 const logger = pino({ name: "server start" })
 const app: Express = express()
@@ -38,6 +39,7 @@ app.use("/communities", communityRouter)
 app.use('/transactions', transactionRouter)
 app.use('/wallets', walletRouter)
 app.use("/payments", paymentRouter)
+app.use("/events", eventRouter)
 
 // Swagger UI
 app.use(openAPIRouter)
