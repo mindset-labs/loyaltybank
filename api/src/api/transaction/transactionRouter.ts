@@ -22,14 +22,3 @@ transactionRegistry.registerPath({
 })
 
 transactionRouter.get("/", verifyJWT, transactionController.queryTransactions)
-
-// Add a new 
-transactionRegistry.registerPath({
-    method: "get",
-    path: "/transactions",
-    tags: ["Transaction"],
-    responses: createApiResponse(z.array(TransactionSchema), "Success"),
-})
-
-transactionRouter.get("/", verifyJWT, transactionController.myTransactions)
-
