@@ -7,7 +7,10 @@ export class PaymentController {
     createPayment: RequestHandler = async (req: Request, res: Response) => {
         paymentService
             .createPayment(req.userId!, req.body)
-            .then((transaction) => handleSuccessResponse(transaction, res, StatusCodes.CREATED))
+            .then(({ transaction, senderWallet }) => handleSuccessResponse({
+                transaction,
+                wallet: senderWallet
+            }, res, StatusCodes.CREATED))
             .catch((error) => handleErrorResponse(error, res))
     };
 }

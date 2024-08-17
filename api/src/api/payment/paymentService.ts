@@ -1,10 +1,15 @@
-import { Transaction, TransactionStatus, TransactionSubtype, TransactionType } from '@prisma/client'
+import { Transaction, TransactionStatus, TransactionSubtype, TransactionType, Wallet } from '@prisma/client'
+import { round } from 'lodash'
 import { CreatePaymentSchemaType } from './paymentRequestValidation'
 import db from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
+import { logger } from '@/server'
 
 export class PaymentService {
-    async createPayment(senderId: string, paymentRequest: CreatePaymentSchemaType): Promise<Transaction> {
+    async createPayment(senderId: string, paymentRequest: CreatePaymentSchemaType): Promise<{
+        transaction: Transaction,
+        senderWallet: Wallet
+    }> {
         // find the sender wallet
         const senderWallet = await db.wallet.findFirst({
             where: {
@@ -24,9 +29,9 @@ export class PaymentService {
             throw new CustomError('Invalid sender wallet ID', CustomErrorCode.INVALID_WALLET_ID, {
                 senderWalletId: paymentRequest.senderWalletId,
             })
-        } else if (Math.round(senderWallet.balance * 100) < Math.round(paymentRequest.amount * 100)) {
+        } else if (round(senderWallet.balance, 2) < round(paymentRequest.amount, 2)) {
             throw new CustomError('Insufficient funds', CustomErrorCode.INSUFFICIENT_FUNDS, {
-                balance: senderWallet.balance,
+                balance: round(senderWallet.balance, 2),
                 amount: paymentRequest.amount,
                 walletId: paymentRequest.senderWalletId,
             })
@@ -54,9 +59,14 @@ export class PaymentService {
                 senderToken: senderWallet.token,
                 receiverToken: receiverWallet.token,
             })
+        } else if (receiverWallet.id === senderWallet.id) {
+            throw new CustomError('Cannot send funds to the same wallet', CustomErrorCode.WALLET_CANNOT_SEND_TO_ITSELF, {
+                senderWalletId: paymentRequest.senderWalletId,
+                receiverWalletId: paymentRequest.receiverWalletId,
+            })
         }
 
-        const [transaction] = await db.$transaction(
+        const [transaction, senderWalletUpdated] = await db.$transaction(
             [
                 db.transaction.create({
                     data: {
@@ -95,7 +105,10 @@ export class PaymentService {
             ]
         )
 
-        return transaction
+        return {
+            transaction,
+            senderWallet: senderWalletUpdated
+        }
     }
 }
 

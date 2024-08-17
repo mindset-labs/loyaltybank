@@ -1,3 +1,4 @@
+import { TransactionSchema, WalletSchema } from '@zodSchema/index'
 import { z } from 'zod'
 
 // Input validation for creating a new transaction
@@ -14,3 +15,11 @@ export const CreatePaymentSchema = z.object({
     }),
 })
 export type CreatePaymentSchemaType = z.infer<typeof CreatePaymentSchema.shape.body>
+
+// Response schema for creating a new transaction
+export const NewPaymentResponseSchema = z.object({
+    body: z.object({
+        transaction: TransactionSchema,
+        wallet: WalletSchema,
+    }),
+})
