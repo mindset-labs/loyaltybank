@@ -1,6 +1,6 @@
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient from "@/db"
-import { type Prisma, type Community, Membership, CommunityStatus } from "@prisma/client"
+import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole } from "@prisma/client"
 import { env } from '@/common/utils/envConfig'
 
 type CommunityQuery = Prisma.CommunityGetPayload<{
@@ -28,6 +28,52 @@ export class CommunityService {
                 id,
             },
             include,
+        })
+    }
+
+    findByIdAndCheckAccess(communityId: string, userId: string, include?: Prisma.CommunityInclude): Promise<Community | null> {
+        return dbClient.community.findFirst({
+            where: {
+                id: communityId,
+                OR: [
+                    // community is public and active
+                    {
+                        status: CommunityStatus.ACTIVE,
+                        isPublic: true
+                    },
+                    // OR the community is created by the user
+                    { createdById: userId },
+                    // OR the user is a member of the community
+                    {
+                        memberships: {
+                            some: {
+                                userId,
+                            }
+                        }
+                    }
+                ]
+            }
+        })
+    }
+
+    async findByIdWithEditAccess(communityId: string, userId: string): Promise<Community | null> {
+        return dbClient.community.findFirst({
+            where: {
+                id: communityId,
+                OR: [
+                    // OR the community is created by the user
+                    { createdById: userId },
+                    // OR the user is a member of the community
+                    {
+                        memberships: {
+                            some: {
+                                userId,
+                                communityRole: CommunityRole.ADMIN,
+                            }
+                        }
+                    }
+                ]
+            }
         })
     }
 

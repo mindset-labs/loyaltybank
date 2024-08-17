@@ -41,7 +41,7 @@ class CommunityController {
         }
 
         return communityService
-            .findById(req.params.id, include)
+            .findByIdAndCheckAccess(req.params.id, req.userId!, include)
             .then((community) => handleSuccessResponse({ community }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };
@@ -57,7 +57,18 @@ class CommunityController {
     };
 
     public updateCommunity: RequestHandler = async (req: Request, res: Response) => {
-        // TODO: check if the user is the creator or has the right permissions
+        const canEdit = !!(await communityService.findByIdWithEditAccess(req.params.id, req.userId!))
+
+        if (!canEdit) {
+            return handleErrorResponse(
+                new CustomError('Invalid community or access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                    communityId: req.params.communityId,
+                    userId: req.userId,
+                }),
+                res,
+                StatusCodes.FORBIDDEN
+            )
+        }
 
         return communityService
             .updateCommunity(req.params.id, req.body)
