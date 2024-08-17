@@ -1,16 +1,16 @@
 model UserOnWallet {
-    userId      String
-    walletId    String
-    role        WalletRole
-    dailyLimit  Float?
-    weeklyLimit Float?
+    userId       String
+    walletId     String
+    role         WalletRole @default(MEMBER)
+    dailyLimit   Float?
+    weeklyLimit  Float?
     monthlyLimit Float?
-    metadata    Json?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @default(now())
-    
+    metadata     Json?
+    createdAt    DateTime   @default(now())
+    updatedAt    DateTime   @default(now())
+
     // relationships
-    user User @relation(fields: [userId], references: [id])
+    user   User   @relation(fields: [userId], references: [id])
     wallet Wallet @relation(fields: [walletId], references: [id])
 
     // composite PK

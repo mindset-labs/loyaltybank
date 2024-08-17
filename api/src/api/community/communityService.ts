@@ -1,6 +1,7 @@
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient from "@/db"
 import { type Prisma, type Community, Membership, CommunityStatus } from "@prisma/client"
+import { env } from '@/common/utils/envConfig'
 
 type CommunityQuery = Prisma.CommunityGetPayload<{
     select: {
@@ -83,6 +84,13 @@ export class CommunityService {
         const community = await dbClient.community.findFirst({
             where: {
                 id,
+            },
+            include: {
+                memberships: {
+                    where: {
+                        userId,
+                    },
+                }
             }
         })
 
@@ -90,6 +98,8 @@ export class CommunityService {
 
         if (!community) {
             throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
+        } else if (community.memberships.length > 0) {
+            throw new CustomError('User is already a member of the community', CustomErrorCode.USER_ALREADY_MEMBER)
         } else if (community.status !== CommunityStatus.ACTIVE) {
             throw new CustomError('Community is not active', CustomErrorCode.COMMUNITY_NOT_ACTIVE)
         } else if (!community.isPublic) {
@@ -112,6 +122,8 @@ export class CommunityService {
                         ownerId: userId,
                         communityId: community.id,
                         token: community.pointsTokenName,
+                        // start with a balance of 1000 points if not in production
+                        balance: env.DEFAULT_BALANCE,
                     }
                 })
             }

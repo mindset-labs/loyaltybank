@@ -11,7 +11,9 @@ import errorHandler from "@/common/middleware/errorHandler"
 import rateLimiter from "@/common/middleware/rateLimiter"
 import requestLogger from "@/common/middleware/requestLogger"
 import { env } from "@/common/utils/envConfig"
-import db from "@/db"
+import { paymentRouter } from './api/payment/paymentRouter'
+import { transactionRouter } from './api/transaction/transactionRouter'
+import { walletRouter } from './api/wallet/walletRouter'
 
 const logger = pino({ name: "server start" })
 const app: Express = express()
@@ -33,6 +35,9 @@ app.use(requestLogger)
 app.use("/health-check", healthCheckRouter)
 app.use("/users", userRouter)
 app.use("/communities", communityRouter)
+app.use('/transactions', transactionRouter)
+app.use('/wallets', walletRouter)
+app.use("/payments", paymentRouter)
 
 // Swagger UI
 app.use(openAPIRouter)

@@ -9,7 +9,7 @@ import type { CreateUserDataType, LoginUserDataType } from "./userRequestValidat
 
 // Omit the password and twoFactorSecret fields from the User type
 const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret", "resetPasswordToken"])
-type UserWithoutSecrets = Prisma.UserGetPayload<{
+export type UserWithoutSecrets = Prisma.UserGetPayload<{
   select: typeof userOmitSecrets
 }>
 
