@@ -1,10 +1,10 @@
 model EventLog {
     id            String    @id @default(uuid())
-    name          String
     type          EventType @default(SYSTEM)
     value         Float?
     description   String?
     userId        String
+    createdById   String
     communityId   String?
     walletId      String?
     transactionId String?
@@ -15,6 +15,7 @@ model EventLog {
 
     // relationships
     user        User         @relation(fields: [userId], references: [id])
+    createdBy   User         @relation("createdBy", fields: [createdById], references: [id])
     community   Community?   @relation(fields: [communityId], references: [id])
     transaction Transaction? @relation(fields: [transactionId], references: [id])
     wallet      Wallet?      @relation(fields: [walletId], references: [id])

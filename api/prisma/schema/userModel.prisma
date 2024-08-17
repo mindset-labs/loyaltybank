@@ -25,7 +25,8 @@ model User {
   events               Event[]
   apiKeys              ApiKey[]
   achievements         Achievement[]
-  EventLog             EventLog[]
+  eventLogs            EventLog[]
+  createdEventLogs     EventLog[]          @relation("createdBy")
   AchievementReward    AchievementReward[]
 }
 
