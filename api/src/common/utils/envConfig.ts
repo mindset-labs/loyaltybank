@@ -1,9 +1,9 @@
-import dotenv from "dotenv";
-import { cleanEnv, host, num, port, str, testOnly } from "envalid";
+import yenv from 'yenv'
+import { cleanEnv, host, num, port, str, testOnly } from "envalid"
 
-dotenv.config();
+const envValues = yenv('env.yaml')
 
-export const env = cleanEnv(process.env, {
+export const env = cleanEnv(envValues, {
   NODE_ENV: str({ devDefault: testOnly("test"), choices: ["development", "production", "test"] }),
   HOST: host({ devDefault: testOnly("localhost") }),
   PORT: port({ devDefault: testOnly(3000) }),
@@ -12,4 +12,5 @@ export const env = cleanEnv(process.env, {
   COMMON_RATE_LIMIT_WINDOW_MS: num({ devDefault: testOnly(1000) }),
   JWT_AUTH_SECRET: str({ devDefault: testOnly("test") }),
   DATABASE_URL: str({ devDefault: testOnly("localhost:5432") }),
-});
+  DEFAULT_BALANCE: num(),
+})
