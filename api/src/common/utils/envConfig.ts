@@ -11,6 +11,6 @@ export const env = cleanEnv(envValues, {
   COMMON_RATE_LIMIT_MAX_REQUESTS: num({ devDefault: testOnly(1000) }),
   COMMON_RATE_LIMIT_WINDOW_MS: num({ devDefault: testOnly(1000) }),
   JWT_AUTH_SECRET: str({ devDefault: testOnly("test") }),
-  DATABASE_URL: str({ devDefault: testOnly("localhost:5432") }),
+  DATABASE_URL: str(),
   DEFAULT_BALANCE: num(),
 })

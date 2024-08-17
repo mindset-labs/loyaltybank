@@ -15,6 +15,7 @@ export enum CustomErrorCode {
   COMMUNITY_NOT_ACTIVE = 201,
   COMMUNITY_NOT_PUBLIC = 202,
   USER_ALREADY_MEMBER = 203,
+  INVALID_COMMUNITY_ACCESS = 204,
 
   // payment errors
   INVALID_WALLET_ID = 301,
@@ -26,16 +27,22 @@ export enum CustomErrorCode {
   // wallet errors
   INVALID_RECIPIENT_ID = 401,
   WALLET_ALREADY_SHARED_WITH_USER = 402,
+
+  // event errors
+  UNKNOWN_EVENT = 501,
+  MUST_BE_EVENT_OWNER_OR_COMMUNITY_ADMIN = 502,
 }
 
 export class CustomError extends Error {
   message: string
-  data?: unknown
+  data: unknown
+  meta?: unknown // for prisma errors
   statusCode?: number
   code: CustomErrorCode
 
   constructor(message: string, code: CustomErrorCode, data: unknown = {}, statusCode = 500) {
     super(message)
+    this.name = 'CustomError'
     this.message = message
     this.code = code
     this.data = data
