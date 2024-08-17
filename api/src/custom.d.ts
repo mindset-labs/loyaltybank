@@ -1,10 +1,13 @@
-import { ApiKey } from '@prisma/client'
+import { UserWithoutSecrets } from './api/user/userService'
+import { type ApiKey } from '@prisma/client'
 
-declare namespace Express {
-  export interface Request {
-    userId?: string
-    user?: UserWithoutSecrets
-    tenantId?: string
-    apiKey?: ApiKey
+declare global {
+  namespace Express {
+    export interface Request {
+      userId?: string
+      user?: UserWithoutSecrets
+      tenantId?: string
+      apiKey?: ApiKey
+    }
   }
 }
