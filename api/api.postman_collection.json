@@ -1,0 +1,1483 @@
+{
+	"info": {
+		"_postman_id": "3cbe4f41-cced-4686-a82f-507a5375ce1d",
+		"name": "Loyalty Points API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37658396"
+	},
+	"item": [
+		{
+			"name": "0 - Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const requestData = JSON.parse(pm.request.body.raw);",
+									"",
+									"// set the auth token",
+									"pm.environment.set('TOKEN', responseData.data.token);",
+									"",
+									"// set the email and password",
+									"pm.environment.set('EMAIL', requestData.email);",
+									"pm.environment.set('PASSWORD', requestData.password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"username\": \"{{$randomUserName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/users/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"// set the auth token",
+									"pm.environment.set('TOKEN', responseData.data.token);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{EMAIL}}\",\n    \"password\": \"{{PASSWORD}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/users/login",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1 - Users",
+			"item": [
+				{
+					"name": "All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/users/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								"me"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{\"wallets\": true, \"memberships\": true}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "2 - Community",
+			"item": [
+				{
+					"name": "All Communities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Communities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/me",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Community",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"// set the auth token",
+									"pm.environment.set('COMMUNITY_ID', responseData.data.community.id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomStreetName}}\",\n    \"description\": \"{{$randomLoremParagraph}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/communities/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Community",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"UPDATED COMMUNITY NAME\",\n    \"status\": \"ACTIVE\",\n    \"isPublic\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Community",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}/join?createWallet=true&walletName=Community Wallet X",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}",
+								"join"
+							],
+							"query": [
+								{
+									"key": "createWallet",
+									"value": "true"
+								},
+								{
+									"key": "walletName",
+									"value": "Community Wallet X"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Community Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}?include={\"memberships\": { \"include\": { \"user\": true }}}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{\"memberships\": { \"include\": { \"user\": true }}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "3 - Wallets",
+			"item": [
+				{
+					"name": "My Wallets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('WALLET_ID', responseData.data.wallets[0].id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/wallets",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share Wallet",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"recipientId\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/wallets/{{WALLET_ID}}/share",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets",
+								"{{WALLET_ID}}",
+								"share"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "4 - Payments",
+			"item": [
+				{
+					"name": "Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"senderWalletId\": \"dc0c8704-7725-4b3d-9e8e-7a68ecd85fcd\",\n    \"receiverWalletId\": \"8d0b9870-c82c-4752-b25d-88b6422cca31\",\n    \"amount\": 0.01,\n    \"communityId\": \"815ed345-fd3a-4fc5-8ca0-258ac53cac3c\",\n    \"description\": \"test payment\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/payments/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"payments",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "99 - Test Runner",
+			"item": [
+				{
+					"name": "User 1 registers",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const requestData = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.test('Response should include a token', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('token')",
+									"})",
+									"",
+									"// set the auth token",
+									"pm.environment.set('TOKEN_1', responseData.data.token);",
+									"",
+									"// set the email and password",
+									"pm.environment.set('EMAIL_1', requestData.email);",
+									"pm.environment.set('PASSWORD_1', requestData.password);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"username\": \"{{$randomUserName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/users/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 gets own info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('USER_ID_1', responseData.data.user.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								"me"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{\"wallets\": true, \"memberships\": true}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 2 registers",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const requestData = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.test('Response should include a token', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('token')",
+									"})",
+									"",
+									"// set the auth token",
+									"pm.environment.set('TOKEN_2', responseData.data.token);",
+									"",
+									"// set the email and password",
+									"pm.environment.set('EMAIL_2', requestData.email);",
+									"pm.environment.set('PASSWORD_2', requestData.password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"username\": \"{{$randomUserName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/users/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 2 gets own info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('USER_ID_2', responseData.data.user.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_2}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								"me"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{\"wallets\": true, \"memberships\": true}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 creates community",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Response should include community details', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('community')",
+									"    pm.expect(responseData.data.community).to.haveOwnProperty('id')",
+									"})",
+									"",
+									"pm.test('Created community must have status DRAFT', () => {",
+									"    const community = responseData.data.community",
+									"    pm.expect(community.status).to.equal('DRAFT')",
+									"})",
+									"",
+									"pm.test('Created community must not be public by default', () => {",
+									"    const community = responseData.data.community",
+									"    pm.expect(community.isPublic).to.equal(false)",
+									"})",
+									"",
+									"// set the auth token",
+									"pm.environment.set('COMMUNITY_ID', responseData.data.community.id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomStreetName}}\",\n    \"description\": \"{{$randomLoremParagraph}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/communities/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 activates community",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Response should include community details', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('community')",
+									"    pm.expect(responseData.data.community).to.haveOwnProperty('id')",
+									"})",
+									"",
+									"pm.test('Community status must be changed to ACTIVE', () => {",
+									"    const community = responseData.data.community",
+									"    pm.expect(community.status).to.equal('ACTIVE')",
+									"})",
+									"",
+									"pm.test('Community isPublic must be set to true', () => {",
+									"    const community = responseData.data.community",
+									"    pm.expect(community.isPublic).to.equal(true)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"UPDATED COMMUNITY NAME\",\n    \"status\": \"ACTIVE\",\n    \"isPublic\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 joins community",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Response should include membership details', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('membership')",
+									"    pm.expect(responseData.data.membership).to.haveOwnProperty('id')",
+									"",
+									"    const communityId = pm.environment.get('COMMUNITY_ID')",
+									"    pm.expect(responseData.data.membership.communityId).to.equal(communityId)",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}/join?createWallet=true&walletName=Community Wallet X",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}",
+								"join"
+							],
+							"query": [
+								{
+									"key": "createWallet",
+									"value": "true"
+								},
+								{
+									"key": "walletName",
+									"value": "Community Wallet X"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 joins community again",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Request must be rejected', () => {",
+									"    pm.expect(pm.response.code).to.equal(500)",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}/join?createWallet=true&walletName=Community Wallet X",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}",
+								"join"
+							],
+							"query": [
+								{
+									"key": "createWallet",
+									"value": "true"
+								},
+								{
+									"key": "walletName",
+									"value": "Community Wallet X"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 2 joins community",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Response should include membership details', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('membership')",
+									"    pm.expect(responseData.data.membership).to.haveOwnProperty('id')",
+									"",
+									"    const communityId = pm.environment.get('COMMUNITY_ID')",
+									"    pm.expect(responseData.data.membership.communityId).to.equal(communityId)",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_2}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}/join?createWallet=true&walletName=Community Wallet X",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}",
+								"join"
+							],
+							"query": [
+								{
+									"key": "createWallet",
+									"value": "true"
+								},
+								{
+									"key": "walletName",
+									"value": "Community Wallet X"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 views wallets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const communityId = pm.environment.get('COMMUNITY_ID')",
+									"",
+									"pm.test('Response must contain at least one wallet', () => {",
+									"    pm.expect(responseData.data.wallets.length).to.be.above(0);",
+									"})",
+									"",
+									"pm.test('Response must contain a wallet for the community created', () => {",
+									"    const found = responseData.data.wallets",
+									"        .find((wallet) => wallet.communityId === communityId)",
+									"    ",
+									"    pm.expect(found).to.haveOwnProperty('id')",
+									"    pm.environment.set('WALLET_ID_1', found.id)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/wallets",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 2 views wallets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const communityId = pm.environment.get('COMMUNITY_ID')",
+									"",
+									"pm.test('Response must contain at least one wallet', () => {",
+									"    pm.expect(responseData.data.wallets.length).to.be.above(0);",
+									"})",
+									"",
+									"pm.test('Response must contain a wallet for the community created', () => {",
+									"    const found = responseData.data.wallets",
+									"        .find((wallet) => wallet.communityId === communityId)",
+									"    ",
+									"    pm.expect(found).to.haveOwnProperty('id')",
+									"    pm.environment.set('WALLET_ID_2', found.id)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_2}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/wallets",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 pays User 2",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"senderWalletId\": \"{{WALLET_ID_1}}\",\n    \"receiverWalletId\": \"{{WALLET_ID_2}}\",\n    \"amount\": 30,\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"description\": \"test payment\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/payments/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"payments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 3 registers",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const requestData = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.test('Response should include a token', () => {",
+									"    pm.expect(responseData.data).to.haveOwnProperty('token')",
+									"})",
+									"",
+									"// set the auth token",
+									"pm.environment.set('TOKEN_3', responseData.data.token);",
+									"",
+									"// set the email and password",
+									"pm.environment.set('EMAIL_3', requestData.email);",
+									"pm.environment.set('PASSWORD_3', requestData.password);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"username\": \"{{$randomUserName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/users/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 3 gets own info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('USER_ID_3', responseData.data.user.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_3}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								"me"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{\"wallets\": true, \"memberships\": true}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 shares wallet w. User 3",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"recipientId\": \"{{USER_ID_3}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/wallets/{{WALLET_ID_1}}/share",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets",
+								"{{WALLET_ID_1}}",
+								"share"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 3 views wallets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const communityId = pm.environment.get('COMMUNITY_ID')",
+									"",
+									"pm.test('Response must contain at least one wallet', () => {",
+									"    pm.expect(responseData.data.wallets.length).to.be.above(0);",
+									"})",
+									"",
+									"pm.test('Response must contain a wallet for the community created', () => {",
+									"    const found = responseData.data.wallets",
+									"        .find((wallet) => wallet.communityId === communityId)",
+									"    ",
+									"    pm.expect(found).to.haveOwnProperty('id')",
+									"    pm.environment.set('WALLET_ID_2', found.id)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_3}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/wallets?includeShared=true",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets"
+							],
+							"query": [
+								{
+									"key": "includeShared",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/health-check",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"health-check"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
