@@ -1,70 +1,66 @@
-# 🚀 Express TypeScript Boilerplate 2024
-
-[![Build](https://github.com/edwinhern/express-typescript-2024/actions/workflows/build.yml/badge.svg)](https://github.com/edwinhern/express-typescript-2024/actions/workflows/build.yml)
-[![Test](https://github.com/edwinhern/express-typescript-2024/actions/workflows/test.yml/badge.svg)](https://github.com/edwinhern/express-typescript-2024/actions/workflows/test.yml)
-[![Code Quality](https://github.com/edwinhern/express-typescript-2024/actions/workflows/code-quality.yml/badge.svg)](https://github.com/edwinhern/express-typescript-2024/actions/workflows/code-quality.yml)
-[![Docker Image CI](https://github.com/edwinhern/express-typescript-2024/actions/workflows/docker-image.yml/badge.svg)](https://github.com/edwinhern/express-typescript-2024/actions/workflows/docker-image.yml)
-
-``` code
-Hey There! 🙌 
-🤾 that ⭐️ button if you like this boilerplate. 
-```
+# 🌟 Open Rewards
 
 ## 🌟 Introduction
 
-Welcome to the Express TypeScript Boilerplate 2024 – a streamlined, efficient, and scalable foundation for building powerful backend services with modern tools and practices in Express.js and TypeScript.
+Open Rewards is a modern, scalable and exciting way to reward your customers. With a simple and easy-to-use API, you can integrate rewards into your application and delight your users with points, discounts, and more!
+
+Open Rewards also includes the ability to have wallet balances and log transactions which can support a fully functional points system, among other use cases.
+
+---
+
 
 ## 💡 Motivation
 
-This boilerplate aims to:
+The goal of Open Rewards is to provide a simple and easy-to-use API for developers to integrate rewards into their applications. We believe that rewards are a great way to engage users and build loyalty, and we want to make it easy for developers to add rewards to their applications.
 
-- ✨ Reduce setup time for new projects
-- 📊 Ensure code consistency and quality
-- ⚡  Facilitate rapid development
-- 🛡️ Encourage best practices in security, testing, and performance
+Most small business may not have the resources to build a rewards system from scratch, and that's where Open Rewards comes in. With Open Rewards, developers can quickly and easily integrate rewards into their applications, without having to worry about the complexity of building a rewards system from scratch.
+
+Points systems are a great way to engage users and build loyalty, and Open Rewards makes it easy to add a points system to your application. With Open Rewards, you can reward users for completing certain actions, such as making a purchase, referring a friend, or sharing your app on social media. You can also set up different rewards levels, so that users can earn more points as they complete more actions.
+
+
+---
+
 
 ## 🚀 Features
 
-- 📁 Modular Structure: Organized by feature for easy navigation and scalability
-- 💨 Faster Execution with tsx: Rapid TypeScript execution with `tsx` and type checking with `tsc`
-- 🌐 Stable Node Environment: Latest LTS Node version in `.nvmrc`
-- 🔧 Simplified Environment Variables: Managed with Envalid
-- 🔗 Path Aliases: Cleaner code with shortcut imports
-- 🔄 Renovate Integration: Automatic updates for dependencies
-- 🔒 Security: Helmet for HTTP header security and CORS setup
-- 📊 Logging: Efficient logging with `pino-http`
-- 🧪 Comprehensive Testing: Setup with Vitest and Supertest
-- 🔑 Code Quality Assurance: Husky and lint-staged for consistent quality
-- ✅ Unified Code Style: `Biomejs` for consistent coding standards
-- 📃 API Response Standardization: `ServiceResponse` class for consistent API responses
-- 🐳 Docker Support: Ready for containerization and deployment
-- 📝 Input Validation with Zod: Strongly typed request validation using `Zod`
-- 🧩 Swagger UI: Interactive API documentation generated from Zod schemas
+### Points System
 
-## 🛠️ Getting Started
+...
 
-### Video Demo
+### Wallet Balances
 
-For a visual guide, watch the [video demo](https://github.com/user-attachments/assets/b1698dac-d582-45a0-8d61-31131732b74e) to see the setup and running of the project.
+...
 
-### Step-by-Step Guide
+### Transaction Logs
 
-#### Step 1: 🚀 Initial Setup
+...
 
-- Clone the repository: `git clone https://github.com/edwinhern/express-typescript-2024.git`
-- Navigate: `cd express-typescript-2024`
-- Install dependencies: `npm ci`
+### Communities
 
-#### Step 2: ⚙️ Environment Configuration
+...
 
-- Create `.env`: Copy `.env.template` to `.env`
-- Update `.env`: Fill in necessary environment variables
+### Memberships and Roles
 
-#### Step 3: 🏃‍♂️ Running the Project
+...
 
-- Development Mode: `npm run dev`
-- Building: `npm run build`
-- Production Mode: Set `.env` to `NODE_ENV="production"` then `npm run build && npm run start`
+### Event Logs
+
+...
+
+### Achievements & Rewards
+
+...
+
+
+---
+
+
+## 📚 Documentation
+
+...
+
+
+---
 
 ## 🤝 Feedback and Contributions
 
