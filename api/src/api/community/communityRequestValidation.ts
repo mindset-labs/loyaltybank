@@ -27,3 +27,12 @@ export const CreateOrUpdateCommunitySchema = z.object({
         metadata: z.record(z.string()).optional(),
     })
 })
+
+export const IssueCommunityPointsSchema = z.object({
+    body: z.object({
+        amount: z.number(),
+        walletId: z.string().uuid(),
+        communityId: z.string().uuid(),
+        reason: z.string().optional(),
+    })
+})

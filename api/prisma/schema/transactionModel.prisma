@@ -7,9 +7,9 @@ model Transaction {
     description        String?
     tags               String[]           @default([])
     // invoiceId          String?
-    senderId           String
+    senderId           String?
     receiverId         String
-    senderWalletId     String
+    senderWalletId     String?
     receiverWalletId   String
     communityId        String?
     metadata           Json?
@@ -17,10 +17,10 @@ model Transaction {
     updatedAt          DateTime           @default(now())
 
     // relationships
-    sender         User       @relation("sender", fields: [senderId], references: [id])
+    sender         User?      @relation("sender", fields: [senderId], references: [id])
     receiver       User       @relation("receiver", fields: [receiverId], references: [id])
     community      Community? @relation(fields: [communityId], references: [id])
-    senderWallet   Wallet     @relation("senderWallet", fields: [senderWalletId], references: [id])
+    senderWallet   Wallet?    @relation("senderWallet", fields: [senderWalletId], references: [id])
     receiverWallet Wallet     @relation("receiverWallet", fields: [receiverWalletId], references: [id])
     EventLog       EventLog[]
 }

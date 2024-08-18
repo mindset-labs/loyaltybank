@@ -116,6 +116,13 @@ class CommunityController {
             .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };
+
+    public issueCommunityPoints: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .issuePoints(req.userId!, req.body)
+            .then((transaction) => handleSuccessResponse({ transaction }, res, StatusCodes.CREATED))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    }
 }
 
 export const communityController = new CommunityController()

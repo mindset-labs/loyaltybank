@@ -7,7 +7,7 @@ import verifyJWT from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { communityController } from "./communityController"
 import { CommunitySchema, MembershipSchema } from '@zodSchema/index'
-import { CreateOrUpdateCommunitySchema, GetCommunitySchema } from './communityRequestValidation'
+import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema } from './communityRequestValidation'
 
 export const communityRegistry = new OpenAPIRegistry()
 export const communityRouter: Router = express.Router()
@@ -73,6 +73,16 @@ communityRegistry.registerPath({
 })
 
 communityRouter.post("/:id/join", verifyJWT, communityController.joinCommunity)
+
+// Issue points to community member
+communityRegistry.registerPath({
+    method: "post",
+    path: "/communities/{id}/issue-points",
+    tags: ["Community"],
+    responses: createApiResponse(MembershipSchema, "Success"),
+})
+
+communityRouter.post("/:id/issue-points", verifyJWT, validateRequest(IssueCommunityPointsSchema), communityController.issueCommunityPoints)
 
 // Archive a community
 communityRegistry.registerPath({

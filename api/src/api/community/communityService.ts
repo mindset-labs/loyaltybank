@@ -1,7 +1,8 @@
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient from "@/db"
-import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole } from "@prisma/client"
+import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole, Transaction, TransactionType, TransactionSubtype } from "@prisma/client"
 import { env } from '@/common/utils/envConfig'
+import { round } from 'lodash'
 
 type CommunityQuery = Prisma.CommunityGetPayload<{
     select: {
@@ -176,6 +177,78 @@ export class CommunityService {
 
             return membership
         })
+    }
+
+    async issuePoints(
+        userId: string,
+        data: {
+            communityId: string,
+            walletId: string,
+            amount: number,
+            reason?: string,
+        }
+    ): Promise<Transaction> {
+        const { communityId, walletId, amount, reason } = data
+        // find the community
+        const community = await dbClient.community.findFirst({
+            where: {
+                id: communityId,
+            },
+            include: {
+                memberships: {
+                    where: {
+                        userId,
+                        communityRole: CommunityRole.ADMIN,
+                    }
+                }
+            }
+        })
+
+        if (!community) {
+            throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
+        } else if (community.memberships.length === 0 && community.createdById !== userId) {
+            throw new CustomError('User is not an admin of the community', CustomErrorCode.INVALID_ACCESS_CONTROL)
+        }
+
+        // find the wallet and check if the user has access to it
+        const wallet = await dbClient.wallet.findFirst({
+            where: {
+                id: walletId,
+            }
+        })
+
+        if (!wallet) {
+            throw new CustomError('Wallet not found', CustomErrorCode.INVALID_WALLET_ID)
+        } else if (wallet.communityId !== communityId) {
+            throw new CustomError('Wallet does not belong to the community', CustomErrorCode.INVALID_WALLET_FOR_COMMUNITY)
+        }
+
+        const [transaction, _] = await dbClient.$transaction([
+            dbClient.transaction.create({
+                data: {
+                    receiverWalletId: walletId,
+                    // reward points to the wallet owner
+                    receiverId: wallet.ownerId,
+                    senderId: userId,
+                    amount,
+                    transactionType: TransactionType.REWARD,
+                    transactionSubtype: TransactionSubtype.POINTS,
+                    description: reason || `Awarded by ${community.name} community's admin`,
+                }
+            }),
+            dbClient.wallet.update({
+                where: {
+                    id: walletId,
+                },
+                data: {
+                    balance: {
+                        increment: round(amount, 2),
+                    }
+                }
+            })
+        ])
+
+        return transaction
     }
 }
 
