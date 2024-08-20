@@ -3,18 +3,20 @@ import express, { type Express } from "express"
 import helmet from "helmet"
 import { pino } from "pino"
 
-import { openAPIRouter } from "@/api-docs/openAPIRouter"
-import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter"
-import { userRouter } from "@/api/user/userRouter"
-import { communityRouter } from "@/api/community/communityRouter"
 import errorHandler from "@/common/middleware/errorHandler"
 import rateLimiter from "@/common/middleware/rateLimiter"
 import requestLogger from "@/common/middleware/requestLogger"
 import { env } from "@/common/utils/envConfig"
+import eventQ from '@/worker/eventWorker'
+import { openAPIRouter } from "@/api-docs/openAPIRouter"
+import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter"
+import { userRouter } from "@/api/user/userRouter"
+import { communityRouter } from "@/api/community/communityRouter"
 import { paymentRouter } from './api/payment/paymentRouter'
 import { transactionRouter } from './api/transaction/transactionRouter'
 import { walletRouter } from './api/wallet/walletRouter'
 import { eventRouter } from './api/event/eventRouter'
+import { achievementRouter } from './api/achievement/achievementRouter'
 
 const logger = pino({ name: "server start" })
 const app: Express = express()
@@ -40,6 +42,7 @@ app.use('/transactions', transactionRouter)
 app.use('/wallets', walletRouter)
 app.use("/payments", paymentRouter)
 app.use("/events", eventRouter)
+app.use('/achievements', achievementRouter)
 
 // Swagger UI
 app.use(openAPIRouter)
