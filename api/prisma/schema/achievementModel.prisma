@@ -5,7 +5,7 @@ model Achievement {
     id                  String                   @id @default(uuid())
     name                String
     description         String?
-    rewardType          AchievementRewardType    @default(SIMPLE)
+    rewardType          AchievementRewardType    @default(POINTS)
     rewardAmount        Float                    @default(0)
     // achievement condition fields
     conditionType       AchievementConditionType @default(EVENT)
@@ -34,8 +34,9 @@ model Achievement {
 }
 
 enum AchievementRewardType {
-    SIMPLE // simple reward with a specific amount
+    POINTS // simple reward with a specific amount
     COUPON // reward with a coupon
+    BADGE // reward with a badge
     COMPLEX // complex reward with a set of rules
 }
 

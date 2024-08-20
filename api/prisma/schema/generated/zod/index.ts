@@ -88,7 +88,7 @@ export const JsonNullValueFilterSchema = z.enum(['DbNull','JsonNull','AnyNull',]
 
 export const NullsOrderSchema = z.enum(['first','last']);
 
-export const AchievementRewardTypeSchema = z.enum(['SIMPLE','COUPON','COMPLEX']);
+export const AchievementRewardTypeSchema = z.enum(['POINTS','COUPON','BADGE','COMPLEX']);
 
 export type AchievementRewardTypeType = `${z.infer<typeof AchievementRewardTypeSchema>}`
 
