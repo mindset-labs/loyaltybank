@@ -1,6 +1,6 @@
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient from "@/db"
-import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole, Transaction, TransactionType, TransactionSubtype } from "@prisma/client"
+import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole, Transaction, TransactionType, TransactionSubtype, MembershipStatus } from "@prisma/client"
 import { env } from '@/common/utils/envConfig'
 import { round } from 'lodash'
 
@@ -23,7 +23,7 @@ type JoinCommunityOptions = {
 }
 
 export class CommunityService {
-    findById(id: string, include?: Prisma.CommunityInclude): Promise<Community | null> {
+    findById(id: string, include: Prisma.CommunityInclude = {}): Promise<Community | null> {
         return dbClient.community.findFirst({
             where: {
                 id,
@@ -32,7 +32,7 @@ export class CommunityService {
         })
     }
 
-    findByIdAndCheckAccess(communityId: string, userId: string, include?: Prisma.CommunityInclude): Promise<Community | null> {
+    findByIdAndCheckAccess(communityId: string, userId: string, include: Prisma.CommunityInclude = {}): Promise<Community | null> {
         return dbClient.community.findFirst({
             where: {
                 id: communityId,
@@ -49,11 +49,15 @@ export class CommunityService {
                         memberships: {
                             some: {
                                 userId,
+                                membershipStatus: {
+                                    in: [MembershipStatus.ACTIVE, MembershipStatus.PENDING],
+                                }
                             }
                         }
                     }
                 ]
-            }
+            },
+            include,
         })
     }
 
@@ -146,7 +150,9 @@ export class CommunityService {
         if (!community) {
             throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
         } else if (community.memberships.length > 0) {
-            throw new CustomError('User is already a member of the community', CustomErrorCode.USER_ALREADY_MEMBER)
+            throw new CustomError('User is already a member of the community', CustomErrorCode.USER_ALREADY_MEMBER, {
+                membership: community.memberships[0],
+            })
         } else if (community.status !== CommunityStatus.ACTIVE) {
             throw new CustomError('Community is not active', CustomErrorCode.COMMUNITY_NOT_ACTIVE)
         } else if (!community.isPublic) {

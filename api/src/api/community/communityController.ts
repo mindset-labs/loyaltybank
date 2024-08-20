@@ -33,8 +33,7 @@ class CommunityController {
         if (req.query.include) {
             try {
                 const parsed = JSON.parse(req.query.include as string)
-                CommunityIncludeSchema.parse(parsed)
-                include = parsed
+                include = CommunityIncludeSchema.parse(parsed)
             } catch (error) {
                 logger.error('Failed to parse include query', error)
             }

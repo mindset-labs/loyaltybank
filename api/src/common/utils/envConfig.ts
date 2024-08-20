@@ -1,5 +1,5 @@
 import yenv from 'yenv'
-import { cleanEnv, host, num, port, str, testOnly } from "envalid"
+import { cleanEnv, host, num, port, str, testOnly, url } from "envalid"
 
 const envValues = yenv('env.yaml')
 
@@ -11,6 +11,7 @@ export const env = cleanEnv(envValues, {
   COMMON_RATE_LIMIT_MAX_REQUESTS: num({ devDefault: testOnly(1000) }),
   COMMON_RATE_LIMIT_WINDOW_MS: num({ devDefault: testOnly(1000) }),
   JWT_AUTH_SECRET: str({ devDefault: testOnly("test") }),
-  DATABASE_URL: str(),
+  DATABASE_URL: url(),
   DEFAULT_BALANCE: num(),
+  REDIS_URL: url(),
 })
