@@ -1697,7 +1697,7 @@
 									"        .find((wallet) => wallet.communityId === communityId)",
 									"    ",
 									"    pm.expect(found).to.haveOwnProperty('id')",
-									"    pm.environment.set('WALLET_ID_2', found.id)",
+									"    pm.environment.set('WALLET_ID_3', found.id)",
 									"})"
 								],
 								"type": "text/javascript",
@@ -1731,6 +1731,159 @@
 									"key": "includeShared",
 									"value": "true"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 1 awards User 2 points",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"walletId\": \"{{WALLET_ID_2}}\",\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"amount\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}/issue-points",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}",
+								"issue-points"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 2 queries wallet transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Response must contain exactly one transaction', () => {",
+									"    pm.expect(responseData.data.transactions.length).to.be.equal(1);",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_2}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/wallets/{{WALLET_ID_2}}/transactions?transactionType[in][]=REWARD&transactionType[in][]=PAYMENT",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets",
+								"{{WALLET_ID_2}}",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "transactionType[in][]",
+									"value": "REWARD"
+								},
+								{
+									"key": "transactionType[in][]",
+									"value": "PAYMENT"
+								},
+								{
+									"key": "status",
+									"value": "PENDING",
+									"disabled": true
+								},
+								{
+									"key": "transactionSubtype",
+									"value": "POINTS",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 3 pays via shared wallet",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"senderWalletId\": \"{{WALLET_ID_3}}\",\n    \"receiverWalletId\": \"{{WALLET_ID_2}}\",\n    \"amount\": 10,\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"description\": \"payment from shared wallet\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/payments/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"payments",
+								""
 							]
 						}
 					},
