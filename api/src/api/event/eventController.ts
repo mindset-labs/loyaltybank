@@ -7,7 +7,7 @@ import { addJob } from '@/worker/eventWorker'
 export class EventController {
     createEvent: RequestHandler = async (req: Request, res: Response) => {
         eventService
-            .createEvent({
+            .createEvent(req.userId!, {
                 ...req.body,
                 createdById: req.userId!
             })

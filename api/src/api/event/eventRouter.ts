@@ -7,7 +7,7 @@ import verifyJWT from "@/common/middleware/verifyJWT"
 import { eventController } from "./eventController"
 import { EventLogSchema, EventSchema } from '@zodSchema/index'
 import { validateRequest } from '@/common/utils/httpHandlers'
-import { CreateEventLogSchema, CreateEventSchema } from './walletRequestValidation'
+import { CreateEventLogSchema, CreateEventSchema } from './eventRequestValidation'
 
 export const eventRegistry = new OpenAPIRegistry()
 export const eventRouter: Router = express.Router()

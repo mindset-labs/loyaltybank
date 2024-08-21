@@ -6,6 +6,7 @@ import { UserIncludeSchema } from '@zodSchema/index'
 import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
+import { generateUUID } from '@/common/utils/random'
 
 class UserController {
   public getUsers: RequestHandler = async (_req: Request, res: Response) => {
@@ -55,6 +56,21 @@ class UserController {
     }
 
     handleSuccessResponse({ user: req.user }, res, StatusCodes.OK)
+  };
+
+  public createManagedUser: RequestHandler = async (req: Request, res: Response) => {
+    const emailSplit = req.user?.email.split("@")
+
+    userService
+      .createUser({
+        name: req.body.name,
+        email: `${emailSplit?.[0]}+${generateUUID()}@${emailSplit?.[1]}`,
+        password: generateUUID(),
+        managedById: req.userId!,
+      })
+      .then((user) => jwt.sign({ id: user.id, role: user.role }, env.JWT_AUTH_SECRET, {}))
+      .then((token) => handleSuccessResponse({ token }, res, StatusCodes.OK))
+      .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
 }
 

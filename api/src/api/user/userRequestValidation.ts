@@ -19,7 +19,13 @@ export const CreateUserSchema = z.object({
     password: z.string(),
   }),
 })
-export type CreateUserDataType = z.infer<typeof CreateUserSchema.shape.body>
+
+// Input and Type validation for creating a managed user
+export const CreateManagedUserSchema = z.object({
+  body: z.object({
+    name: z.string(),
+  }),
+})
 
 // Input and Type validation for user login
 export const LoginUserSchema = z.object({

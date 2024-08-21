@@ -1,10 +1,20 @@
 import { EventLog, Event, Prisma, CommunityRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
+import { communityService } from '../community/communityService'
 
 export class EventService {
     // Create a new event
-    async createEvent(data: Prisma.EventUncheckedCreateInput): Promise<Event> {
+    async createEvent(userId: string, data: Prisma.EventUncheckedCreateInput): Promise<Event> {
+        // check if the user is authorized to create an event
+        const community = await communityService.findByIdWithEditAccess(userId, data.communityId)
+
+        if (!community) {
+            throw new CustomError('Invalid community or access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                communityId: data.communityId,
+            })
+        }
+
         return dbClient.event.create({
             data,
         })

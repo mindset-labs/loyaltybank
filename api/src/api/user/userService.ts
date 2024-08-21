@@ -5,7 +5,7 @@ import { logger } from "@/server"
 import { PrismaClient, type Prisma, type User } from "@prisma/client"
 import bcrypt from "bcrypt"
 import { StatusCodes } from "http-status-codes"
-import type { CreateUserDataType, LoginUserDataType } from "./userRequestValidation"
+import type { LoginUserDataType } from "./userRequestValidation"
 
 // Omit the password and twoFactorSecret fields from the User type
 const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret", "resetPasswordToken"])
@@ -36,7 +36,7 @@ export class UserService {
   }
 
   // Creates a single user
-  async createUser(data: CreateUserDataType): Promise<UserWithoutSecrets> {
+  async createUser(data: Prisma.UserUncheckedCreateInput): Promise<UserWithoutSecrets> {
     const userFound = await dbClient.user.findFirst({ where: { email: data.email } })
 
     if (userFound) {
@@ -94,7 +94,7 @@ export class UserService {
     throw new Error("Not implemented")
   }
 
-  async updateMe(data: CreateUserDataType): Promise<ServiceResponse<null>> {
+  async updateMe(data: Prisma.UserUncheckedUpdateInput): Promise<ServiceResponse<null>> {
     throw new Error("Not implemented")
   }
 

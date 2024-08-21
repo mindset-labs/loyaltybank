@@ -3,7 +3,7 @@ import express, { type Router } from "express"
 import { z } from "zod"
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
-import { CreateUserSchema, GetUserSchema, LoginUserSchema, MeQuerySchema } from "@/api/user/userRequestValidation"
+import { CreateManagedUserSchema, CreateUserSchema, GetUserSchema, LoginUserSchema, MeQuerySchema } from "@/api/user/userRequestValidation"
 import verifyJWT from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { UserSchema } from "@zodSchema/index"
@@ -55,6 +55,17 @@ userRegistry.registerPath({
 })
 
 userRouter.post("/", validateRequest(CreateUserSchema), userController.register)
+
+// Get a managed user by ID
+userRegistry.registerPath({
+  method: "post",
+  path: "/users/managed",
+  tags: ["User"],
+  request: { params: CreateUserSchema.shape.body },
+  responses: createApiResponse(UserSchema, "Success"),
+})
+
+userRouter.post("/managed", verifyJWT, validateRequest(CreateManagedUserSchema), userController.createManagedUser)
 
 // Login a user
 userRegistry.registerPath({
