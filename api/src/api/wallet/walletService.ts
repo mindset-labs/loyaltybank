@@ -6,31 +6,23 @@ import { TransactionWhereInputSchema } from '@zodSchema/index'
 import { StatusCodes } from 'http-status-codes'
 
 export class WalletService {
-    async userWallets(userId: string, options?: { includeShared?: boolean }): Promise<Wallet[]> {
-        const ownedWallets = await dbClient.wallet.findMany({
+    async userWallets(userId: string): Promise<Wallet[]> {
+        return dbClient.wallet.findMany({
             where: {
-                ownerId: userId,
-                isShared: false,
+                OR: [
+                    {
+                        ownerId: userId,
+                    },
+                    {
+                        users: {
+                            some: {
+                                userId,
+                            }
+                        }
+                    }
+                ]
             }
         })
-
-        if (!options?.includeShared) {
-            return ownedWallets
-        }
-
-        const sharedWallets = await dbClient.userOnWallet.findMany({
-            where: {
-                walletId: {
-                    notIn: ownedWallets.map((wallet) => wallet.id)
-                },
-                userId: userId
-            },
-            select: {
-                wallet: true
-            }
-        }).then((userOnWallets) => userOnWallets.map((userOnWallet) => userOnWallet.wallet))
-
-        return [...ownedWallets, ...sharedWallets]
     }
 
     async queryWalletTransactions(userId: string, walletId: string, query: Prisma.TransactionWhereInput): Promise<Transaction[]> {

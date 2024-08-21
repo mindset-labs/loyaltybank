@@ -6,7 +6,7 @@ import { walletService } from './walletService'
 export class WalletController {
     myWallets: RequestHandler = async (req: Request, res: Response) => {
         walletService
-            .userWallets(req.userId!, req.query)
+            .userWallets(req.userId!)
             .then((wallets) => handleSuccessResponse({ wallets }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res))
     };
