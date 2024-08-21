@@ -21,7 +21,7 @@ model User {
   wallets              Wallet[]
   sharedWallets        UserOnWallet[]
   managedBy            User?               @relation("managedBy", fields: [managedById], references: [id])
-  managedByMe          User[]              @relation("managedBy")
+  managedUsers         User[]              @relation("managedBy")
   events               Event[]
   apiKeys              ApiKey[]
   achievements         Achievement[]

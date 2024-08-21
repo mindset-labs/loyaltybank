@@ -3,16 +3,16 @@ model Event {
     name        String
     tag         String
     description String?
-    communityId String?
+    communityId String
     createdById String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @default(now())
 
     // relationships
-    createdBy   User          @relation(fields: [createdById], references: [id])
-    community   Community?    @relation(fields: [communityId], references: [id])
-    events      EventLog[]
-    Achievement Achievement[]
+    createdBy    User          @relation(fields: [createdById], references: [id])
+    community    Community     @relation(fields: [communityId], references: [id])
+    eventLogs    EventLog[]
+    achievements Achievement[]
 
     @@unique([tag, communityId])
 }

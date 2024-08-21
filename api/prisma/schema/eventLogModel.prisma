@@ -1,7 +1,7 @@
 model EventLog {
     id            String    @id @default(uuid())
     type          EventType @default(SYSTEM)
-    value         Float?
+    value         Float     @default(0)
     description   String?
     userId        String
     createdById   String

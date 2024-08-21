@@ -2,42 +2,42 @@
 // It contains the configs / rules and the reward for the achievement
 
 model Achievement {
-    id                  String                   @id @default(uuid())
-    name                String
-    description         String?
-    rewardType          AchievementRewardType    @default(POINTS)
-    rewardAmount        Float                    @default(0)
+    id                           String                              @id @default(uuid())
+    name                         String
+    description                  String?
+    rewardType                   AchievementRewardType               @default(POINTS)
+    rewardAmount                 Float                               @default(0)
     // achievement condition fields
-    conditionType       AchievementConditionType @default(EVENT)
-    conditionEventId    String? // FK - if the condition is based on an event occurance
-    conditionEventValue Float? // the value of the event itself (ex: the amount of the transaction)
-    conditionValue      Float // the value of the condition (ex: number of transactions required for achievement)
-    conditionMinValue   Float?
-    conditionMaxValue   Float?
-    conditionDateFrom   DateTime?
-    conditionDateTo     DateTime?
-    status              AchievementStatus        @default(ACTIVE)
-    frequencyLimit      Int                      @default(1) // 0 means no limit
-    dateFrom            DateTime?
-    dateTo              DateTime?
-    communityId         String?
-    createdById         String
-    metadata            Json?
-    createdAt           DateTime                 @default(now())
-    updatedAt           DateTime                 @default(now())
+    conditionEventId             String
+    conditionEventValue          Float // the value of the event itself (ex: the amount of the transaction)
+    conditionEventComparisonType AchievementConditionComparisionType
+    conditionEventAggregateType  AchievementConditionAggregateType
+    conditionEventCountLimit     Int? // count limit for the event occurance
+    conditionRawEvaluator        String? // raw eval of the condition, if aggregation and comparision is custom
+    conditionDateFrom            DateTime?
+    conditionDateTo              DateTime?
+    status                       AchievementStatus                   @default(ACTIVE)
+    frequencyLimit               Int                                 @default(1) // 0 means no limit
+    dateFrom                     DateTime?
+    dateTo                       DateTime?
+    communityId                  String
+    createdById                  String
+    metadata                     Json?
+    createdAt                    DateTime                            @default(now())
+    updatedAt                    DateTime                            @default(now())
 
     // relationships
-    createdBy         User                @relation(fields: [createdById], references: [id])
-    community         Community?          @relation(fields: [communityId], references: [id])
-    achievementReward AchievementReward[]
-    conditionEvent    Event?              @relation(fields: [conditionEventId], references: [id])
+    createdBy          User                @relation(fields: [createdById], references: [id])
+    community          Community           @relation(fields: [communityId], references: [id])
+    conditionEvent     Event               @relation(fields: [conditionEventId], references: [id])
+    achievementRewards AchievementReward[]
 }
 
 enum AchievementRewardType {
     POINTS // simple reward with a specific amount
+    POINTS_CUSTOM // calculated reward based on a custom formula
     COUPON // reward with a coupon
     BADGE // reward with a badge
-    COMPLEX // complex reward with a set of rules
 }
 
 enum AchievementStatus {
@@ -46,7 +46,21 @@ enum AchievementStatus {
     ARCHIVED
 }
 
-enum AchievementConditionType {
-    EVENT
-    TRANSACTION
+enum AchievementConditionComparisionType {
+    EQUAL
+    GREATER_THAN
+    GREATER_THAN_OR_EQUAL
+    LESS_THAN
+    LESS_THAN_OR_EQUAL
+    NOT_EQUAL
+    CUSTOM
+}
+
+enum AchievementConditionAggregateType {
+    SUM
+    COUNT
+    AVG
+    MIN
+    MAX
+    CUSTOM
 }
