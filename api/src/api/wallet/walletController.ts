@@ -1,8 +1,6 @@
 import type { Request, RequestHandler, Response } from "express"
-import dbClient from '@/db'
-import { handleErrorResponse, handleSuccessResponse } from '@/common/utils/httpHandlers'
 import { StatusCodes } from 'http-status-codes'
-import { CustomError, CustomErrorCode } from '@/common/utils/errors'
+import { handleErrorResponse, handleSuccessResponse } from '@/common/utils/httpHandlers'
 import { walletService } from './walletService'
 
 export class WalletController {
@@ -12,6 +10,13 @@ export class WalletController {
             .then((wallets) => handleSuccessResponse({ wallets }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res))
     };
+
+    queryWalletTransactions: RequestHandler = async (req: Request, res: Response) => {
+        walletService
+            .queryWalletTransactions(req.userId!, req.params.walletId, req.query)
+            .then((transactions) => handleSuccessResponse({ transactions }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res))
+    }
 
     shareWallet: RequestHandler = async (req: Request, res: Response) => {
         const { walletId } = req.params

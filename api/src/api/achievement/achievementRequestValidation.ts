@@ -19,3 +19,14 @@ export const CreateAchievementSchema = z.object({
         return true
     }),
 })
+
+// Update achievement schema
+export const UpdateAchievementSchema = z.object({
+    body: z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        rewardType: z.string().optional(),
+        rewardAmount: z.number().optional(),
+        status: z.string().optional(),
+    }),
+})

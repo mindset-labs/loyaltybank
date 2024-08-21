@@ -7,7 +7,7 @@ import verifyJWT from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { achievementController } from "./achievementController"
 import { AchievementSchema } from '@zodSchema/index'
-import { CreateAchievementSchema } from './achievementRequestValidation'
+import { CreateAchievementSchema, UpdateAchievementSchema } from './achievementRequestValidation'
 
 export const achievementRegistry = new OpenAPIRegistry()
 export const achievementRouter: Router = express.Router()
@@ -24,12 +24,22 @@ achievementRegistry.registerPath({
 
 achievementRouter.post("/", verifyJWT, validateRequest(CreateAchievementSchema), achievementController.createAchievement)
 
-// Create a reward for an achievement
+// Update an achievement
+achievementRegistry.registerPath({
+    method: "put",
+    path: "/achievement/{id}",
+    tags: ["Achievement"],
+    responses: createApiResponse(z.array(AchievementSchema), "Success"),
+})
+
+achievementRouter.put("/:id", verifyJWT, validateRequest(UpdateAchievementSchema), achievementController.updateAchievement)
+
+// Claim an achievement reward
 // achievementRegistry.registerPath({
-//     method: "get",
-//     path: "/achievement/{id}/reward",
+//     method: "post",
+//     path: "/achievement/{id}/rewards/{rewardId}/claim",
 //     tags: ["Achievement"],
-//     responses: createApiResponse(z.array(AchievementRewardSchema), "Success"),
+//     responses: createApiResponse(z.object({}), "Success"),
 // })
 
-// achievementRouter.get("/:achievementId/reward", verifyJWT, achievementController.createAchievementReward)
+// achievementRouter.post("/:achievementId/rewards/:rewardId/claim", verifyJWT, achievementController.claimAchievementReward)

@@ -7,14 +7,14 @@ import verifyJWT from "@/common/middleware/verifyJWT"
 import { walletController } from "./walletController"
 import { TransactionSchema, WalletSchema } from '@zodSchema/index'
 import { validateRequest } from '@/common/utils/httpHandlers'
-import { GetWalletsSchema } from './walletRequestValidation'
+import { GetWalletsSchema, GetWalletTransactionsSchema } from './walletRequestValidation'
 
 export const walletRegistry = new OpenAPIRegistry()
 export const walletRouter: Router = express.Router()
 
 walletRegistry.register("Transaction", TransactionSchema)
 
-// Query user's own transactions
+// Get all wallets for the user
 walletRegistry.registerPath({
     method: "get",
     path: "/wallets",
@@ -23,6 +23,16 @@ walletRegistry.registerPath({
 })
 
 walletRouter.get("/", verifyJWT, validateRequest(GetWalletsSchema), walletController.myWallets)
+
+// Query a specific wallet's transactions
+walletRegistry.registerPath({
+    method: "get",
+    path: "/wallets/{walletId}/transactions",
+    tags: ["Wallet"],
+    responses: createApiResponse(z.array(TransactionSchema), "Success"),
+})
+
+walletRouter.get("/:walletId/transactions", verifyJWT, validateRequest(GetWalletTransactionsSchema), walletController.queryWalletTransactions)
 
 // Share wallet with another user
 walletRegistry.registerPath({

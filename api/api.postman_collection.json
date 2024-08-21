@@ -134,11 +134,25 @@
 				},
 				{
 					"name": "My Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('USER_ID', responseData.data.user.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true}",
+							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true, \"managedUsers\": true}",
 							"host": [
 								"{{API_URL}}"
 							],
@@ -149,8 +163,35 @@
 							"query": [
 								{
 									"key": "include",
-									"value": "{\"wallets\": true, \"memberships\": true}"
+									"value": "{\"wallets\": true, \"memberships\": true, \"managedUsers\": true}"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Managed User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Managed User 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/users/managed",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"users",
+								"managed"
 							]
 						}
 					},
@@ -334,7 +375,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}?include={\"memberships\": { \"include\": { \"user\": true }}}",
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}?include={\"events\": true, \"memberships\": { \"include\": { \"user\": true }}, \"achievements\": true}",
 							"host": [
 								"{{API_URL}}"
 							],
@@ -345,8 +386,36 @@
 							"query": [
 								{
 									"key": "include",
-									"value": "{\"memberships\": { \"include\": { \"user\": true }}}"
+									"value": "{\"events\": true, \"memberships\": { \"include\": { \"user\": true }}, \"achievements\": true}"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Issue Community Points",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"walletId\": \"{{WALLET_ID}}\",\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"amount\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}/issue-points",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"communities",
+								"{{COMMUNITY_ID}}",
+								"issue-points"
 							]
 						}
 					},
@@ -415,6 +484,69 @@
 							],
 							"path": [
 								"wallets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Query Wallet Transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transactionType\": {\n        \"in\": [\"PAYMENT\"]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/wallets/{{WALLET_ID}}/transactions?transactionType[in][]=REWARD&transactionType[in][]=PAYMENT",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"wallets",
+								"{{WALLET_ID}}",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "transactionType[in][]",
+									"value": "REWARD"
+								},
+								{
+									"key": "transactionType[in][]",
+									"value": "PAYMENT"
+								},
+								{
+									"key": "status",
+									"value": "PENDING",
+									"disabled": true
+								},
+								{
+									"key": "transactionSubtype",
+									"value": "POINTS",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -506,6 +638,187 @@
 							],
 							"path": [
 								"payments",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "5 - Events & Event Logs",
+			"item": [
+				{
+					"name": "Create Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('EVENT_ID', responseData.data.event.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"name\": \"Test Event {{$randomAlphaNumeric}}\",\n    \"tag\": \"event_{{$randomInt}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/events/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"events",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Event Log",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"eventId\": \"{{EVENT_ID}}\",\n    \"userId\": \"{{USER_ID}}\",\n    \"type\": \"COMMUNITY\",\n    \"value\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/events/log",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"events",
+								"log"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "6 - Achievements & Rewards",
+			"item": [
+				{
+					"name": "Create Achievement",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"name\": \"Test Achievement {{$randomAlphaNumeric}}\",\n    \"conditionEventId\": \"{{EVENT_ID}}\",\n    \"conditionEventValue\": 10,\n    \"conditionEventComparisonType\": \"GREATER_THAN_OR_EQUAL\",\n    \"conditionEventAggregateType\": \"COUNT\",\n    \"rewardAmount\": 77\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/achievements/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"achievements",
 								""
 							]
 						}

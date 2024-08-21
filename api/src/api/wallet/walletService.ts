@@ -1,7 +1,9 @@
-import { Wallet, WalletRole } from '@prisma/client'
+import { Prisma, Transaction, Wallet, WalletRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { logger } from '@/server'
+import { TransactionWhereInputSchema } from '@zodSchema/index'
+import { StatusCodes } from 'http-status-codes'
 
 export class WalletService {
     async userWallets(userId: string, options?: { includeShared?: boolean }): Promise<Wallet[]> {
@@ -29,6 +31,47 @@ export class WalletService {
         }).then((userOnWallets) => userOnWallets.map((userOnWallet) => userOnWallet.wallet))
 
         return [...ownedWallets, ...sharedWallets]
+    }
+
+    async queryWalletTransactions(userId: string, walletId: string, query: Prisma.TransactionWhereInput): Promise<Transaction[]> {
+        const walletDetails = await dbClient.wallet.findFirst({
+            where: {
+                id: walletId,
+                OR: [
+                    {
+                        ownerId: userId,
+                    },
+                    {
+                        users: {
+                            some: {
+                                userId,
+                            }
+                        }
+                    }
+                ]
+            },
+        })
+
+        if (!walletDetails) {
+            throw new CustomError('Wallet not found or not accessible', CustomErrorCode.INVALID_WALLET_ID, {
+                walletId,
+                userId,
+            })
+        }
+
+        return dbClient.transaction.findMany({
+            where: {
+                ...query,
+                OR: [
+                    {
+                        senderWalletId: walletId,
+                    },
+                    {
+                        receiverWalletId: walletId,
+                    }
+                ],
+            }
+        })
     }
 
     async shareWallet(userId: string, walletId: string, recipientId: string): Promise<Wallet> {

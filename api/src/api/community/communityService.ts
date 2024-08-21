@@ -240,6 +240,7 @@ export class CommunityService {
                     transactionType: TransactionType.REWARD,
                     transactionSubtype: TransactionSubtype.POINTS,
                     description: reason || `Awarded by ${community.name} community's admin`,
+                    communityId,
                 }
             }),
             dbClient.wallet.update({

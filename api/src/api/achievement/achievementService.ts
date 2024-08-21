@@ -1,4 +1,4 @@
-import { Prisma, Achievement, AchievementReward, Role } from '@prisma/client'
+import { Prisma, Achievement, AchievementReward, Role, CommunityRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { communityService } from '../community/communityService'
@@ -39,6 +39,48 @@ export class AchievementService {
                 ...data,
                 createdById: userId,
             },
+        })
+    }
+
+    async updateAchievement(
+        userId: string,
+        id: string,
+        data: Prisma.AchievementUncheckedUpdateInput
+    ): Promise<Achievement> {
+        const achievement = await dbClient.achievement.findFirst({
+            where: {
+                id,
+            },
+            include: {
+                community: {
+                    include: {
+                        memberships: {
+                            where: {
+                                userId,
+                                communityRole: CommunityRole.ADMIN,
+                            },
+                        },
+                    }
+                },
+            }
+        })
+
+        if (!achievement) {
+            throw new CustomError('Achievement not found', CustomErrorCode.INVALID_ACHIEVEMENT, {
+                achievementId: id,
+            })
+        } else if (achievement.community?.memberships.length === 0) {
+            throw new CustomError('Invalid community or access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                communityId: achievement.communityId,
+                userId,
+            })
+        }
+
+        return dbClient.achievement.update({
+            where: {
+                id,
+            },
+            data,
         })
     }
 }

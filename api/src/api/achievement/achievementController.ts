@@ -10,12 +10,12 @@ export class AchievementController {
             .catch((error) => handleErrorResponse(error, res))
     };
 
-    // createAchievementReward: RequestHandler = async (req: Request, res: Response) => {
-    //     achievementService
-    //         .createAchievementReward(req.userId!, req.body)
-    //         .then((data) => handleSuccessResponse(data, res))
-    //         .catch((error) => handleErrorResponse(error, res))
-    // };
+    updateAchievement: RequestHandler = async (req: Request, res: Response) => {
+        achievementService
+            .updateAchievement(req.userId!, req.params.id, req.body)
+            .then((data) => handleSuccessResponse(data, res))
+            .catch((error) => handleErrorResponse(error, res))
+    };
 }
 
 export const achievementController = new AchievementController()

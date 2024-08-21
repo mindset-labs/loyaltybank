@@ -9,6 +9,7 @@ export enum CustomErrorCode {
   INVALID_ACCESS_CONTROL = 106,
   INVALID_API_KEY = 107,
   DATABASE_ERROR = 108,
+  INVALID_QUERY = 109,
 
   // community errors
   INVALID_COMMUNITY = 200,
@@ -32,6 +33,9 @@ export enum CustomErrorCode {
   // event errors
   UNKNOWN_EVENT = 501,
   MUST_BE_EVENT_OWNER_OR_COMMUNITY_ADMIN = 502,
+
+  // achievement errors
+  INVALID_ACHIEVEMENT = 601,
 }
 
 export class CustomError extends Error {
