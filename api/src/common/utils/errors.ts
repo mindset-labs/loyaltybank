@@ -36,6 +36,8 @@ export enum CustomErrorCode {
 
   // achievement errors
   INVALID_ACHIEVEMENT = 601,
+  INVALID_REWARD_CLAIM = 602,
+  INVALID_ACHIEVEMENT_REWARD = 603,
 }
 
 export class CustomError extends Error {

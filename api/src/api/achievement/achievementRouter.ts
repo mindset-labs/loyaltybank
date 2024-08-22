@@ -37,12 +37,22 @@ achievementRouter.put("/:id", verifyJWT, validateRequest(UpdateAchievementSchema
 // Update an achievement
 achievementRegistry.registerPath({
     method: "post",
-    path: "/achievement/{id}/issue-reward",
+    path: "/achievement/{id}/rewards/issue",
     tags: ["Achievement"],
     responses: createApiResponse(z.array(AchievementRewardSchema), "Success"),
 })
 
-achievementRouter.put("/:id/issue-reward", verifyJWT, achievementController.issueAchievementReward)
+achievementRouter.put("/:id/rewards/issue", verifyJWT, achievementController.issueAchievementReward)
+
+// Update an achievement
+achievementRegistry.registerPath({
+    method: "post",
+    path: "/achievement/{id}/rewards/claim",
+    tags: ["Achievement"],
+    responses: createApiResponse(z.array(AchievementRewardSchema), "Success"),
+})
+
+achievementRouter.put("/:id/rewards/claim", verifyJWT, achievementController.claimAchievementReward)
 
 // Claim an achievement reward
 // achievementRegistry.registerPath({

@@ -23,6 +23,13 @@ export class AchievementController {
             .then((data) => handleSuccessResponse(data, res))
             .catch((error) => handleErrorResponse(error, res))
     };
+
+    claimAchievementReward: RequestHandler = async (req: Request, res: Response) => {
+        achievementService
+            .claimAchievementReward(req.userId!, req.params.achievementId, req.params.rewardId)
+            .then((reward) => handleSuccessResponse(reward, res))
+            .catch((error) => handleErrorResponse(error, res))
+    };
 }
 
 export const achievementController = new AchievementController()

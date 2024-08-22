@@ -1,7 +1,8 @@
-import { Prisma, Achievement, AchievementReward, Role, CommunityRole } from '@prisma/client'
+import { Prisma, Achievement, AchievementReward, Role, CommunityRole, AchievementRewardType } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { communityService } from '../community/communityService'
+import { logger } from '@/server'
 
 export class AchievementService {
     /**
@@ -199,6 +200,77 @@ export class AchievementService {
                     walletId: data.walletId,
                     achievementId,
                     claimedAt,
+                },
+            })
+        })
+    }
+
+    /**
+     * This method will claim an achievement reward for a user.
+     * 
+     * @param userId The ID of the user claiming the reward
+     * @param rewardId The ID of the reward to claim
+     * @param walletId The ID of the wallet to claim to
+     * @returns Promise<AchievementReward>
+     */
+    async claimAchievementReward(userId: string, rewardId: string, walletId: string): Promise<AchievementReward> {
+        const reward = await dbClient.achievementReward.findFirst({
+            where: {
+                id: rewardId,
+                userId,
+            },
+            include: {
+                achievement: true,
+            }
+        })
+
+        if (!reward) {
+            throw new CustomError('Invalid reward', CustomErrorCode.INVALID_ACHIEVEMENT_REWARD, {
+                rewardId,
+                userId,
+            })
+        } else if (reward.claimedAt) {
+            throw new CustomError('Reward already claimed', CustomErrorCode.INVALID_REWARD_CLAIM, {
+                rewardId,
+                claimedAt: reward.claimedAt,
+                userId,
+            })
+        }
+
+        return dbClient.$transaction(async () => {
+            switch (reward.achievement.rewardType) {
+                case AchievementRewardType.POINTS:
+                    // Update the user's wallet balance
+                    await dbClient.wallet.update({
+                        where: {
+                            id: walletId,
+                        },
+                        data: {
+                            balance: {
+                                increment: reward.achievement.rewardAmount,
+                            },
+                        },
+                    })
+                    break
+                case AchievementRewardType.BADGE:
+                case AchievementRewardType.COUPON:
+                case AchievementRewardType.POINTS_CUSTOM:
+                    // TODO: handle other reward types for claims
+                    logger.error({
+                        rewardType: reward.achievement.rewardType,
+                        rewardId,
+                        userId,
+                    }, 'Unhandled reward type claim')
+                default:
+                    break
+            }
+
+            return dbClient.achievementReward.update({
+                where: {
+                    id: rewardId,
+                },
+                data: {
+                    claimedAt: new Date(),
                 },
             })
         })
