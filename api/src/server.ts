@@ -28,19 +28,21 @@ app.set("trust proxy", true)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use((req, res, next) => {
-    const parseBooleans = (obj: Record<string, unknown>) => {
+    const parseBooleansAndNull = (obj: Record<string, unknown>) => {
         for (const key in obj) {
             if (obj[key] === 'true') {
                 obj[key] = true
             } else if (obj[key] === 'false') {
                 obj[key] = false
+            } else if (obj[key] === 'null') {
+                obj[key] = null
             } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-                parseBooleans(obj[key] as Record<string, unknown>)
+                parseBooleansAndNull(obj[key] as Record<string, unknown>)
             }
         }
     }
 
-    parseBooleans(req.query)
+    parseBooleansAndNull(req.query)
     next()
 })
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))

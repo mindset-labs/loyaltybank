@@ -2,6 +2,7 @@ import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi"
 import { z } from "zod"
 
 import { commonValidations } from "@/common/utils/commonValidation"
+import { UserIncludeSchema } from '@zodSchema/index'
 // import { Prisma } from '@prisma/client'
 
 extendZodWithOpenApi(z)
@@ -40,6 +41,6 @@ export type LoginUserDataType = z.infer<typeof LoginUserSchema.shape.body>
 // Query parameter validation for /me endpoint
 export const MeQuerySchema = z.object({
   query: z.object({
-    include: z.string().optional(),
+    include: UserIncludeSchema.optional(),
   }),
 })

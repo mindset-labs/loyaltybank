@@ -814,7 +814,7 @@ export const UserIncludeSchema: z.ZodType<Prisma.UserInclude> = z.object({
   achievements: z.union([z.boolean(),z.lazy(() => AchievementFindManyArgsSchema)]).optional(),
   eventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   createdEventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
-  AchievementReward: z.union([z.boolean(),z.lazy(() => AchievementRewardFindManyArgsSchema)]).optional(),
+  rewards: z.union([z.boolean(),z.lazy(() => AchievementRewardFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -840,7 +840,7 @@ export const UserCountOutputTypeSelectSchema: z.ZodType<Prisma.UserCountOutputTy
   achievements: z.boolean().optional(),
   eventLogs: z.boolean().optional(),
   createdEventLogs: z.boolean().optional(),
-  AchievementReward: z.boolean().optional(),
+  rewards: z.boolean().optional(),
 }).strict();
 
 export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
@@ -870,7 +870,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   achievements: z.union([z.boolean(),z.lazy(() => AchievementFindManyArgsSchema)]).optional(),
   eventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   createdEventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
-  AchievementReward: z.union([z.boolean(),z.lazy(() => AchievementRewardFindManyArgsSchema)]).optional(),
+  rewards: z.union([z.boolean(),z.lazy(() => AchievementRewardFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -1837,7 +1837,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   achievements: z.lazy(() => AchievementListRelationFilterSchema).optional(),
   eventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardListRelationFilterSchema).optional()
+  rewards: z.lazy(() => AchievementRewardListRelationFilterSchema).optional()
 }).strict();
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
@@ -1867,7 +1867,7 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   achievements: z.lazy(() => AchievementOrderByRelationAggregateInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogOrderByRelationAggregateInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogOrderByRelationAggregateInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardOrderByRelationAggregateInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -1928,7 +1928,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   achievements: z.lazy(() => AchievementListRelationFilterSchema).optional(),
   eventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardListRelationFilterSchema).optional()
+  rewards: z.lazy(() => AchievementRewardListRelationFilterSchema).optional()
 }).strict());
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
@@ -2363,7 +2363,7 @@ export const AchievementRewardCreateInputSchema: z.ZodType<Prisma.AchievementRew
   createdAt: z.coerce.date().optional(),
   claimedAt: z.coerce.date().optional().nullable(),
   achievement: z.lazy(() => AchievementCreateNestedOneWithoutAchievementRewardsInputSchema),
-  user: z.lazy(() => UserCreateNestedOneWithoutAchievementRewardInputSchema),
+  user: z.lazy(() => UserCreateNestedOneWithoutRewardsInputSchema),
   wallet: z.lazy(() => WalletCreateNestedOneWithoutAchievementRewardInputSchema).optional()
 }).strict();
 
@@ -2381,7 +2381,7 @@ export const AchievementRewardUpdateInputSchema: z.ZodType<Prisma.AchievementRew
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   achievement: z.lazy(() => AchievementUpdateOneRequiredWithoutAchievementRewardsNestedInputSchema).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutRewardsNestedInputSchema).optional(),
   wallet: z.lazy(() => WalletUpdateOneWithoutAchievementRewardNestedInputSchema).optional()
 }).strict();
 
@@ -3072,7 +3072,7 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
@@ -3101,7 +3101,7 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
@@ -3130,7 +3130,7 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
@@ -3159,7 +3159,7 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
@@ -4789,9 +4789,9 @@ export const AchievementCreateNestedOneWithoutAchievementRewardsInputSchema: z.Z
   connect: z.lazy(() => AchievementWhereUniqueInputSchema).optional()
 }).strict();
 
-export const UserCreateNestedOneWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutAchievementRewardInput> = z.object({
-  create: z.union([ z.lazy(() => UserCreateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedCreateWithoutAchievementRewardInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutAchievementRewardInputSchema).optional(),
+export const UserCreateNestedOneWithoutRewardsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutRewardsInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedCreateWithoutRewardsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutRewardsInputSchema).optional(),
   connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
 }).strict();
 
@@ -4809,12 +4809,12 @@ export const AchievementUpdateOneRequiredWithoutAchievementRewardsNestedInputSch
   update: z.union([ z.lazy(() => AchievementUpdateToOneWithWhereWithoutAchievementRewardsInputSchema),z.lazy(() => AchievementUpdateWithoutAchievementRewardsInputSchema),z.lazy(() => AchievementUncheckedUpdateWithoutAchievementRewardsInputSchema) ]).optional(),
 }).strict();
 
-export const UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutAchievementRewardNestedInput> = z.object({
-  create: z.union([ z.lazy(() => UserCreateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedCreateWithoutAchievementRewardInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutAchievementRewardInputSchema).optional(),
-  upsert: z.lazy(() => UserUpsertWithoutAchievementRewardInputSchema).optional(),
+export const UserUpdateOneRequiredWithoutRewardsNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutRewardsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedCreateWithoutRewardsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutRewardsInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutRewardsInputSchema).optional(),
   connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutAchievementRewardInputSchema),z.lazy(() => UserUpdateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedUpdateWithoutAchievementRewardInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutRewardsInputSchema),z.lazy(() => UserUpdateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutRewardsInputSchema) ]).optional(),
 }).strict();
 
 export const WalletUpdateOneWithoutAchievementRewardNestedInputSchema: z.ZodType<Prisma.WalletUpdateOneWithoutAchievementRewardNestedInput> = z.object({
@@ -6909,7 +6909,7 @@ export const UserCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserCrea
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAchievementsInput> = z.object({
@@ -6937,7 +6937,7 @@ export const UserUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<Prisma
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAchievementsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAchievementsInput> = z.object({
@@ -7021,7 +7021,7 @@ export const AchievementRewardCreateWithoutAchievementInputSchema: z.ZodType<Pri
   id: z.string().optional(),
   createdAt: z.coerce.date().optional(),
   claimedAt: z.coerce.date().optional().nullable(),
-  user: z.lazy(() => UserCreateNestedOneWithoutAchievementRewardInputSchema),
+  user: z.lazy(() => UserCreateNestedOneWithoutRewardsInputSchema),
   wallet: z.lazy(() => WalletCreateNestedOneWithoutAchievementRewardInputSchema).optional()
 }).strict();
 
@@ -7079,7 +7079,7 @@ export const UserUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUpda
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAchievementsInput> = z.object({
@@ -7107,7 +7107,7 @@ export const UserUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutAchievementsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutAchievementsInput> = z.object({
@@ -7277,7 +7277,7 @@ export const AchievementCreateOrConnectWithoutAchievementRewardsInputSchema: z.Z
   create: z.union([ z.lazy(() => AchievementCreateWithoutAchievementRewardsInputSchema),z.lazy(() => AchievementUncheckedCreateWithoutAchievementRewardsInputSchema) ]),
 }).strict();
 
-export const UserCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserCreateWithoutAchievementRewardInput> = z.object({
+export const UserCreateWithoutRewardsInputSchema: z.ZodType<Prisma.UserCreateWithoutRewardsInput> = z.object({
   id: z.string().optional(),
   username: z.string().cuid().optional(),
   name: z.string(),
@@ -7305,7 +7305,7 @@ export const UserCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.Use
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional()
 }).strict();
 
-export const UserUncheckedCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAchievementRewardInput> = z.object({
+export const UserUncheckedCreateWithoutRewardsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutRewardsInput> = z.object({
   id: z.string().optional(),
   username: z.string().cuid().optional(),
   name: z.string(),
@@ -7333,9 +7333,9 @@ export const UserUncheckedCreateWithoutAchievementRewardInputSchema: z.ZodType<P
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional()
 }).strict();
 
-export const UserCreateOrConnectWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAchievementRewardInput> = z.object({
+export const UserCreateOrConnectWithoutRewardsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutRewardsInput> = z.object({
   where: z.lazy(() => UserWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => UserCreateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedCreateWithoutAchievementRewardInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedCreateWithoutRewardsInputSchema) ]),
 }).strict();
 
 export const WalletCreateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.WalletCreateWithoutAchievementRewardInput> = z.object({
@@ -7438,18 +7438,18 @@ export const AchievementUncheckedUpdateWithoutAchievementRewardsInputSchema: z.Z
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const UserUpsertWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUpsertWithoutAchievementRewardInput> = z.object({
-  update: z.union([ z.lazy(() => UserUpdateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedUpdateWithoutAchievementRewardInputSchema) ]),
-  create: z.union([ z.lazy(() => UserCreateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedCreateWithoutAchievementRewardInputSchema) ]),
+export const UserUpsertWithoutRewardsInputSchema: z.ZodType<Prisma.UserUpsertWithoutRewardsInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutRewardsInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedCreateWithoutRewardsInputSchema) ]),
   where: z.lazy(() => UserWhereInputSchema).optional()
 }).strict();
 
-export const UserUpdateToOneWithWhereWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutAchievementRewardInput> = z.object({
+export const UserUpdateToOneWithWhereWithoutRewardsInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutRewardsInput> = z.object({
   where: z.lazy(() => UserWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => UserUpdateWithoutAchievementRewardInputSchema),z.lazy(() => UserUncheckedUpdateWithoutAchievementRewardInputSchema) ]),
+  data: z.union([ z.lazy(() => UserUpdateWithoutRewardsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutRewardsInputSchema) ]),
 }).strict();
 
-export const UserUpdateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUpdateWithoutAchievementRewardInput> = z.object({
+export const UserUpdateWithoutRewardsInputSchema: z.ZodType<Prisma.UserUpdateWithoutRewardsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7477,7 +7477,7 @@ export const UserUpdateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.Use
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional()
 }).strict();
 
-export const UserUncheckedUpdateWithoutAchievementRewardInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAchievementRewardInput> = z.object({
+export const UserUncheckedUpdateWithoutRewardsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutRewardsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -7575,7 +7575,7 @@ export const UserCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserCreateWit
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutApiKeysInput> = z.object({
@@ -7603,7 +7603,7 @@ export const UserUncheckedCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutApiKeysInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutApiKeysInput> = z.object({
@@ -7647,7 +7647,7 @@ export const UserUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUpdateWit
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutApiKeysInput> = z.object({
@@ -7675,7 +7675,7 @@ export const UserUncheckedUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const MembershipCreateWithoutCommunityInputSchema: z.ZodType<Prisma.MembershipCreateWithoutCommunityInput> = z.object({
@@ -7741,7 +7741,7 @@ export const UserCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserCre
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutMyCommunitiesInput> = z.object({
@@ -7769,7 +7769,7 @@ export const UserUncheckedCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutMyCommunitiesInput> = z.object({
@@ -8071,7 +8071,7 @@ export const UserUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUpd
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutMyCommunitiesInput> = z.object({
@@ -8099,7 +8099,7 @@ export const UserUncheckedUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const TransactionUpsertWithWhereUniqueWithoutCommunityInputSchema: z.ZodType<Prisma.TransactionUpsertWithWhereUniqueWithoutCommunityInput> = z.object({
@@ -8305,7 +8305,7 @@ export const UserCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserCreateW
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutEventLogsInput> = z.object({
@@ -8333,7 +8333,7 @@ export const UserUncheckedCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.Us
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutEventLogsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutEventLogsInput> = z.object({
@@ -8366,7 +8366,7 @@ export const UserCreateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.User
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutCreatedEventLogsInput> = z.object({
@@ -8394,7 +8394,7 @@ export const UserUncheckedCreateWithoutCreatedEventLogsInputSchema: z.ZodType<Pr
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutCreatedEventLogsInput> = z.object({
@@ -8590,7 +8590,7 @@ export const UserUpdateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserUpdateW
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutEventLogsInput> = z.object({
@@ -8618,7 +8618,7 @@ export const UserUncheckedUpdateWithoutEventLogsInputSchema: z.ZodType<Prisma.Us
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserUpsertWithoutCreatedEventLogsInput> = z.object({
@@ -8657,7 +8657,7 @@ export const UserUpdateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.User
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutCreatedEventLogsInput> = z.object({
@@ -8685,7 +8685,7 @@ export const UserUncheckedUpdateWithoutCreatedEventLogsInputSchema: z.ZodType<Pr
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutEventLogInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutEventLogInput> = z.object({
@@ -8889,7 +8889,7 @@ export const UserCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserCreateWith
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutEventsInput> = z.object({
@@ -8917,7 +8917,7 @@ export const UserUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserU
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutEventsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutEventsInput> = z.object({
@@ -9104,7 +9104,7 @@ export const UserUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUpdateWith
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutEventsInput> = z.object({
@@ -9132,7 +9132,7 @@ export const UserUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserU
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutEventsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutEventsInput> = z.object({
@@ -9241,7 +9241,7 @@ export const UserCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreat
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutMembershipsInput> = z.object({
@@ -9269,7 +9269,7 @@ export const UserUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutMembershipsInput> = z.object({
@@ -9356,7 +9356,7 @@ export const UserUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUpdat
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutMembershipsInput> = z.object({
@@ -9384,7 +9384,7 @@ export const UserUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutMembershipsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutMembershipsInput> = z.object({
@@ -9461,7 +9461,7 @@ export const UserCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTransactionsSentInput> = z.object({
@@ -9489,7 +9489,7 @@ export const UserUncheckedCreateWithoutTransactionsSentInputSchema: z.ZodType<Pr
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTransactionsSentInput> = z.object({
@@ -9522,7 +9522,7 @@ export const UserCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTransactionsReceivedInput> = z.object({
@@ -9550,7 +9550,7 @@ export const UserUncheckedCreateWithoutTransactionsReceivedInputSchema: z.ZodTyp
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTransactionsReceivedInput> = z.object({
@@ -9755,7 +9755,7 @@ export const UserUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTransactionsSentInput> = z.object({
@@ -9783,7 +9783,7 @@ export const UserUncheckedUpdateWithoutTransactionsSentInputSchema: z.ZodType<Pr
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUpsertWithoutTransactionsReceivedInput> = z.object({
@@ -9822,7 +9822,7 @@ export const UserUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTransactionsReceivedInput> = z.object({
@@ -9850,7 +9850,7 @@ export const UserUncheckedUpdateWithoutTransactionsReceivedInputSchema: z.ZodTyp
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutTransactionsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutTransactionsInput> = z.object({
@@ -10287,7 +10287,7 @@ export const UserCreateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserCrea
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutManagedUsersInput> = z.object({
@@ -10315,7 +10315,7 @@ export const UserUncheckedCreateWithoutManagedUsersInputSchema: z.ZodType<Prisma
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutManagedUsersInput> = z.object({
@@ -10348,7 +10348,7 @@ export const UserCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserCreateW
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutManagedByInput> = z.object({
@@ -10376,7 +10376,7 @@ export const UserUncheckedCreateWithoutManagedByInputSchema: z.ZodType<Prisma.Us
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutManagedByInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutManagedByInput> = z.object({
@@ -10787,7 +10787,7 @@ export const UserUpdateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserUpda
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutManagedUsersInput> = z.object({
@@ -10815,7 +10815,7 @@ export const UserUncheckedUpdateWithoutManagedUsersInputSchema: z.ZodType<Prisma
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithWhereUniqueWithoutManagedByInputSchema: z.ZodType<Prisma.UserUpsertWithWhereUniqueWithoutManagedByInput> = z.object({
@@ -10990,7 +10990,7 @@ export const UserCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCre
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSharedWalletsInput> = z.object({
@@ -11018,7 +11018,7 @@ export const UserUncheckedCreateWithoutSharedWalletsInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSharedWalletsInput> = z.object({
@@ -11101,7 +11101,7 @@ export const UserUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUpd
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSharedWalletsInput> = z.object({
@@ -11129,7 +11129,7 @@ export const UserUncheckedUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const WalletUpsertWithoutUsersInputSchema: z.ZodType<Prisma.WalletUpsertWithoutUsersInput> = z.object({
@@ -11202,7 +11202,7 @@ export const UserCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserCreateWit
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutWalletsInput> = z.object({
@@ -11230,7 +11230,7 @@ export const UserUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutWalletsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutWalletsInput> = z.object({
@@ -11450,7 +11450,7 @@ export const AchievementRewardCreateWithoutWalletInputSchema: z.ZodType<Prisma.A
   createdAt: z.coerce.date().optional(),
   claimedAt: z.coerce.date().optional().nullable(),
   achievement: z.lazy(() => AchievementCreateNestedOneWithoutAchievementRewardsInputSchema),
-  user: z.lazy(() => UserCreateNestedOneWithoutAchievementRewardInputSchema)
+  user: z.lazy(() => UserCreateNestedOneWithoutRewardsInputSchema)
 }).strict();
 
 export const AchievementRewardUncheckedCreateWithoutWalletInputSchema: z.ZodType<Prisma.AchievementRewardUncheckedCreateWithoutWalletInput> = z.object({
@@ -11507,7 +11507,7 @@ export const UserUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUpdateWit
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutWalletsInput> = z.object({
@@ -11535,7 +11535,7 @@ export const UserUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const TransactionUpsertWithWhereUniqueWithoutSenderWalletInputSchema: z.ZodType<Prisma.TransactionUpsertWithWhereUniqueWithoutSenderWalletInput> = z.object({
@@ -11679,7 +11679,7 @@ export const AchievementRewardUpdateWithoutAchievementInputSchema: z.ZodType<Pri
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutRewardsNestedInputSchema).optional(),
   wallet: z.lazy(() => WalletUpdateOneWithoutAchievementRewardNestedInputSchema).optional()
 }).strict();
 
@@ -12789,7 +12789,7 @@ export const UserUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUpdateW
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutManagedByInput> = z.object({
@@ -12817,7 +12817,7 @@ export const UserUncheckedUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.Us
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  AchievementReward: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateManyWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyWithoutManagedByInput> = z.object({
@@ -13350,7 +13350,7 @@ export const AchievementRewardUpdateWithoutWalletInputSchema: z.ZodType<Prisma.A
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   achievement: z.lazy(() => AchievementUpdateOneRequiredWithoutAchievementRewardsNestedInputSchema).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutAchievementRewardNestedInputSchema).optional()
+  user: z.lazy(() => UserUpdateOneRequiredWithoutRewardsNestedInputSchema).optional()
 }).strict();
 
 export const AchievementRewardUncheckedUpdateWithoutWalletInputSchema: z.ZodType<Prisma.AchievementRewardUncheckedUpdateWithoutWalletInput> = z.object({

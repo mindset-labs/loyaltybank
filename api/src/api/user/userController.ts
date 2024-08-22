@@ -7,6 +7,8 @@ import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
 import { generateUUID } from '@/common/utils/random'
+import { logger } from '@/server'
+import { Prisma } from '@prisma/client'
 
 class UserController {
   public getUsers: RequestHandler = async (_req: Request, res: Response) => {
@@ -38,24 +40,12 @@ class UserController {
   };
 
   public myInfo: RequestHandler = async (req: Request, res: Response) => {
-    if (req.query.include) {
-      let include: Record<string, unknown> = {}
-      try {
-        const parsed = JSON.parse(req.query.include as string)
-        UserIncludeSchema.parse(parsed)
-        include = parsed
-      } catch (err) {
-        const error = new CustomError("Invalid inputs", CustomErrorCode.INVALID_REQUEST_DATA, err)
-        return handleErrorResponse(error, res, StatusCodes.BAD_REQUEST)
-      }
+    logger.debug({ include: req.query.include }, 'Get community by ID with include')
 
-      return userService
-        .myInfo(req.userId!, include)
-        .then((user) => handleSuccessResponse({ user }, res, StatusCodes.OK))
-        .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
-    }
-
-    handleSuccessResponse({ user: req.user }, res, StatusCodes.OK)
+    return userService
+      .myInfo(req.userId!, req.query.include as Prisma.UserInclude | undefined)
+      .then((user) => handleSuccessResponse({ user }, res, StatusCodes.OK))
+      .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
 
   public createManagedUser: RequestHandler = async (req: Request, res: Response) => {
