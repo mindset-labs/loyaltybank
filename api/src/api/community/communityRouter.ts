@@ -27,7 +27,7 @@ communityRouter.get("/", verifyJWT, communityController.communities)
 // List communities created by user
 communityRegistry.registerPath({
     method: "get",
-    path: "/communities/by-me",
+    path: "/communities/me",
     tags: ["Community"],
     responses: createApiResponse(z.array(CommunitySchema), "Success"),
 })

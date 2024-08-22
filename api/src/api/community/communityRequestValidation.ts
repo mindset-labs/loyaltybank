@@ -6,7 +6,7 @@ extendZodWithOpenApi(z)
 
 export const GetCommunitySchema = z.object({
     query: z.object({
-        include: z.string().optional(),
+        include: CommunityIncludeSchema.optional(),
     })
 })
 
