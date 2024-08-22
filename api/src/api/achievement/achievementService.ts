@@ -4,6 +4,14 @@ import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { communityService } from '../community/communityService'
 
 export class AchievementService {
+    /**
+     * Create an achievement configuration for a certain community. 
+     * This method will check if the user has edit access to the community (i.e. creator or admin).
+     * 
+     * @param userId The ID of the user creating the achievement
+     * @param data The achievement data
+     * @returns Promise<Achievement>
+     */
     async createAchievement(
         userId: string,
         data: Prisma.AchievementUncheckedCreateWithoutCreatedByInput
@@ -42,6 +50,15 @@ export class AchievementService {
         })
     }
 
+    /**
+     * This method will update an existing achievement configuration.
+     * This method also checks if the user has edit access to the community.
+     * 
+     * @param userId The ID of the user updating the achievement
+     * @param id The ID of the achievement to update
+     * @param data The updated achievement data
+     * @returns Promise<Achievement>
+     */
     async updateAchievement(
         userId: string,
         id: string,
@@ -81,6 +98,109 @@ export class AchievementService {
                 id,
             },
             data,
+        })
+    }
+
+    /**
+     * This method will issue a reward for a certain achievement to a user.
+     * 
+     * @param userId: the ID of the user issuing the achievement reward
+     * @param achievementId: the ID of the achievement whose reward is to be issued
+     * @param data: the reward data
+     *  - userId: the ID of the user receiving the reward
+     *  - walletId: the ID of the wallet to receive the reward
+     * @returns AchievementReward object
+     */
+    async issueAchievementReward(
+        userId: string,
+        achievementId: string,
+        data: Prisma.AchievementRewardUncheckedCreateInput
+    ): Promise<AchievementReward> {
+        const achievement = await dbClient.achievement.findFirst({
+            where: {
+                id: achievementId,
+                // Check if the user has access to issue rewards for the community
+                OR: [
+                    {
+                        community: {
+                            memberships: {
+                                some: {
+                                    userId,
+                                    communityRole: CommunityRole.ADMIN,
+                                },
+                            },
+                        },
+                    },
+                    {
+                        community: {
+                            createdById: userId,
+                        },
+                    },
+                ]
+            },
+        })
+
+        if (!achievement) {
+            throw new CustomError('Achievement not found or invalid access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                achievementId,
+                userId,
+            })
+        }
+
+        return dbClient.$transaction(async () => {
+            let claimedAt
+
+            // Check if the reward is points based and if the walletId can be found
+            // If yes, update the wallet balance
+            if (data.walletId && achievement.rewardType === 'POINTS') {
+                // Update the user's wallet balance
+                await dbClient.wallet.update({
+                    where: {
+                        id: data.walletId,
+                    },
+                    data: {
+                        balance: {
+                            increment: achievement.rewardAmount,
+                        },
+                    },
+                })
+
+                claimedAt = new Date()
+            } else if (achievement.rewardType === 'POINTS') {
+                // attempt finding a wallet for the user in the community
+                const userCommunityWallet = await dbClient.wallet.findFirst({
+                    where: {
+                        ownerId: data.userId,
+                        communityId: achievement.communityId,
+                    },
+                })
+
+                if (userCommunityWallet) {
+                    // Update the user's wallet balance
+                    await dbClient.wallet.update({
+                        where: {
+                            id: userCommunityWallet.id,
+                        },
+                        data: {
+                            balance: {
+                                increment: achievement.rewardAmount,
+                            },
+                        },
+                    })
+
+                    claimedAt = new Date()
+                }
+            }
+
+            // Create the achievement reward
+            return dbClient.achievementReward.create({
+                data: {
+                    userId: data.userId,
+                    walletId: data.walletId,
+                    achievementId,
+                    claimedAt,
+                },
+            })
         })
     }
 }

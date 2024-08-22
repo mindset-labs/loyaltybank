@@ -30,3 +30,11 @@ export const UpdateAchievementSchema = z.object({
         status: z.string().optional(),
     }),
 })
+
+// Update achievement schema
+export const IssueAchievementReward = z.object({
+    body: z.object({
+        userId: z.string(),
+        walletId: z.string().optional(),
+    }),
+})
