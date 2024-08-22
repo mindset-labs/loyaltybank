@@ -141,7 +141,12 @@
 								"exec": [
 									"const responseData = pm.response.json();",
 									"",
-									"pm.environment.set('USER_ID', responseData.data.user.id)"
+									"pm.environment.set('USER_ID', responseData.data.user.id)",
+									"",
+									"if (responseData.data.user.rewards && responseData.data.user.rewards.length > 0) {",
+									"    pm.environment.set('REWARD_ID', responseData.data.user.rewards[0].id)",
+									"    pm.environment.set('ACHIEVMENT_ID', responseData.data.user.rewards[0].achievementId)",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -152,7 +157,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/users/me?include={\"wallets\": true, \"memberships\": true, \"managedUsers\": true}",
+							"raw": "{{API_URL}}/users/me?include[wallets]=true&include[memberships]=true&include[managedUsers]=true&include[sharedWallets]=true&include[rewards][where][claimedAt]=null",
 							"host": [
 								"{{API_URL}}"
 							],
@@ -162,8 +167,24 @@
 							],
 							"query": [
 								{
-									"key": "include",
-									"value": "{\"wallets\": true, \"memberships\": true, \"managedUsers\": true}"
+									"key": "include[wallets]",
+									"value": "true"
+								},
+								{
+									"key": "include[memberships]",
+									"value": "true"
+								},
+								{
+									"key": "include[managedUsers]",
+									"value": "true"
+								},
+								{
+									"key": "include[sharedWallets]",
+									"value": "true"
+								},
+								{
+									"key": "include[rewards][where][claimedAt]",
+									"value": "null"
 								}
 							]
 						}
@@ -375,7 +396,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}?include={\"events\": true, \"memberships\": { \"include\": { \"user\": true }}, \"achievements\": true}",
+							"raw": "{{API_URL}}/communities/{{COMMUNITY_ID}}?include[events]=true&include[memberships][include][user]=true&include[achievements]=true",
 							"host": [
 								"{{API_URL}}"
 							],
@@ -385,8 +406,16 @@
 							],
 							"query": [
 								{
-									"key": "include",
-									"value": "{\"events\": true, \"memberships\": { \"include\": { \"user\": true }}, \"achievements\": true}"
+									"key": "include[events]",
+									"value": "true"
+								},
+								{
+									"key": "include[memberships][include][user]",
+									"value": "true"
+								},
+								{
+									"key": "include[achievements]",
+									"value": "true"
 								}
 							]
 						}
@@ -793,7 +822,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('ACHIEVEMENT_ID', responseData.data.achievement.id)"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -820,6 +851,90 @@
 							"path": [
 								"achievements",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Issue Achievement Reward",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.environment.set('REWARD_ID', responseData.data.reward.id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"{{USER_ID}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/achievements/{{ACHIEVEMENT_ID}}/rewards/issue",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"achievements",
+								"{{ACHIEVEMENT_ID}}",
+								"rewards",
+								"issue"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Claim Reward",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rewardId\": \"{{REWARD_ID}}\",\n    \"walletId\": \"{{WALLET_ID}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/achievements/{{ACHIEVEMENT_ID}}/rewards/claim",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"achievements",
+								"{{ACHIEVEMENT_ID}}",
+								"rewards",
+								"claim"
 							]
 						}
 					},
@@ -1870,6 +1985,61 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"senderWalletId\": \"{{WALLET_ID_3}}\",\n    \"receiverWalletId\": \"{{WALLET_ID_2}}\",\n    \"amount\": 10,\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"description\": \"payment from shared wallet\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/payments/",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"payments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 3 attempts over-paying",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Request must be rejected', () => {",
+									"    pm.expect(pm.response.code).to.equal(500)",
+									"    pm.expect(responseData.error.code).to.equal(302)",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN_1}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"senderWalletId\": \"{{WALLET_ID_3}}\",\n    \"receiverWalletId\": \"{{WALLET_ID_2}}\",\n    \"amount\": 100000,\n    \"communityId\": \"{{COMMUNITY_ID}}\",\n    \"description\": \"payment from shared wallet\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
