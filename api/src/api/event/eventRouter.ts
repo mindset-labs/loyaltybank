@@ -12,14 +12,18 @@ import { CreateEventLogSchema, CreateEventSchema } from './eventRequestValidatio
 export const eventRegistry = new OpenAPIRegistry()
 export const eventRouter: Router = express.Router()
 
+// open API zod schemas
+const EventLogWithoutMetadataSchema = EventLogSchema.omit({ metadata: true })
+
 eventRegistry.register("Event", EventSchema)
+eventRegistry.register("EventLog", EventLogWithoutMetadataSchema)
 
 // Create a new event type
 eventRegistry.registerPath({
     method: "post",
     path: "/events",
     tags: ["Event"],
-    responses: createApiResponse(z.array(EventSchema), "Success"),
+    responses: createApiResponse(z.object({ event: EventSchema }), "Success"),
 })
 
 eventRouter.post("/", verifyJWT, validateRequest(CreateEventSchema), eventController.createEvent)
@@ -29,7 +33,9 @@ eventRegistry.registerPath({
     method: "post",
     path: "/events/log",
     tags: ["Event"],
-    responses: createApiResponse(z.array(EventLogSchema), "Success"),
+    responses: createApiResponse(z.object({
+        eventLog: EventLogWithoutMetadataSchema,
+    }), "Success"),
 })
 
 eventRouter.post("/log", verifyJWT, validateRequest(CreateEventLogSchema), eventController.logEvent)

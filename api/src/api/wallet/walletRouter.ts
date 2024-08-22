@@ -12,7 +12,10 @@ import { GetWalletsSchema, GetWalletTransactionsSchema } from './walletRequestVa
 export const walletRegistry = new OpenAPIRegistry()
 export const walletRouter: Router = express.Router()
 
-walletRegistry.register("Transaction", TransactionSchema)
+// open API zod schemas
+const TransactionWithoutMetadataSchema = TransactionSchema.omit({ metadata: true })
+
+walletRegistry.register("Wallet", WalletSchema)
 
 // Get all wallets for the user
 walletRegistry.registerPath({
@@ -29,7 +32,7 @@ walletRegistry.registerPath({
     method: "get",
     path: "/wallets/{walletId}/transactions",
     tags: ["Wallet"],
-    responses: createApiResponse(z.array(TransactionSchema), "Success"),
+    responses: createApiResponse(z.object({ transaction: TransactionWithoutMetadataSchema }), "Success"),
 })
 
 walletRouter.get("/:walletId/transactions", verifyJWT, validateRequest(GetWalletTransactionsSchema), walletController.queryWalletTransactions)

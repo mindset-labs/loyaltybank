@@ -6,20 +6,26 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
 import verifyJWT from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { paymentController } from "./paymentController"
-import { TransactionSchema } from '@zodSchema/index'
-import { CreatePaymentSchema, NewPaymentResponseSchema } from './paymentRequestValidation'
+import { TransactionSchema, WalletSchema } from '@zodSchema/index'
+import { CreatePaymentSchema } from './paymentRequestValidation'
 
 export const paymentRegistry = new OpenAPIRegistry()
 export const paymentRouter: Router = express.Router()
 
-paymentRegistry.register("Payment", TransactionSchema)
+// open API zod schemas
+const TransactionWithoutMetadataSchema = TransactionSchema.omit({ metadata: true })
+
+paymentRegistry.register("Payment", TransactionWithoutMetadataSchema)
 
 // Query user's own transactions
 paymentRegistry.registerPath({
     method: "post",
     path: "/payments",
     tags: ["Payment"],
-    responses: createApiResponse(NewPaymentResponseSchema, "Success"),
+    responses: createApiResponse(z.object({
+        transaction: TransactionWithoutMetadataSchema,
+        wallet: WalletSchema,
+    }), "Success"),
 })
 
 paymentRouter.post("/", verifyJWT, validateRequest(CreatePaymentSchema), paymentController.createPayment)

@@ -1,6 +1,9 @@
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi"
 import { z } from "zod"
-import { AchievementUncheckedCreateWithoutCreatedByInputSchema } from '@zodSchema/index'
+import {
+    AchievementRewardUncheckedCreateWithoutAchievementInputSchema,
+    AchievementUncheckedCreateWithoutCreatedByInputSchema
+} from '@zodSchema/index'
 import { AchievementRewardType } from '@prisma/client'
 
 extendZodWithOpenApi(z)
@@ -33,8 +36,13 @@ export const UpdateAchievementSchema = z.object({
 
 // Update achievement schema
 export const IssueAchievementReward = z.object({
+    body: AchievementRewardUncheckedCreateWithoutAchievementInputSchema,
+})
+
+// Update achievement schema
+export const ClaimRewardSchema = z.object({
     body: z.object({
-        userId: z.string(),
-        walletId: z.string().optional(),
+        rewardId: z.string(),
+        walletId: z.string(),
     }),
 })

@@ -12,14 +12,18 @@ import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPoints
 export const communityRegistry = new OpenAPIRegistry()
 export const communityRouter: Router = express.Router()
 
-communityRegistry.register("Community", CommunitySchema)
+// open API zod schemas
+const CommunityWithoutMetadata = CommunitySchema.omit({ metadata: true })
+const MembershipWithoutMetadata = MembershipSchema.omit({ nftMetadata: true, membershipMetadata: true })
+
+communityRegistry.register("Community", CommunityWithoutMetadata)
 
 // Query all communities
 communityRegistry.registerPath({
     method: "get",
     path: "/communities",
     tags: ["Community"],
-    responses: createApiResponse(z.array(CommunitySchema), "Success"),
+    responses: createApiResponse(z.array(CommunityWithoutMetadata), "Success"),
 })
 
 communityRouter.get("/", verifyJWT, communityController.communities)
@@ -29,7 +33,7 @@ communityRegistry.registerPath({
     method: "get",
     path: "/communities/me",
     tags: ["Community"],
-    responses: createApiResponse(z.array(CommunitySchema), "Success"),
+    responses: createApiResponse(z.array(CommunityWithoutMetadata), "Success"),
 })
 
 communityRouter.get("/me", verifyJWT, communityController.myCommunities)
@@ -39,7 +43,7 @@ communityRegistry.registerPath({
     method: "get",
     path: "/communities/{id}",
     tags: ["Community"],
-    responses: createApiResponse(CommunitySchema, "Success"),
+    responses: createApiResponse(CommunityWithoutMetadata, "Success"),
 })
 
 communityRouter.get("/:id", verifyJWT, validateRequest(GetCommunitySchema), communityController.getCommunityById)
@@ -49,7 +53,7 @@ communityRegistry.registerPath({
     method: "post",
     path: "/communities",
     tags: ["Community"],
-    responses: createApiResponse(CommunitySchema, "Success"),
+    responses: createApiResponse(CommunityWithoutMetadata, "Success"),
 })
 
 communityRouter.post("/", verifyJWT, validateRequest(CreateOrUpdateCommunitySchema), communityController.createCommunity)
@@ -59,7 +63,7 @@ communityRegistry.registerPath({
     method: "put",
     path: "/communities/{id}",
     tags: ["Community"],
-    responses: createApiResponse(CommunitySchema, "Success"),
+    responses: createApiResponse(CommunityWithoutMetadata, "Success"),
 })
 
 communityRouter.put("/:id", verifyJWT, validateRequest(CreateOrUpdateCommunitySchema), communityController.updateCommunity)
@@ -69,7 +73,7 @@ communityRegistry.registerPath({
     method: "post",
     path: "/communities/{id}/join",
     tags: ["Community"],
-    responses: createApiResponse(MembershipSchema, "Success"),
+    responses: createApiResponse(MembershipWithoutMetadata, "Success"),
 })
 
 communityRouter.post("/:id/join", verifyJWT, communityController.joinCommunity)
@@ -79,7 +83,7 @@ communityRegistry.registerPath({
     method: "post",
     path: "/communities/{id}/issue-points",
     tags: ["Community"],
-    responses: createApiResponse(MembershipSchema, "Success"),
+    responses: createApiResponse(MembershipWithoutMetadata, "Success"),
 })
 
 communityRouter.post("/:id/issue-points", verifyJWT, validateRequest(IssueCommunityPointsSchema), communityController.issueCommunityPoints)
@@ -89,7 +93,7 @@ communityRegistry.registerPath({
     method: "put",
     path: "/communities/{id}/archive",
     tags: ["Community"],
-    responses: createApiResponse(CommunitySchema, "Success"),
+    responses: createApiResponse(CommunityWithoutMetadata, "Success"),
 })
 
 communityRouter.put("/:id/archive", verifyJWT, communityController.archiveCommunity)

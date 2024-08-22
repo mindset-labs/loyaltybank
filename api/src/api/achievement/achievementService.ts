@@ -1,4 +1,4 @@
-import { Prisma, Achievement, AchievementReward, Role, CommunityRole, AchievementRewardType } from '@prisma/client'
+import { Prisma, Achievement, AchievementReward, Role, CommunityRole, AchievementRewardType, TransactionType, TransactionSubtype } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { communityService } from '../community/communityService'
@@ -166,31 +166,18 @@ export class AchievementService {
                     },
                 })
 
-                claimedAt = new Date()
-            } else if (achievement.rewardType === 'POINTS') {
-                // attempt finding a wallet for the user in the community
-                const userCommunityWallet = await dbClient.wallet.findFirst({
-                    where: {
-                        ownerId: data.userId,
-                        communityId: achievement.communityId,
+                await dbClient.transaction.create({
+                    data: {
+                        receiverId: data.userId,
+                        receiverWalletId: data.walletId,
+                        amount: achievement.rewardAmount,
+                        transactionType: TransactionType.REWARD,
+                        transactionSubtype: TransactionSubtype.POINTS,
+                        description: `Reward for achievement ${achievement.name}`,
                     },
                 })
 
-                if (userCommunityWallet) {
-                    // Update the user's wallet balance
-                    await dbClient.wallet.update({
-                        where: {
-                            id: userCommunityWallet.id,
-                        },
-                        data: {
-                            balance: {
-                                increment: achievement.rewardAmount,
-                            },
-                        },
-                    })
-
-                    claimedAt = new Date()
-                }
+                claimedAt = new Date()
             }
 
             // Create the achievement reward
@@ -249,6 +236,17 @@ export class AchievementService {
                             balance: {
                                 increment: reward.achievement.rewardAmount,
                             },
+                        },
+                    })
+
+                    await dbClient.transaction.create({
+                        data: {
+                            receiverId: userId,
+                            receiverWalletId: walletId,
+                            amount: reward.achievement.rewardAmount,
+                            transactionType: TransactionType.REWARD,
+                            transactionSubtype: TransactionSubtype.POINTS,
+                            description: `Reward for achievement ${reward.achievement.name}`,
                         },
                     })
                     break
