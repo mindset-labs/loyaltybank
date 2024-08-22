@@ -50,7 +50,17 @@ userRegistry.registerPath({
   method: "post",
   path: "/users",
   tags: ["User"],
-  request: { params: CreateUserSchema.shape.body },
+  request: {
+    body: {
+      description: 'object containing user information',
+      content: {
+        'application/json': {
+          schema: CreateUserSchema.shape.body,
+        },
+      },
+      required: true,
+    }
+  },
   responses: createApiResponse(UserSchema, "Success"),
 })
 
@@ -61,7 +71,17 @@ userRegistry.registerPath({
   method: "post",
   path: "/users/managed",
   tags: ["User"],
-  request: { params: CreateUserSchema.shape.body },
+  request: {
+    body: {
+      description: 'object containing managed user information',
+      content: {
+        'application/json': {
+          schema: CreateManagedUserSchema.shape.body,
+        },
+      },
+      required: true,
+    }
+  },
   responses: createApiResponse(UserSchema, "Success"),
 })
 
@@ -72,7 +92,17 @@ userRegistry.registerPath({
   method: "post",
   path: "/users/login",
   tags: ["User"],
-  request: { params: LoginUserSchema.shape.body },
+  request: {
+    body: {
+      description: 'object containing user login information',
+      content: {
+        'application/json': {
+          schema: LoginUserSchema.shape.body,
+        },
+      },
+      required: true,
+    }
+  },
   responses: createApiResponse(UserSchema, "Success"),
 })
 

@@ -31,7 +31,7 @@ walletRouter.get("/", verifyJWT, validateRequest(GetWalletsSchema), walletContro
 walletRegistry.registerPath({
     method: "get",
     path: "/wallets/{walletId}/transactions",
-    tags: ["Wallet"],
+    tags: ["Wallet", "Transaction"],
     responses: createApiResponse(z.object({ transactions: z.array(TransactionWithoutMetadataSchema) }), "Success"),
 })
 
