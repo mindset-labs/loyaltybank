@@ -18,7 +18,7 @@ import { walletRouter } from './api/wallet/walletRouter'
 import { eventRouter } from './api/event/eventRouter'
 import { achievementRouter } from './api/achievement/achievementRouter'
 
-const logger = pino({ name: "server start" })
+const logger = pino({ name: "server start", level: env.LOG_LEVEL })
 const app: Express = express()
 
 // Set the application to trust the reverse proxy
@@ -27,6 +27,22 @@ app.set("trust proxy", true)
 // Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use((req, res, next) => {
+    const parseBooleans = (obj: Record<string, unknown>) => {
+        for (const key in obj) {
+            if (obj[key] === 'true') {
+                obj[key] = true
+            } else if (obj[key] === 'false') {
+                obj[key] = false
+            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                parseBooleans(obj[key] as Record<string, unknown>)
+            }
+        }
+    }
+
+    parseBooleans(req.query)
+    next()
+})
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))
 app.use(helmet())
 app.use(rateLimiter)

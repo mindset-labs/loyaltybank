@@ -14,4 +14,5 @@ export const env = cleanEnv(envValues, {
   DATABASE_URL: url(),
   DEFAULT_BALANCE: num(),
   REDIS_URL: url(),
+  LOG_LEVEL: str({ default: 'debug' })
 })
