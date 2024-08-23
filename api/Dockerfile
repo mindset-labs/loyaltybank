@@ -1,19 +1,18 @@
-FROM node:22.6-slim
+FROM node:20.12.1-slim
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install app dependencies
-RUN npm ci
-
 # Bundle app source
 COPY . .
+RUN rm -rf node_modules
+RUN rm -rf yarn.lock
+
+# Install app dependencies
+RUN yarn install
 
 # Build the TypeScript files
-RUN npm run build
+RUN yarn build
 
 # Expose port 8080
 EXPOSE 8080
