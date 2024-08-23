@@ -6,21 +6,17 @@ import type { NextFunction, Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import bcrypt from 'bcrypt'
 
-const rejectApiKey = (res: Response) => {
-    return handleErrorResponse(
-        new CustomError("Invalid API Key", CustomErrorCode.INVALID_API_KEY, {
-            message: "Invalid or missing API Key",
-        }),
-        res,
-        StatusCodes.UNAUTHORIZED,
-    )
+const rejectApiKey = (res: Response, err?: CustomError) => {
+    const error = err || new CustomError("Invalid API Key", CustomErrorCode.INVALID_API_KEY)
+    return handleErrorResponse(error, res, StatusCodes.UNAUTHORIZED)
 }
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-    // Check if the request has a valid token
     const apiKey = req.headers['x-api-key']
+
+    // If not API Key is provided, continue
     if (!apiKey) {
-        return rejectApiKey(res)
+        return next()
     }
 
     // Verify the API Key
@@ -32,12 +28,28 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         return rejectApiKey(res)
     }
 
-    bcrypt.compare(apiKey as string, key.secret, (err) => {
+    bcrypt.compare(apiKey as string, key.secret, async (err) => {
         if (err) {
             return rejectApiKey(res)
         }
 
         req.apiKey = key
+
+        // If the API key is valid and a user ID is provided, set the user ID in the request
+        // as a way to authenticate on behalf of a user, otherwise, assume the key owner is the user
+        if (req.headers['x-user-id']) {
+            req.userId = req.headers['x-user-id'] as string
+        } else {
+            req.userId = key.createdById
+        }
+
+        const user = await db.user.findFirst({ where: { id: req.userId } })
+
+        if (!user) {
+            return rejectApiKey(res, new CustomError("Invalid user for API Key", CustomErrorCode.INVALID_USER_FOR_API_KEY))
+        }
+
+        req.user = user
         next()
     })
 }

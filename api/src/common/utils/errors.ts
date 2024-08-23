@@ -10,6 +10,7 @@ export enum CustomErrorCode {
   INVALID_API_KEY = 107,
   DATABASE_ERROR = 108,
   INVALID_QUERY = 109,
+  INVALID_USER_FOR_API_KEY = 110,
 
   // community errors
   INVALID_COMMUNITY = 200,

@@ -21,8 +21,15 @@ export const verifyJWTAndRole = (role: string) => async (req: Request, res: Resp
 }
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  // Check if the request has a valid token
+  // If the user ID has already been set (via API Key validation), continue
+  // No need to check for an Auth token
+  if (req.userId) {
+    return next()
+  }
+
   const token = req.headers.authorization
+
+  // If no token is provided and no user ID is set (via API Key validation), reject the request
   if (!token) {
     return rejectJWT(res)
   }

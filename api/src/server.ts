@@ -17,6 +17,7 @@ import { transactionRouter } from './api/transaction/transactionRouter'
 import { walletRouter } from './api/wallet/walletRouter'
 import { eventRouter } from './api/event/eventRouter'
 import { achievementRouter } from './api/achievement/achievementRouter'
+import verifyApiKey from './common/middleware/verifyApiKey'
 
 const logger = pino({ name: "server start", level: env.LOG_LEVEL })
 const app: Express = express()
@@ -51,6 +52,8 @@ app.use(rateLimiter)
 
 // Request logging
 app.use(requestLogger)
+// Api Key verification
+app.use(verifyApiKey)
 
 // Routes
 app.use("/health-check", healthCheckRouter)
