@@ -5,6 +5,7 @@ import db from "@/db"
 import type { NextFunction, Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import bcrypt from 'bcrypt'
+import { logger } from '@/server'
 
 const rejectApiKey = (res: Response, err?: CustomError) => {
     const error = err || new CustomError("Invalid API Key", CustomErrorCode.INVALID_API_KEY)
@@ -19,16 +20,18 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         return next()
     }
 
+    const apiKeySplit = (apiKey as string).split(':')
+
     // Verify the API Key
     const key = await db.apiKey.findFirst({
-        where: { key: apiKey as string }
+        where: { key: apiKeySplit[0] }
     })
 
     if (!key) {
         return rejectApiKey(res)
     }
 
-    bcrypt.compare(apiKey as string, key.secret, async (err) => {
+    bcrypt.compare(apiKeySplit[1], key.secret, async (err) => {
         if (err) {
             return rejectApiKey(res)
         }

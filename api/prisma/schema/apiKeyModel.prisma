@@ -1,14 +1,14 @@
 model ApiKey {
-    id          String   @id @default(uuid())
-    key         String   @unique
+    id          String            @id @default(uuid())
+    key         String            @unique
+    secret      String
     description String?
     metadata    Json?
-    status      ApiKeyStatus @default(ACTIVE)
+    status      ApiKeyStatus      @default(ACTIVE)
     accessLevel ApiKeyAccessLevel @default(READ_ONLY)
-    secret      String
     createdById String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @default(now())
+    createdAt   DateTime          @default(now())
+    updatedAt   DateTime          @default(now())
 
     // relationships
     createdBy User @relation(fields: [createdById], references: [id])

@@ -60,7 +60,7 @@ export const AchievementScalarFieldEnumSchema = z.enum(['id','name','description
 
 export const AchievementRewardScalarFieldEnumSchema = z.enum(['id','achievementId','userId','walletId','createdAt','claimedAt']);
 
-export const ApiKeyScalarFieldEnumSchema = z.enum(['id','key','description','metadata','status','accessLevel','secret','createdById','createdAt','updatedAt']);
+export const ApiKeyScalarFieldEnumSchema = z.enum(['id','key','secret','description','metadata','status','accessLevel','createdById','createdAt','updatedAt']);
 
 export const CommunityScalarFieldEnumSchema = z.enum(['id','name','description','imageUrl','metadata','pointsTokenName','isPublic','status','createdById','createdAt','updatedAt']);
 
@@ -227,9 +227,9 @@ export const ApiKeySchema = z.object({
   accessLevel: ApiKeyAccessLevelSchema,
   id: z.string(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().nullable(),
   metadata: JsonValueSchema.nullable(),
-  secret: z.string(),
   createdById: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -571,11 +571,11 @@ export const ApiKeyArgsSchema: z.ZodType<Prisma.ApiKeyDefaultArgs> = z.object({
 export const ApiKeySelectSchema: z.ZodType<Prisma.ApiKeySelect> = z.object({
   id: z.boolean().optional(),
   key: z.boolean().optional(),
+  secret: z.boolean().optional(),
   description: z.boolean().optional(),
   metadata: z.boolean().optional(),
   status: z.boolean().optional(),
   accessLevel: z.boolean().optional(),
-  secret: z.boolean().optional(),
   createdById: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
@@ -1187,11 +1187,11 @@ export const ApiKeyWhereInputSchema: z.ZodType<Prisma.ApiKeyWhereInput> = z.obje
   NOT: z.union([ z.lazy(() => ApiKeyWhereInputSchema),z.lazy(() => ApiKeyWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   key: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  secret: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
   status: z.union([ z.lazy(() => EnumApiKeyStatusFilterSchema),z.lazy(() => ApiKeyStatusSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => EnumApiKeyAccessLevelFilterSchema),z.lazy(() => ApiKeyAccessLevelSchema) ]).optional(),
-  secret: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -1201,11 +1201,11 @@ export const ApiKeyWhereInputSchema: z.ZodType<Prisma.ApiKeyWhereInput> = z.obje
 export const ApiKeyOrderByWithRelationInputSchema: z.ZodType<Prisma.ApiKeyOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   key: z.lazy(() => SortOrderSchema).optional(),
+  secret: z.lazy(() => SortOrderSchema).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   metadata: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
   accessLevel: z.lazy(() => SortOrderSchema).optional(),
-  secret: z.lazy(() => SortOrderSchema).optional(),
   createdById: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
@@ -1230,11 +1230,11 @@ export const ApiKeyWhereUniqueInputSchema: z.ZodType<Prisma.ApiKeyWhereUniqueInp
   AND: z.union([ z.lazy(() => ApiKeyWhereInputSchema),z.lazy(() => ApiKeyWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => ApiKeyWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => ApiKeyWhereInputSchema),z.lazy(() => ApiKeyWhereInputSchema).array() ]).optional(),
+  secret: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
   status: z.union([ z.lazy(() => EnumApiKeyStatusFilterSchema),z.lazy(() => ApiKeyStatusSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => EnumApiKeyAccessLevelFilterSchema),z.lazy(() => ApiKeyAccessLevelSchema) ]).optional(),
-  secret: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -1244,11 +1244,11 @@ export const ApiKeyWhereUniqueInputSchema: z.ZodType<Prisma.ApiKeyWhereUniqueInp
 export const ApiKeyOrderByWithAggregationInputSchema: z.ZodType<Prisma.ApiKeyOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   key: z.lazy(() => SortOrderSchema).optional(),
+  secret: z.lazy(() => SortOrderSchema).optional(),
   description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   metadata: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
   accessLevel: z.lazy(() => SortOrderSchema).optional(),
-  secret: z.lazy(() => SortOrderSchema).optional(),
   createdById: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
@@ -1263,11 +1263,11 @@ export const ApiKeyScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ApiKey
   NOT: z.union([ z.lazy(() => ApiKeyScalarWhereWithAggregatesInputSchema),z.lazy(() => ApiKeyScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   key: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  secret: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   metadata: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional(),
   status: z.union([ z.lazy(() => EnumApiKeyStatusWithAggregatesFilterSchema),z.lazy(() => ApiKeyStatusSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => EnumApiKeyAccessLevelWithAggregatesFilterSchema),z.lazy(() => ApiKeyAccessLevelSchema) ]).optional(),
-  secret: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   createdById: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
@@ -2421,11 +2421,11 @@ export const AchievementRewardUncheckedUpdateManyInputSchema: z.ZodType<Prisma.A
 export const ApiKeyCreateInputSchema: z.ZodType<Prisma.ApiKeyCreateInput> = z.object({
   id: z.string().optional(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.lazy(() => ApiKeyStatusSchema).optional(),
   accessLevel: z.lazy(() => ApiKeyAccessLevelSchema).optional(),
-  secret: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   createdBy: z.lazy(() => UserCreateNestedOneWithoutApiKeysInputSchema)
@@ -2434,11 +2434,11 @@ export const ApiKeyCreateInputSchema: z.ZodType<Prisma.ApiKeyCreateInput> = z.ob
 export const ApiKeyUncheckedCreateInputSchema: z.ZodType<Prisma.ApiKeyUncheckedCreateInput> = z.object({
   id: z.string().optional(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.lazy(() => ApiKeyStatusSchema).optional(),
   accessLevel: z.lazy(() => ApiKeyAccessLevelSchema).optional(),
-  secret: z.string(),
   createdById: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
@@ -2447,11 +2447,11 @@ export const ApiKeyUncheckedCreateInputSchema: z.ZodType<Prisma.ApiKeyUncheckedC
 export const ApiKeyUpdateInputSchema: z.ZodType<Prisma.ApiKeyUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   createdBy: z.lazy(() => UserUpdateOneRequiredWithoutApiKeysNestedInputSchema).optional()
@@ -2460,11 +2460,11 @@ export const ApiKeyUpdateInputSchema: z.ZodType<Prisma.ApiKeyUpdateInput> = z.ob
 export const ApiKeyUncheckedUpdateInputSchema: z.ZodType<Prisma.ApiKeyUncheckedUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2473,11 +2473,11 @@ export const ApiKeyUncheckedUpdateInputSchema: z.ZodType<Prisma.ApiKeyUncheckedU
 export const ApiKeyCreateManyInputSchema: z.ZodType<Prisma.ApiKeyCreateManyInput> = z.object({
   id: z.string().optional(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.lazy(() => ApiKeyStatusSchema).optional(),
   accessLevel: z.lazy(() => ApiKeyAccessLevelSchema).optional(),
-  secret: z.string(),
   createdById: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
@@ -2486,11 +2486,11 @@ export const ApiKeyCreateManyInputSchema: z.ZodType<Prisma.ApiKeyCreateManyInput
 export const ApiKeyUpdateManyMutationInputSchema: z.ZodType<Prisma.ApiKeyUpdateManyMutationInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -2498,11 +2498,11 @@ export const ApiKeyUpdateManyMutationInputSchema: z.ZodType<Prisma.ApiKeyUpdateM
 export const ApiKeyUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ApiKeyUncheckedUpdateManyInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3871,11 +3871,11 @@ export const EnumApiKeyAccessLevelFilterSchema: z.ZodType<Prisma.EnumApiKeyAcces
 export const ApiKeyCountOrderByAggregateInputSchema: z.ZodType<Prisma.ApiKeyCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   key: z.lazy(() => SortOrderSchema).optional(),
+  secret: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
   metadata: z.lazy(() => SortOrderSchema).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
   accessLevel: z.lazy(() => SortOrderSchema).optional(),
-  secret: z.lazy(() => SortOrderSchema).optional(),
   createdById: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
@@ -3884,10 +3884,10 @@ export const ApiKeyCountOrderByAggregateInputSchema: z.ZodType<Prisma.ApiKeyCoun
 export const ApiKeyMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ApiKeyMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   key: z.lazy(() => SortOrderSchema).optional(),
+  secret: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
   accessLevel: z.lazy(() => SortOrderSchema).optional(),
-  secret: z.lazy(() => SortOrderSchema).optional(),
   createdById: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
@@ -3896,10 +3896,10 @@ export const ApiKeyMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ApiKeyMaxOrd
 export const ApiKeyMinOrderByAggregateInputSchema: z.ZodType<Prisma.ApiKeyMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   key: z.lazy(() => SortOrderSchema).optional(),
+  secret: z.lazy(() => SortOrderSchema).optional(),
   description: z.lazy(() => SortOrderSchema).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
   accessLevel: z.lazy(() => SortOrderSchema).optional(),
-  secret: z.lazy(() => SortOrderSchema).optional(),
   createdById: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
@@ -10426,11 +10426,11 @@ export const EventCreateManyCreatedByInputEnvelopeSchema: z.ZodType<Prisma.Event
 export const ApiKeyCreateWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyCreateWithoutCreatedByInput> = z.object({
   id: z.string().optional(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.lazy(() => ApiKeyStatusSchema).optional(),
   accessLevel: z.lazy(() => ApiKeyAccessLevelSchema).optional(),
-  secret: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -10438,11 +10438,11 @@ export const ApiKeyCreateWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyCre
 export const ApiKeyUncheckedCreateWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyUncheckedCreateWithoutCreatedByInput> = z.object({
   id: z.string().optional(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.lazy(() => ApiKeyStatusSchema).optional(),
   accessLevel: z.lazy(() => ApiKeyAccessLevelSchema).optional(),
-  secret: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -10891,11 +10891,11 @@ export const ApiKeyScalarWhereInputSchema: z.ZodType<Prisma.ApiKeyScalarWhereInp
   NOT: z.union([ z.lazy(() => ApiKeyScalarWhereInputSchema),z.lazy(() => ApiKeyScalarWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   key: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  secret: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
   status: z.union([ z.lazy(() => EnumApiKeyStatusFilterSchema),z.lazy(() => ApiKeyStatusSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => EnumApiKeyAccessLevelFilterSchema),z.lazy(() => ApiKeyAccessLevelSchema) ]).optional(),
-  secret: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -12415,11 +12415,11 @@ export const EventCreateManyCreatedByInputSchema: z.ZodType<Prisma.EventCreateMa
 export const ApiKeyCreateManyCreatedByInputSchema: z.ZodType<Prisma.ApiKeyCreateManyCreatedByInput> = z.object({
   id: z.string().optional(),
   key: z.string(),
+  secret: z.string(),
   description: z.string().optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.lazy(() => ApiKeyStatusSchema).optional(),
   accessLevel: z.lazy(() => ApiKeyAccessLevelSchema).optional(),
-  secret: z.string(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -12872,11 +12872,11 @@ export const EventUncheckedUpdateManyWithoutCreatedByInputSchema: z.ZodType<Pris
 export const ApiKeyUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyUpdateWithoutCreatedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -12884,11 +12884,11 @@ export const ApiKeyUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyUpd
 export const ApiKeyUncheckedUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyUncheckedUpdateWithoutCreatedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -12896,11 +12896,11 @@ export const ApiKeyUncheckedUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.
 export const ApiKeyUncheckedUpdateManyWithoutCreatedByInputSchema: z.ZodType<Prisma.ApiKeyUncheckedUpdateManyWithoutCreatedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   key: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   status: z.union([ z.lazy(() => ApiKeyStatusSchema),z.lazy(() => EnumApiKeyStatusFieldUpdateOperationsInputSchema) ]).optional(),
   accessLevel: z.union([ z.lazy(() => ApiKeyAccessLevelSchema),z.lazy(() => EnumApiKeyAccessLevelFieldUpdateOperationsInputSchema) ]).optional(),
-  secret: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();

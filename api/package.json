@@ -60,6 +60,7 @@
     "prisma-erd-generator": "^1.11.2",
     "rimraf": "^6.0.0",
     "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
     "tsup": "^8.0.2",
     "tsx": "^4.7.2",
     "typescript": "^5.4.4",
