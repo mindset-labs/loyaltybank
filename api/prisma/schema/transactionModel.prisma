@@ -42,6 +42,7 @@ enum TransactionSubtype {
 }
 
 enum TransactionStatus {
+    PLACEHOLDER
     PENDING
     COMPLETED
     FAILED

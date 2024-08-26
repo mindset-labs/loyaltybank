@@ -2,6 +2,7 @@ import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from 'http-status-codes'
 import { handleErrorResponse, handleSuccessResponse } from '@/common/utils/httpHandlers'
 import { walletService } from './walletService'
+import { transactionService } from '../transaction/transactionService'
 
 export class WalletController {
     myWallets: RequestHandler = async (req: Request, res: Response) => {
@@ -32,6 +33,13 @@ export class WalletController {
         walletService
             .generateWalletQRCode(req.userId!, walletId)
             .then((qrCode) => handleSuccessResponse({ qrCode }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res))
+    }
+
+    createPlaceholderTransaction: RequestHandler = async (req: Request, res: Response) => {
+        walletService
+            .createPlaceholderTransaction(req.userId!, req.params.walletId, req.body.amount, req.body.options)
+            .then((transaction) => handleSuccessResponse({ transaction }, res, StatusCodes.CREATED))
             .catch((error) => handleErrorResponse(error, res))
     }
 }

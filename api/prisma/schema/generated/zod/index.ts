@@ -140,7 +140,7 @@ export const TransactionSubtypeSchema = z.enum(['BANK_TRANSFER','CASH','BALANCE'
 
 export type TransactionSubtypeType = `${z.infer<typeof TransactionSubtypeSchema>}`
 
-export const TransactionStatusSchema = z.enum(['PENDING','COMPLETED','FAILED']);
+export const TransactionStatusSchema = z.enum(['PLACEHOLDER','PENDING','COMPLETED','FAILED']);
 
 export type TransactionStatusType = `${z.infer<typeof TransactionStatusSchema>}`
 

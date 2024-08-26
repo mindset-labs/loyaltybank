@@ -7,7 +7,7 @@ import verifyJWT from "@/common/middleware/verifyJWT"
 import { walletController } from "./walletController"
 import { TransactionSchema, WalletSchema } from '@zodSchema/index'
 import { validateRequest } from '@/common/utils/httpHandlers'
-import { GetWalletsSchema, GetWalletTransactionsSchema } from './walletRequestValidation'
+import { CreatePlaceholderTransactionSchema, GetWalletsSchema, GetWalletTransactionsSchema } from './walletRequestValidation'
 
 export const walletRegistry = new OpenAPIRegistry()
 export const walletRouter: Router = express.Router()
@@ -56,3 +56,13 @@ walletRegistry.registerPath({
 })
 
 walletRouter.get("/:walletId/qrcode", verifyJWT, walletController.generateQRCode)
+
+// Generate a placeholder transaction for a wallet
+walletRegistry.registerPath({
+    method: "post",
+    path: "/wallets/{walletId}/transactions/placeholder",
+    tags: ["Wallet", "Transaction"],
+    responses: createApiResponse(z.object({ data: z.object({ transaction: TransactionSchema }) }), "Success"),
+})
+
+walletRouter.post("/:walletId/transactions/placeholder", verifyJWT, validateRequest(CreatePlaceholderTransactionSchema), walletController.createPlaceholderTransaction)

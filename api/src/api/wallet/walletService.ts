@@ -1,8 +1,10 @@
-import { Prisma, Transaction, Wallet, WalletRole } from '@prisma/client'
+import { Community, Prisma, Transaction, TransactionStatus, TransactionSubtype, TransactionType, User, Wallet, WalletRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import QRCode from 'qrcode'
 import { logger } from '@/server'
+
+type WalletWithOwnerAndCommunity = Wallet & { owner?: User | null, community?: Community | null }
 
 export class WalletService {
     async userWallets(userId: string): Promise<Wallet[]> {
@@ -24,8 +26,8 @@ export class WalletService {
         })
     }
 
-    async queryWalletTransactions(userId: string, walletId: string, query: Prisma.TransactionWhereInput): Promise<Transaction[]> {
-        const walletDetails = await dbClient.wallet.findFirst({
+    async findWalletWithPermission(userId: string, walletId: string, include?: Prisma.WalletInclude): Promise<WalletWithOwnerAndCommunity | null> {
+        return dbClient.wallet.findFirst({
             where: {
                 id: walletId,
                 OR: [
@@ -33,6 +35,7 @@ export class WalletService {
                         ownerId: userId,
                     },
                     {
+                        isShared: true,
                         users: {
                             some: {
                                 userId,
@@ -41,7 +44,12 @@ export class WalletService {
                     }
                 ]
             },
+            include,
         })
+    }
+
+    async queryWalletTransactions(userId: string, walletId: string, query: Prisma.TransactionWhereInput): Promise<Transaction[]> {
+        const walletDetails = await this.findWalletWithPermission(userId, walletId)
 
         if (!walletDetails) {
             throw new CustomError('Wallet not found or not accessible', CustomErrorCode.INVALID_WALLET_ID, {
@@ -130,28 +138,9 @@ export class WalletService {
      * @returns A string of the QR code data URL (image as a string)
      */
     async generateWalletQRCode(walletId: string, userId: string): Promise<string> {
-        const wallet = await dbClient.wallet.findUnique({
-            where: {
-                id: walletId,
-                OR: [
-                    {
-                        isShared: true,
-                        users: {
-                            some: {
-                                userId: userId,
-                                role: WalletRole.OWNER
-                            }
-                        }
-                    },
-                    {
-                        ownerId: userId,
-                    }
-                ]
-            },
-            include: {
-                community: true,
-                owner: true
-            }
+        const wallet = await this.findWalletWithPermission(userId, walletId, {
+            owner: true,
+            community: true,
         })
 
         if (!wallet) {
@@ -163,7 +152,7 @@ export class WalletService {
 
         const qrCodeData = {
             walletId: wallet.id,
-            ownerId: userId,
+            userId: userId,
             ownerName: wallet.owner?.name || null,
             communityId: wallet.community?.id || null,
             communityName: wallet.community?.name || null,
@@ -185,6 +174,31 @@ export class WalletService {
                 userId,
             })
         }
+    }
+
+    async createPlaceholderTransaction(userId: string, walletId: string, amount: number, options?: {
+        transactionType?: TransactionType,
+        transactionSubtype?: TransactionSubtype,
+    }): Promise<Transaction> {
+        const wallet = await this.findWalletWithPermission(userId, walletId)
+
+        if (!wallet) {
+            throw new CustomError('Wallet not found or user is not the owner', CustomErrorCode.INVALID_WALLET_ID, {
+                walletId,
+                userId,
+            })
+        }
+
+        return dbClient.transaction.create({
+            data: {
+                transactionType: options?.transactionType || TransactionType.PAYMENT,
+                transactionSubtype: options?.transactionSubtype || TransactionSubtype.BALANCE,
+                receiverWalletId: walletId,
+                receiverId: userId,
+                amount,
+                status: TransactionStatus.PLACEHOLDER,
+            }
+        })
     }
 }
 
