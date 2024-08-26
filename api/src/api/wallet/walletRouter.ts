@@ -62,7 +62,7 @@ walletRegistry.registerPath({
     method: "post",
     path: "/wallets/{walletId}/transactions/placeholder",
     tags: ["Wallet", "Transaction"],
-    responses: createApiResponse(z.object({ data: z.object({ transaction: TransactionSchema }) }), "Success"),
+    responses: createApiResponse(z.object({ data: z.object({ transaction: TransactionWithoutMetadataSchema }) }), "Success"),
 })
 
 walletRouter.post("/:walletId/transactions/placeholder", verifyJWT, validateRequest(CreatePlaceholderTransactionSchema), walletController.createPlaceholderTransaction)
