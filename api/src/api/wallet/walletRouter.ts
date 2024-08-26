@@ -46,3 +46,13 @@ walletRegistry.registerPath({
 })
 
 walletRouter.put("/:walletId/share", verifyJWT, walletController.shareWallet)
+
+// Generate a QR code for a wallet
+walletRegistry.registerPath({
+    method: "get",
+    path: "/wallets/{walletId}/qrcode",
+    tags: ["Wallet"],
+    responses: createApiResponse(z.object({ data: z.object({ qrCode: z.string() }) }), "Success"),
+})
+
+walletRouter.get("/:walletId/qrcode", verifyJWT, walletController.generateQRCode)

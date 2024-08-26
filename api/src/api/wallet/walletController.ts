@@ -26,6 +26,14 @@ export class WalletController {
             .then((wallet) => handleSuccessResponse({ wallet }, res, StatusCodes.CREATED))
             .catch((error) => handleErrorResponse(error, res))
     };
+
+    generateQRCode: RequestHandler = async (req: Request, res: Response) => {
+        const { walletId } = req.params
+        walletService
+            .generateWalletQRCode(req.userId!, walletId)
+            .then((qrCode) => handleSuccessResponse({ qrCode }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res))
+    }
 }
 
 export const walletController = new WalletController()

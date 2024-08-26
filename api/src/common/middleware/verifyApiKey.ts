@@ -1,4 +1,3 @@
-import { env } from "@/common/utils/envConfig"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import { handleErrorResponse } from "@/common/utils/httpHandlers"
 import db from "@/db"

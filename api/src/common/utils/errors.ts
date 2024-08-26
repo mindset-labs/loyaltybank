@@ -30,6 +30,7 @@ export enum CustomErrorCode {
   // wallet errors
   INVALID_RECIPIENT_ID = 401,
   WALLET_ALREADY_SHARED_WITH_USER = 402,
+  QR_CODE_GENERATION_FAILED = 403,
 
   // event errors
   UNKNOWN_EVENT = 501,

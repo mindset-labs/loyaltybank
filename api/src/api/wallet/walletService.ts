@@ -1,9 +1,8 @@
 import { Prisma, Transaction, Wallet, WalletRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
+import QRCode from 'qrcode'
 import { logger } from '@/server'
-import { TransactionWhereInputSchema } from '@zodSchema/index'
-import { StatusCodes } from 'http-status-codes'
 
 export class WalletService {
     async userWallets(userId: string): Promise<Wallet[]> {
@@ -122,6 +121,70 @@ export class WalletService {
         ])
 
         return sharedWallet
+    }
+
+    /**
+     * Generate a QR code for a wallet
+     * @param walletId: The ID of the wallet
+     * @param userId: The ID of the user
+     * @returns A string of the QR code data URL (image as a string)
+     */
+    async generateWalletQRCode(walletId: string, userId: string): Promise<string> {
+        const wallet = await dbClient.wallet.findUnique({
+            where: {
+                id: walletId,
+                OR: [
+                    {
+                        isShared: true,
+                        users: {
+                            some: {
+                                userId: userId,
+                                role: WalletRole.OWNER
+                            }
+                        }
+                    },
+                    {
+                        ownerId: userId,
+                    }
+                ]
+            },
+            include: {
+                community: true,
+                owner: true
+            }
+        })
+
+        if (!wallet) {
+            throw new CustomError('Wallet not found or user is not the owner', CustomErrorCode.INVALID_WALLET_ID, {
+                walletId,
+                userId,
+            })
+        }
+
+        const qrCodeData = {
+            walletId: wallet.id,
+            ownerId: userId,
+            ownerName: wallet.owner?.name || null,
+            communityId: wallet.community?.id || null,
+            communityName: wallet.community?.name || null,
+        }
+
+        const qrCodeString = JSON.stringify(qrCodeData)
+
+        try {
+            const qrCodeDataUrl = await QRCode.toDataURL(qrCodeString)
+            return qrCodeDataUrl
+        } catch (error) {
+            logger.error('Failed to generate QR code', {
+                walletId,
+                userId,
+                error,
+            })
+            throw new CustomError('Failed to generate QR code', CustomErrorCode.QR_CODE_GENERATION_FAILED, {
+                walletId,
+                userId,
+            })
+        }
     }
 }
 
