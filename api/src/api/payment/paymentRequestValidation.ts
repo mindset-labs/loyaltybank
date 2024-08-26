@@ -12,6 +12,7 @@ export const CreatePaymentSchema = z.object({
         amount: z.number().positive(),
         description: z.string().max(255).optional(),
         communityId: z.string().uuid().optional(),
+        transactionId: z.string().uuid().optional(),
     }),
 })
 export type CreatePaymentSchemaType = z.infer<typeof CreatePaymentSchema.shape.body>

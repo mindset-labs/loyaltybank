@@ -17,7 +17,7 @@ const TransactionWithoutMetadataSchema = TransactionSchema.omit({ metadata: true
 
 paymentRegistry.register("Payment", TransactionWithoutMetadataSchema)
 
-// Query user's own transactions
+// Create a payment
 paymentRegistry.registerPath({
     method: "post",
     path: "/payments",

@@ -66,9 +66,24 @@ export class PaymentService {
             })
         }
 
-        const [transaction, senderWalletUpdated] = await db.$transaction(
-            [
-                db.transaction.create({
+        return db.$transaction(async () => {
+            let transaction: Transaction
+
+            // If the transaction ID is provided, update the existing (placeholder) transaction
+            if (paymentRequest.transactionId) {
+                transaction = await db.transaction.update({
+                    where: {
+                        id: paymentRequest.transactionId,
+                        status: TransactionStatus.PLACEHOLDER,
+                    },
+                    data: {
+                        senderId: senderId,
+                        senderWalletId: paymentRequest.senderWalletId,
+                        status: TransactionStatus.COMPLETED,
+                    },
+                })
+            } else {
+                transaction = await db.transaction.create({
                     data: {
                         amount: paymentRequest.amount,
                         description: paymentRequest.description,
@@ -81,34 +96,38 @@ export class PaymentService {
                         transactionSubtype: TransactionSubtype.BALANCE,
                         status: TransactionStatus.COMPLETED,
                     },
-                }),
-                db.wallet.update({
-                    where: {
-                        id: paymentRequest.senderWalletId,
-                    },
-                    data: {
-                        balance: {
-                            decrement: paymentRequest.amount,
-                        },
-                    },
-                }),
-                db.wallet.update({
-                    where: {
-                        id: paymentRequest.receiverWalletId,
-                    },
-                    data: {
-                        balance: {
-                            increment: paymentRequest.amount,
-                        },
-                    },
-                }),
-            ]
-        )
+                })
+            }
 
-        return {
-            transaction,
-            senderWallet: senderWalletUpdated
-        }
+            // update the sender wallet balance
+            const senderWalletUpdated = await db.wallet.update({
+                where: {
+                    id: paymentRequest.senderWalletId,
+                },
+                data: {
+                    balance: {
+                        decrement: paymentRequest.amount,
+                    },
+                },
+            })
+
+            // update the receiver wallet balance
+            const receiverWalletUpdated = await db.wallet.update({
+                where: {
+                    id: paymentRequest.receiverWalletId,
+                },
+                data: {
+                    balance: {
+                        increment: paymentRequest.amount,
+                    },
+                },
+            })
+
+            return {
+                transaction,
+                senderWallet: senderWalletUpdated,
+            }
+        })
     }
 }
 
