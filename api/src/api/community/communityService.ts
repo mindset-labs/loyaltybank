@@ -24,6 +24,13 @@ export class CommunityService {
         })
     }
 
+    /**
+     * Find a community by id and check if the user has view/edit access
+     * @param communityId: the id of the community
+     * @param userId: the user performing the action
+     * @param include: (optional) the relationships to include
+     * @returns the community
+     */
     findByIdAndCheckAccess(communityId: string, userId: string, include: Prisma.CommunityInclude = {}): Promise<Community | null> {
         return dbClient.community.findFirst({
             where: {
@@ -53,6 +60,13 @@ export class CommunityService {
         })
     }
 
+    /**
+     * Find a community by id and check if the user has edit access
+     * @param communityId: the id of the community
+     * @param userId: the user performing the action
+     * @param select: (optional) the fields to select
+     * @returns the community
+     */
     async findByIdWithEditAccess(communityId: string, userId: string, select?: Prisma.CommunitySelect): Promise<Community | null> {
         return dbClient.community.findFirst({
             where: {
@@ -98,6 +112,16 @@ export class CommunityService {
         })
     }
 
+    /**
+     * Add a member to a community
+     * @param userId: the user performing the action
+     * @param membershipData: the data to add the member with
+     * @param membershipData.communityId: the community to add the member to
+     * @param membershipData.userId: the user to add to the community
+     * @param membershipData.communityRole: (optional) the role of the member in the community
+     * @param membershipData.membershipStatus: (optional) the status of the membership
+     * @returns the membership
+     */
     async addMember(userId: string, membershipData: Prisma.MembershipUncheckedCreateInput): Promise<Membership> {
         // find the community
         const community = await dbClient.community.findFirst({
@@ -117,6 +141,13 @@ export class CommunityService {
         })
     }
 
+    /**
+     * Join a community
+     * @param id: the id of the community
+     * @param userId: the user performing the action
+     * @param options: (optional) options to join the community
+     * @returns the membership
+     */
     async joinCommunity(id: string, userId: string, options?: JoinCommunityOptions): Promise<Membership> {
         // find the community
         const community = await dbClient.community.findFirst({
@@ -172,6 +203,16 @@ export class CommunityService {
         })
     }
 
+    /**
+     * Issue points to a wallet
+     * @param userId: the user performing the action
+     * @param data: the data to issue points
+     * @param data.communityId: the community to issue points to
+     * @param data.walletId: the wallet to issue points to
+     * @param data.amount: the amount of points to issue
+     * @param data.reason: (optional) the reason for issuing points
+     * @returns the transaction
+     */
     async issuePoints(
         userId: string,
         data: {

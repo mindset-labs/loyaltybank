@@ -4,7 +4,12 @@ import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { communityService } from '../community/communityService'
 
 export class EventService {
-    // Create a new event
+    /**
+     * Create a new event
+     * @param userId: the user performing the action
+     * @param data: the data to create the event
+     * @returns the created event
+     */
     async createEvent(userId: string, data: Prisma.EventUncheckedCreateInput): Promise<Event> {
         // check if the user is authorized to create an event
         const community = await communityService.findByIdWithEditAccess(userId, data.communityId)
@@ -37,7 +42,13 @@ export class EventService {
         })
     }
 
-    // Update an event
+    /**
+     * Update an event
+     * @param userId: the user performing the action
+     * @param eventId: the id of the event
+     * @param data: the data to update
+     * @returns the updated event
+     */
     async updateEvent(userId: string, eventId: string, data: Prisma.EventUpdateInput): Promise<Event> {
         const eventDetails = await dbClient.event.findFirst({
             where: {

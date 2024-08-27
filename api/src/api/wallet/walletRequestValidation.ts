@@ -13,8 +13,8 @@ export const CreatePlaceholderTransactionSchema = z.object({
     body: z.object({
         amount: z.number(),
         options: z.object({
-            transactionType: TransactionTypeSchema,
-            transactionSubtype: TransactionSubtypeSchema,
-        }),
+            transactionType: TransactionTypeSchema.optional(),
+            transactionSubtype: TransactionSubtypeSchema.optional(),
+        }).optional(),
     }),
 })

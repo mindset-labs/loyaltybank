@@ -38,7 +38,7 @@ export class WalletController {
 
     createPlaceholderTransaction: RequestHandler = async (req: Request, res: Response) => {
         walletService
-            .createPlaceholderTransaction(req.userId!, req.params.walletId, req.body.amount, req.body.options)
+            .createPlaceholderTransactionForWallet(req.userId!, req.params.walletId, req.body.amount, req.body.options)
             .then((transaction) => handleSuccessResponse({ transaction }, res, StatusCodes.CREATED))
             .catch((error) => handleErrorResponse(error, res))
     }

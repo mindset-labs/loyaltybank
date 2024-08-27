@@ -3,10 +3,16 @@ import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import QRCode from 'qrcode'
 import { logger } from '@/server'
+import { transactionService } from '../transaction/transactionService'
 
 type WalletWithOwnerAndCommunity = Wallet & { owner?: User | null, community?: Community | null }
 
 export class WalletService {
+    /**
+     * Get all wallets for a user (owned and shared)
+     * @param userId: the id of the user
+     * @returns an array of wallets
+     */
     async userWallets(userId: string): Promise<Wallet[]> {
         return dbClient.wallet.findMany({
             where: {
@@ -26,6 +32,13 @@ export class WalletService {
         })
     }
 
+    /**
+     * Find a wallet by id and check if the user has view/edit access
+     * @param userId: the id of the user
+     * @param walletId: the id of the wallet
+     * @param include: the fields to include
+     * @returns the wallet if found, otherwise null
+     */
     async findWalletWithPermission(userId: string, walletId: string, include?: Prisma.WalletInclude): Promise<WalletWithOwnerAndCommunity | null> {
         return dbClient.wallet.findFirst({
             where: {
@@ -48,6 +61,13 @@ export class WalletService {
         })
     }
 
+    /**
+     * Query transactions for a wallet. The user must have view access to the wallet (owner or shared).
+     * @param userId: the id of the user
+     * @param walletId: the id of the wallet
+     * @param query: the query to filter transactions
+     * @returns an array of transactions
+     */
     async queryWalletTransactions(userId: string, walletId: string, query: Prisma.TransactionWhereInput): Promise<Transaction[]> {
         const walletDetails = await this.findWalletWithPermission(userId, walletId)
 
@@ -73,11 +93,17 @@ export class WalletService {
         })
     }
 
+    /**
+     * Share a wallet with a user. The user must be the owner of the wallet.
+     * @param userId: the id of the user
+     * @param walletId: the id of the wallet
+     * @param recipientId: the id of the user to share the wallet with
+     * @returns the shared wallet
+     */
     async shareWallet(userId: string, walletId: string, recipientId: string): Promise<Wallet> {
         const wallet = await dbClient.wallet.findFirst({
             where: {
                 id: walletId,
-                // must be owned by the user
                 ownerId: userId,
             },
             include: {
@@ -176,7 +202,18 @@ export class WalletService {
         }
     }
 
-    async createPlaceholderTransaction(userId: string, walletId: string, amount: number, options?: {
+    /**
+     * Create a placeholder transaction for a wallet. The user must have edit access to the wallet.
+     * The transaction will be created with a status of PLACEHOLDER and can be paid & confirmed later by the payer.
+     * @param userId: the id of the user
+     * @param walletId: the id of the wallet
+     * @param amount: the amount of the transaction
+     * @param options: the options for the transaction
+     * @param options.transactionType: the type of the transaction
+     * @param options.transactionSubtype: the subtype of the transaction
+     * @returns the created transaction
+     */
+    async createPlaceholderTransactionForWallet(userId: string, walletId: string, amount: number, options?: {
         transactionType?: TransactionType,
         transactionSubtype?: TransactionSubtype,
     }): Promise<Transaction> {
@@ -189,16 +226,7 @@ export class WalletService {
             })
         }
 
-        return dbClient.transaction.create({
-            data: {
-                transactionType: options?.transactionType || TransactionType.PAYMENT,
-                transactionSubtype: options?.transactionSubtype || TransactionSubtype.BALANCE,
-                receiverWalletId: walletId,
-                receiverId: userId,
-                amount,
-                status: TransactionStatus.PLACEHOLDER,
-            }
-        })
+        return transactionService.createPlaceholderTransaction(userId, walletId, amount, options)
     }
 }
 
