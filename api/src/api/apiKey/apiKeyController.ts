@@ -16,6 +16,13 @@ export class ApiKeyController {
             .then(({ apiKey, secretPlainText }) => handleSuccessResponse({ apiKey, secretPlainText }, res))
             .catch((error) => handleErrorResponse(error, res))
     };
+
+    removeApiKey: RequestHandler = async (req: Request, res: Response) => {
+        return apiKeyService
+            .removeApiKey(req.userId!, req.params.apiKeyId)
+            .then(() => handleSuccessResponse({}, res))
+            .catch((error) => handleErrorResponse(error, res))
+    };
 }
 
 export const apiKeyController = new ApiKeyController()

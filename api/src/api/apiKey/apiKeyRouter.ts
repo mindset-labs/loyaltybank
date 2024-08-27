@@ -32,3 +32,12 @@ apiKeyRegistry.registerPath({
     }), "Success"),
 })
 apiKeyRouter.post('/', verifyJWT, apiKeyController.createApiKey)
+
+// Remove an API key
+apiKeyRegistry.registerPath({
+    method: "delete",
+    path: "/api-keys/:apiKeyId",
+    tags: ["ApiKey"],
+    responses: createApiResponse(z.object({}), "Success"),
+})
+apiKeyRouter.delete('/:apiKeyId', verifyJWT, apiKeyController.removeApiKey)
