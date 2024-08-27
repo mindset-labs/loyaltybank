@@ -7,7 +7,7 @@ import verifyJWT from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { communityController } from "./communityController"
 import { CommunitySchema, MembershipSchema } from '@zodSchema/index'
-import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema } from './communityRequestValidation'
+import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema, UpdateMembershipSchema } from './communityRequestValidation'
 
 export const communityRegistry = new OpenAPIRegistry()
 export const communityRouter: Router = express.Router()
@@ -77,6 +77,16 @@ communityRegistry.registerPath({
 })
 
 communityRouter.post("/:id/join", verifyJWT, communityController.joinCommunity)
+
+// Update a community
+communityRegistry.registerPath({
+    method: "put",
+    path: "/communities/{id}/memberships/{membershipId}",
+    tags: ["Community", "Membership"],
+    responses: createApiResponse(z.object({ membership: MembershipWithoutMetadata }), "Success"),
+})
+
+communityRouter.put("/:id/memberships/:membershipId", verifyJWT, validateRequest(UpdateMembershipSchema), communityController.updateMembership)
 
 // Issue points to community member
 communityRegistry.registerPath({

@@ -133,6 +133,13 @@ class CommunityController {
             .then((transaction) => handleSuccessResponse({ transaction }, res, StatusCodes.CREATED))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     }
+
+    public updateMembership: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .updateMembership(req.userId!, req.params.communityId, req.params.membershipId, req.body)
+            .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    }
 }
 
 export const communityController = new CommunityController()

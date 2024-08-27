@@ -52,7 +52,7 @@ walletRegistry.registerPath({
     method: "get",
     path: "/wallets/{walletId}/qrcode",
     tags: ["Wallet"],
-    responses: createApiResponse(z.object({ data: z.object({ qrCode: z.string() }) }), "Success"),
+    responses: createApiResponse(z.object({ qrCode: z.string() }), "Success"),
 })
 
 walletRouter.get("/:walletId/qrcode", verifyJWT, walletController.generateQRCode)
@@ -62,7 +62,7 @@ walletRegistry.registerPath({
     method: "post",
     path: "/wallets/{walletId}/transactions/placeholder",
     tags: ["Wallet", "Transaction"],
-    responses: createApiResponse(z.object({ data: z.object({ transaction: TransactionWithoutMetadataSchema }) }), "Success"),
+    responses: createApiResponse(z.object({ transaction: TransactionWithoutMetadataSchema }), "Success"),
 })
 
 walletRouter.post("/:walletId/transactions/placeholder", verifyJWT, validateRequest(CreatePlaceholderTransactionSchema), walletController.createPlaceholderTransaction)

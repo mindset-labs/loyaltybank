@@ -53,7 +53,7 @@ export class CommunityService {
         })
     }
 
-    async findByIdWithEditAccess(communityId: string, userId: string): Promise<Community | null> {
+    async findByIdWithEditAccess(communityId: string, userId: string, select?: Prisma.CommunitySelect): Promise<Community | null> {
         return dbClient.community.findFirst({
             where: {
                 id: communityId,
@@ -70,7 +70,8 @@ export class CommunityService {
                         }
                     }
                 ]
-            }
+            },
+            select,
         })
     }
 
@@ -242,6 +243,35 @@ export class CommunityService {
         ])
 
         return transaction
+    }
+
+    /**
+     * Update a membership within a community
+     * @param userId: the user performing the action
+     * @param membershipId: the membership to update
+     * @param communityId: the community the membership is in
+     * @param data: the data to update the membership with
+     * @returns the updated membership
+     */
+    async updateMembership(userId: string, communityId: string, membershipId: string, data: Prisma.MembershipUpdateInput): Promise<Membership> {
+        // check the user has access to update the community / its memberships
+        const community = await this.findByIdWithEditAccess(communityId, userId, { id: true })
+
+        if (!community) {
+            throw new CustomError('Community not found or user does not have edit access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                communityId,
+                userId,
+                membershipId,
+            })
+        }
+
+        return dbClient.membership.update({
+            where: {
+                id: membershipId,
+                communityId,
+            },
+            data,
+        })
     }
 }
 

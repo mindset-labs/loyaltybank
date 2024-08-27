@@ -7,7 +7,6 @@ import errorHandler from "@/common/middleware/errorHandler"
 import rateLimiter from "@/common/middleware/rateLimiter"
 import requestLogger from "@/common/middleware/requestLogger"
 import { env } from "@/common/utils/envConfig"
-import eventQ from '@/worker/eventWorker'
 import { openAPIRouter } from "@/api-docs/openAPIRouter"
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter"
 import { userRouter } from "@/api/user/userRouter"
@@ -17,6 +16,7 @@ import { transactionRouter } from './api/transaction/transactionRouter'
 import { walletRouter } from './api/wallet/walletRouter'
 import { eventRouter } from './api/event/eventRouter'
 import { achievementRouter } from './api/achievement/achievementRouter'
+import { apiKeyRouter } from './api/apiKey/apiKeyRouter'
 import verifyApiKey from './common/middleware/verifyApiKey'
 
 const logger = pino({ name: "server start", level: env.LOG_LEVEL })
@@ -64,6 +64,7 @@ app.use('/wallets', walletRouter)
 app.use("/payments", paymentRouter)
 app.use("/events", eventRouter)
 app.use('/achievements', achievementRouter)
+app.use('/api-keys', apiKeyRouter)
 
 // Swagger UI
 app.use(openAPIRouter)
