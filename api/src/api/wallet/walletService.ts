@@ -1,4 +1,4 @@
-import { Community, Prisma, Transaction, TransactionStatus, TransactionSubtype, TransactionType, User, Wallet, WalletRole } from '@prisma/client'
+import { Community, Prisma, Transaction, TransactionSubtype, TransactionType, User, Wallet, WalletRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import QRCode from 'qrcode'

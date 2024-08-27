@@ -1,9 +1,8 @@
-import { Transaction, TransactionStatus, TransactionSubtype, TransactionType, Wallet } from '@prisma/client'
+import { Prisma, Transaction, TransactionStatus, TransactionSubtype, TransactionType, Wallet } from '@prisma/client'
 import { round } from 'lodash'
 import { CreatePaymentSchemaType } from './paymentRequestValidation'
 import db from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
-import { logger } from '@/server'
 
 export class PaymentService {
     async createPayment(senderId: string, paymentRequest: CreatePaymentSchemaType): Promise<{
@@ -71,17 +70,27 @@ export class PaymentService {
 
             // If the transaction ID is provided, update the existing (placeholder) transaction
             if (paymentRequest.transactionId) {
-                transaction = await db.transaction.update({
-                    where: {
-                        id: paymentRequest.transactionId,
-                        status: TransactionStatus.PLACEHOLDER,
-                    },
-                    data: {
-                        senderId: senderId,
-                        senderWalletId: paymentRequest.senderWalletId,
-                        status: TransactionStatus.COMPLETED,
-                    },
-                })
+                try {
+                    transaction = await db.transaction.update({
+                        where: {
+                            id: paymentRequest.transactionId,
+                            status: TransactionStatus.PLACEHOLDER,
+                        },
+                        data: {
+                            senderId: senderId,
+                            senderWalletId: paymentRequest.senderWalletId,
+                            status: TransactionStatus.COMPLETED,
+                        },
+                    })
+                } catch (prismaError) {
+                    if (prismaError instanceof Prisma.PrismaClientKnownRequestError && prismaError.code === 'P2025') {
+                        throw new CustomError('Transaction ID invalid or already paid', CustomErrorCode.INVALID_OR_PAID_PAYMENT_TRANSACTION, {
+                            transactionId: paymentRequest.transactionId,
+                        })
+                    }
+
+                    throw prismaError
+                }
             } else {
                 transaction = await db.transaction.create({
                     data: {
