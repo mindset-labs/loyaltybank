@@ -42,6 +42,6 @@ By using PointsBank, developers can focus on creating unique user experiences wh
 ## Project Components & Documentation
 
 - [API](./api)
-- [Admin UI - coming soon]()
-- [Mobile App - coming soon]()
+- Admin UI - coming soon..
+- Mobile App - coming soon..
 
