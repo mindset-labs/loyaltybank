@@ -1,16 +1,18 @@
 import { handleErrorResponse, handleSuccessResponse } from "@/common/utils/httpHandlers"
 import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { communityService } from "./communityService"
+import { communityService, QueryPaging } from "./communityService"
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { CommunityStatus, MembershipStatus, Prisma } from '@prisma/client'
-import { logger } from '@/server'
-import { CommunityIncludeSchema } from '@zodSchema/index'
 
 class CommunityController {
     public communities: RequestHandler = async (req: Request, res: Response) => {
         return communityService
-            .queryCommunities({})
+            .queryCommunities(
+                (req.query.where || {}) as Prisma.CommunityWhereInput,
+                req.query.include as Prisma.CommunityInclude,
+                req.query.paging as QueryPaging
+            )
             .then((communities) => handleSuccessResponse({ communities }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };
@@ -26,30 +28,18 @@ class CommunityController {
                         memberships: {
                             some: {
                                 userId: req.userId!,
-                                membershipStatus: MembershipStatus.ACTIVE
+                                // TODO: decide if we want to include non-active memberships
+                                // membershipStatus: MembershipStatus.ACTIVE
                             }
                         }
                     }
                 ]
-            })
+            }, req.query.include as Prisma.CommunityInclude, req.query.paging as QueryPaging)
             .then((communities) => handleSuccessResponse({ communities }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     };
 
     public getCommunityById: RequestHandler = async (req: Request, res: Response) => {
-        // let include: Prisma.CommunityInclude = {}
-
-        // if (req.query.include) {
-        //     try {
-        //         const parsed = JSON.parse(req.query.include as string)
-        //         include = CommunityIncludeSchema.parse(parsed)
-        //     } catch (error) {
-        //         logger.error('Failed to parse include query', error)
-        //     }
-        // }
-
-        logger.debug({ include: req.query.include }, 'Get community by ID with include')
-
         return communityService
             .findByIdAndCheckAccess(req.params.id, req.userId!, req.query.include as Prisma.CommunityInclude | undefined)
             .then((community) => handleSuccessResponse({ community }, res, StatusCodes.OK))

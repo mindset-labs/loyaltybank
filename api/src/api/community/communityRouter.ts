@@ -3,11 +3,12 @@ import express, { type Router } from "express"
 import { z } from "zod"
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
-import verifyJWT from "@/common/middleware/verifyJWT"
+import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { communityController } from "./communityController"
 import { CommunitySchema, MembershipSchema } from '@zodSchema/index'
-import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema, UpdateMembershipSchema } from './communityRequestValidation'
+import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema, QueryAllCommunitiesSchema, UpdateMembershipSchema } from './communityRequestValidation'
+import { Role } from '@prisma/client'
 
 export const communityRegistry = new OpenAPIRegistry()
 export const communityRouter: Router = express.Router()
@@ -26,7 +27,7 @@ communityRegistry.registerPath({
     responses: createApiResponse(z.array(CommunityWithoutMetadata), "Success"),
 })
 
-communityRouter.get("/", verifyJWT, communityController.communities)
+communityRouter.get("/", verifyJWTAndRole([Role.ADMIN]), validateRequest(QueryAllCommunitiesSchema), communityController.communities)
 
 // List communities created by user
 communityRegistry.registerPath({

@@ -1,9 +1,20 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import { MembershipStatus, MembershipTier } from '@prisma/client'
-import { CommunityIncludeSchema } from '@zodSchema/index'
+import { CommunityIncludeSchema, CommunityWhereInputSchema } from '@zodSchema/index'
 import { z } from 'zod'
 
 extendZodWithOpenApi(z)
+
+export const QueryAllCommunitiesSchema = z.object({
+    query: z.object({
+        include: CommunityIncludeSchema.optional(),
+        where: CommunityWhereInputSchema.optional(),
+        paging: z.object({
+            take: z.number().optional(),
+            skip: z.number().optional(),
+        }).optional(),
+    })
+})
 
 export const GetCommunitySchema = z.object({
     query: z.object({

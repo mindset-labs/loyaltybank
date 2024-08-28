@@ -2,24 +2,61 @@ import { env } from "@/common/utils/envConfig"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import { handleErrorResponse, handleSuccessResponse } from "@/common/utils/httpHandlers"
 import db from "@/db"
+import { Role } from '@prisma/client'
 import type { NextFunction, Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
 
-const rejectJWT = (res: Response) => {
+const rejectJWT = (res: Response, message?: string) => {
   return handleErrorResponse(
-    new CustomError("Invalid token", CustomErrorCode.INVALID_TOKEN, {
-      message: "Invalid or missing auth token",
+    new CustomError(message || "Invalid token", CustomErrorCode.INVALID_TOKEN, {
+      message: message || "Invalid or missing auth token",
     }),
     res,
     StatusCodes.UNAUTHORIZED,
   )
 }
 
-export const verifyJWTAndRole = (role: string) => async (req: Request, res: Response, next: NextFunction) => {
-  // TODO: implement role-based access control
+/**
+ * Verifies that the user has a valid JWT and the required role.
+ * Attaches the user to the request object.
+ */
+export const verifyJWTAndRole = (allowedRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
+  // If the user ID has already been set (via API Key validation), continue
+  // No need to check for an Auth token
+  if (req.userId) {
+    return next()
+  }
+
+  const token = req.headers.authorization
+
+  if (!token) {
+    return rejectJWT(res)
+  }
+
+  jwt.verify(token.split(" ")[1], env.JWT_AUTH_SECRET, async (err, decoded: any) => {
+    if (err || !decoded?.id) {
+      return rejectJWT(res)
+    }
+
+    req.userId = decoded?.id
+    const user = await db.user.findFirst({ where: { id: req.userId } })
+
+    if (!user) {
+      return rejectJWT(res)
+    } else if (!allowedRoles.includes(user.role)) {
+      return rejectJWT(res, "User does not have the required role")
+    }
+
+    req.user = user
+    next()
+  })
 }
 
+/**
+ * Verifies that the user has a valid JWT.
+ * Attaches the user to the request object.
+ */
 export default async (req: Request, res: Response, next: NextFunction) => {
   // If the user ID has already been set (via API Key validation), continue
   // No need to check for an Auth token

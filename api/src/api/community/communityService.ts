@@ -4,7 +4,7 @@ import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole
 import { env } from '@/common/utils/envConfig'
 import { round } from 'lodash'
 
-type QueryPaging = {
+export type QueryPaging = {
     take?: number,
     skip?: number,
 }
@@ -89,7 +89,7 @@ export class CommunityService {
         })
     }
 
-    queryCommunities(query: Prisma.CommunityWhereInput, paging?: QueryPaging): Promise<Community[]> {
+    queryCommunities(query: Prisma.CommunityWhereInput, include?: Prisma.CommunityInclude, paging?: QueryPaging): Promise<Community[]> {
         return dbClient.community.findMany({
             where: query,
             take: paging?.take || 25,

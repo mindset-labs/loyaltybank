@@ -5,6 +5,20 @@ import db from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 
 export class PaymentService {
+    /**
+     * Create a payment transaction by the sender. If a `transactionId` is provided, the existing (placeholder) transaction is updated.
+     * Otherwise, a new transaction is created. Balances of sending and receiving wallets are updated accordingly.
+     * @param senderId - The ID of the sender
+     * @param paymentRequest - The payment request object
+     * @param paymentRequest.senderWalletId - The ID of the sender's wallet
+     * @param paymentRequest.receiverWalletId - The ID of the receiver's wallet
+     * @param paymentRequest.amount - The amount to be sent
+     * @param paymentRequest.receiverUserId - The ID of the receiver user (optional)
+     * @param paymentRequest.description - The description of the transaction (optional)
+     * @param paymentRequest.communityId - The ID of the community (optional)
+     * @param paymentRequest.transactionId - The ID of the existing transaction (optional)
+     * @returns The transaction and the updated sender wallet
+     */
     async createPayment(senderId: string, paymentRequest: CreatePaymentSchemaType): Promise<{
         transaction: Transaction,
         senderWallet: Wallet
