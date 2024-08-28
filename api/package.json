@@ -19,7 +19,6 @@
     "test": "vitest run",
     "prepare": "husky",
     "db:migrate": "prisma migrate dev",
-    "db:migrate:production": "prisma migrate production",
     "db:seed": "ts-node ./prisma/seed.ts",
     "env:development": "./node_modules/.bin/yenv print env.yaml development dotenv -f -s -r",
     "env:test": "./node_modules/.bin/yenv print env.yaml test dotenv -f -s -r",
