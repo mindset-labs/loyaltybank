@@ -1,4 +1,4 @@
-# LoyaltyBank
+# 🌟 LoyaltyBank
 
 ## 🌟 Introduction
 
