@@ -94,6 +94,7 @@ export class CommunityService {
             where: query,
             take: paging?.take || 25,
             skip: paging?.skip || 0,
+            include,
         })
     }
 
