@@ -3,11 +3,7 @@ import dbClient from "@/db"
 import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole, Transaction, TransactionType, TransactionSubtype, MembershipStatus } from "@prisma/client"
 import { env } from '@/common/utils/envConfig'
 import { round } from 'lodash'
-
-export type QueryPaging = {
-    take?: number,
-    skip?: number,
-}
+import { type QueryPaging } from '@/common/utils/commonTypes'
 
 type JoinCommunityOptions = {
     createWallet?: boolean,

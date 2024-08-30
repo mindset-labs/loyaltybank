@@ -4,7 +4,6 @@ import { z } from "zod"
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
 import verifyJWT from "@/common/middleware/verifyJWT"
-import { validateRequest } from "@/common/utils/httpHandlers"
 import { transactionController } from "./transactionController"
 import { TransactionSchema } from '@zodSchema/index'
 
@@ -21,7 +20,10 @@ transactionRegistry.registerPath({
     method: "get",
     path: "/transactions",
     tags: ["Transaction"],
-    responses: createApiResponse(z.array(TransactionWithoutMetadataSchema), "Success"),
+    responses: createApiResponse(z.object({
+        transactions: z.array(TransactionWithoutMetadataSchema),
+        total: z.number(),
+    }), "Success"),
 })
 
 transactionRouter.get("/", verifyJWT, transactionController.queryTransactions)
