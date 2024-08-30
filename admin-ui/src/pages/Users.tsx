@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../store'
 import { fetchAllUsers } from '../store/users'
 import PageLayout from '../components/PageLayout'
-import { Button, Row, Space, Table, TablePaginationConfig, Typography } from 'antd'
+import { Button, Row, Space, Table, TablePaginationConfig, Tag, Typography } from 'antd'
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { TableParams } from 'src/utils/common'
+import { RoleType, User } from '@apiTypes'
 
 const Users = () => {
     const dispatch = useAppDispatch()
@@ -32,6 +33,13 @@ const Users = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            render: (text: string) => (
+                <Button type="link" onClick={() => alert('View User')}>
+                    <Typography.Link>
+                        {text}
+                    </Typography.Link>
+                </Button>
+            )
         },
         {
             title: 'Email',
@@ -42,6 +50,42 @@ const Users = () => {
             title: 'Role',
             dataIndex: 'role',
             key: 'role',
+            render: (text: RoleType) => {
+                switch (text) {
+                    case 'SYSTEM_ADMIN':
+                        return <Tag color="purple">System Admin</Tag>
+                    case 'ADMIN':
+                        return <Tag color="blue">Admin</Tag>
+                    case 'USER':
+                        return <Tag>User</Tag>
+                    default:
+                        return <Tag color="red">Unknown</Tag>
+                }
+            }
+        },
+        {
+            title: 'Managed By',
+            dataIndex: 'managedBy',
+            key: 'managedBy',
+            render: (managedBy: User) => {
+                return managedBy?.name
+            }
+        },
+        {
+            title: 'Communities',
+            dataIndex: ['_count', 'myCommunities'],
+            key: 'communities',
+            render: (count: number) => {
+                return count
+            }
+        },
+        {
+            title: 'Transactions',
+            dataIndex: '_count',
+            key: 'transactions',
+            render: ({ transactionsSent, transactionsReceived }: { transactionsSent: number, transactionsReceived: number }) => {
+                return transactionsSent + transactionsReceived
+            }
         },
         {
             title: 'Created At',
@@ -68,9 +112,9 @@ const Users = () => {
     return (
         <PageLayout>
             <Row justify="space-between" align="middle">
-                <Typography.Title level={3}>My Communities</Typography.Title>
-                <Button type="primary" ghost onClick={() => alert('Add Community')} icon={<PlusOutlined />}>
-                    Add Community
+                <Typography.Title level={3}>Users</Typography.Title>
+                <Button type="primary" ghost onClick={() => alert('Add User')} icon={<PlusOutlined />}>
+                    Add User
                 </Button>
             </Row>
             <Table

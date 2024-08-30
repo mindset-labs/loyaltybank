@@ -26,6 +26,10 @@ export const fetchAllUsers = createAsyncThunk(
       const URLParams = new URLSearchParams()
       URLParams.append('paging[skip]', skip.toString())
       URLParams.append('paging[take]', take.toString())
+      URLParams.append('include[managedBy][select][name]', 'true')
+      URLParams.append('include[_count][select][myCommunities]', 'true')
+      URLParams.append('include[_count][select][transactionsSent]', 'true')
+      URLParams.append('include[_count][select][transactionsReceived]', 'true')
 
       const response = await fetch(`/api/users?${URLParams.toString()}`, {
         headers: {

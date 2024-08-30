@@ -22,7 +22,7 @@ export const fetchMyCommunities = createAsyncThunk(
       const token = state.auth.token
 
       const params = new URLSearchParams({
-        'include[memberships]': 'true'
+        'include[memberships][select][user][select][id]': 'true'
       });
 
       const response = await fetch(`/api/communities/me?${params.toString()}`, {

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../store'
 import { fetchAllTransactions } from '../store/transactions'
 import PageLayout from '../components/PageLayout'
-import { Button, Row, Table, TablePaginationConfig, Typography } from 'antd'
-import { Transaction } from '@apiTypes'
+import { Button, Row, Table, TablePaginationConfig, Tag, Typography } from 'antd'
+import { Transaction, TransactionTypeType } from '@apiTypes'
 import { TableParams } from 'src/utils/common'
 
 const Transactions = () => {
@@ -49,6 +49,22 @@ const Transactions = () => {
             title: 'Type',
             dataIndex: 'transactionType',
             key: 'type',
+            render: (type: TransactionTypeType) => {
+                switch (type) {
+                    case 'PAYMENT':
+                        return <Tag color="purple">Payment</Tag>
+                    case 'DEPOSIT':
+                        return <Tag color="darkgreen">Deposit</Tag>
+                    case 'WITHDRAW':
+                        return <Tag color="red">Withdraw</Tag>
+                    case 'TRANSFER':
+                        return <Tag color="darkblue">Transfer</Tag>
+                    case 'REWARD':
+                        return <Tag color="blue">Reward</Tag>
+                    default:
+                        return <Tag color="default">{type}</Tag>
+                }
+            },
         },
         {
             title: 'Subtype',
@@ -64,6 +80,23 @@ const Transactions = () => {
             title: 'Receiver',
             dataIndex: ['receiver', 'name'],
             key: 'receiver',
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string) => {
+                switch (status) {
+                    case 'COMPLETED':
+                        return <Tag color="green">Completed</Tag>
+                    case 'FAILED':
+                        return <Tag color="red">Failed</Tag>
+                    case 'PENDING':
+                        return <Tag color="orange">Pending</Tag>
+                    default:
+                        return <Tag color="default">{status}</Tag>
+                }
+            },
         },
         {
             title: 'Community',
