@@ -4,10 +4,11 @@ import { z } from "zod"
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
 import { CreateManagedUserSchema, CreateUserSchema, GetUserSchema, LoginUserSchema, MeQuerySchema } from "@/api/user/userRequestValidation"
-import verifyJWT from "@/common/middleware/verifyJWT"
+import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { UserSchema } from "@zodSchema/index"
 import { userController } from "./userController"
+import { Role } from '@prisma/client'
 
 export const userRegistry = new OpenAPIRegistry()
 export const userRouter: Router = express.Router()
@@ -22,7 +23,7 @@ userRegistry.registerPath({
   responses: createApiResponse(z.array(UserSchema), "Success"),
 })
 
-userRouter.get("/", verifyJWT, userController.getUsers)
+userRouter.get("/", verifyJWTAndRole([Role.ADMIN]), userController.queryUsers)
 
 // Get a user's own information
 userRegistry.registerPath({

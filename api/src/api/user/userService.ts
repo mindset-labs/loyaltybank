@@ -2,10 +2,11 @@ import type { ServiceResponse } from "@/common/models/serviceResponse"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient, { prismaExclude } from "@/db"
 import { logger } from "@/server"
-import { PrismaClient, type Prisma, type User } from "@prisma/client"
+import { type Prisma } from "@prisma/client"
 import bcrypt from "bcrypt"
 import { StatusCodes } from "http-status-codes"
 import type { LoginUserDataType } from "./userRequestValidation"
+import { QueryPaging } from '@/common/utils/commonTypes'
 
 // Omit the password and twoFactorSecret fields from the User type
 const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret", "resetPasswordToken"])
@@ -15,12 +16,27 @@ export type UserWithoutSecrets = Prisma.UserGetPayload<{
 
 export class UserService {
   // Retrieves all users from the database
-  async findAll(): Promise<UserWithoutSecrets[]> {
-    try {
-      return dbClient.user.findMany()
-    } catch (err) {
-      logger.error(`Error finding all users: $${(err as Error).message}`)
-      throw CustomError.unknown(err as Error)
+  async queryAllUsers(
+    where?: Prisma.UserWhereInput,
+    include?: Prisma.UserInclude,
+    paging?: QueryPaging
+  ): Promise<{
+    users: UserWithoutSecrets[]
+    total: number
+  }> {
+    const [users, total] = await dbClient.$transaction([
+      dbClient.user.findMany({
+        where,
+        include,
+        skip: paging?.skip || 0,
+        take: paging?.take || 100,
+      }),
+      dbClient.user.count({ where })
+    ])
+
+    return {
+      users,
+      total,
     }
   }
 

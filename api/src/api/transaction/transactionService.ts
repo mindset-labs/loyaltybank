@@ -31,14 +31,12 @@ export class TransactionService {
 
     /**
      * Query transactions
-     * @param userId: the id of the user
      * @param where: the where clause for the query
      * @param include: the include for the query
      * @param paging: the paging for the query
      * @returns the queried transactions
      */
     async queryTransactions(
-        userId: string,
         where: Prisma.TransactionWhereInput,
         include: Prisma.TransactionInclude,
         paging: QueryPaging
@@ -50,36 +48,16 @@ export class TransactionService {
             dbClient.transaction.findMany({
                 where: {
                     ...where,
-                    // the user must be the sender or receiver of the transaction
-                    OR: [
-                        {
-                            senderId: userId,
-                        },
-                        {
-                            receiverId: userId,
-                        }
-                    ]
                 },
                 include,
-                skip: paging.skip || 0,
-                take: paging.take || 100,
+                skip: paging?.skip || 0,
+                take: paging?.take || 100,
                 orderBy: {
                     createdAt: 'desc'
                 }
             }),
             dbClient.transaction.count({
-                where: {
-                    ...where,
-                    // the user must be the sender or receiver of the transaction
-                    OR: [
-                        {
-                            senderId: userId,
-                        },
-                        {
-                            receiverId: userId,
-                        }
-                    ]
-                }
+                where,
             })
         ])
 

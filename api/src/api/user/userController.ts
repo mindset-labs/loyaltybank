@@ -8,13 +8,22 @@ import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"
 import { generateUUID } from '@/common/utils/random'
 import { logger } from '@/server'
-import { Prisma } from '@prisma/client'
+import { Prisma, Role } from '@prisma/client'
 
 class UserController {
-  public getUsers: RequestHandler = async (_req: Request, res: Response) => {
+  public queryUsers: RequestHandler = async (req: Request, res: Response) => {
+    const paging = req.query.paging as Record<string, string>
+
     return userService
-      .findAll()
-      .then((users) => handleSuccessResponse({ users }, res, StatusCodes.OK))
+      .queryAllUsers(
+        req.query.where as Prisma.UserWhereInput,
+        req.query.include as Prisma.UserInclude,
+        {
+          skip: parseInt(paging?.skip || '0'),
+          take: parseInt(paging?.take || '10'),
+        }
+      )
+      .then(({ users, total }) => handleSuccessResponse({ users, total }, res, StatusCodes.OK))
       .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
 
