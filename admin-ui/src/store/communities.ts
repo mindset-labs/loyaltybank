@@ -2,8 +2,14 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { Community } from '@apiTypes'
 import { RootState } from '.'
 
+interface CommunityWithCount extends Community {
+    _count: {
+        memberships: number
+    }
+}
+
 interface CommunitiesState {
-    communities: Community[]
+    communities: CommunityWithCount[]
     loading: boolean
     error: string | null
 }
@@ -22,7 +28,7 @@ export const fetchMyCommunities = createAsyncThunk(
       const token = state.auth.token
 
       const params = new URLSearchParams({
-        'include[memberships][select][user][select][id]': 'true'
+        'include[_count][select][memberships]': 'true',
       });
 
       const response = await fetch(`/api/communities/me?${params.toString()}`, {
@@ -36,7 +42,7 @@ export const fetchMyCommunities = createAsyncThunk(
         throw new Error('Failed to fetch communities')
       }
       
-      return (await response.json()).data.communities as Community[]
+      return (await response.json()).data.communities as CommunityWithCount[]
     } catch (error) {
       return rejectWithValue('Failed to fetch communities')
     }
@@ -53,7 +59,7 @@ const communitiesSlice = createSlice({
                 state.loading = true
                 state.error = null
             })
-            .addCase(fetchMyCommunities.fulfilled, (state, action: PayloadAction<Community[]>) => {
+            .addCase(fetchMyCommunities.fulfilled, (state, action: PayloadAction<CommunityWithCount[]>) => {
                 state.communities = action.payload
                 state.loading = false
             })

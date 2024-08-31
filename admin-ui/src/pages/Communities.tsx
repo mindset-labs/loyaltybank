@@ -49,9 +49,9 @@ const Communities = () => {
         },
         {
             title: 'Members',
-            dataIndex: 'memberships',
+            dataIndex: ['_count', 'memberships'],
             key: 'memberships',
-            render: (memberships: Membership[]) => memberships.length,
+            render: (count: number) => count,
         },
         {
             title: 'Actions',
