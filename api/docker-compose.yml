@@ -19,3 +19,25 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes: 
       - ./resources/redis:/data
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/loyaltypoints?schema=public
+      - REDIS_URL=redis://default:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@redis:6379
+      - NODE_ENV=development
+      - JWT_AUTH_SECRET=supersecret
+      - DEFAULT_BALANCE=1000
+      - LOG_LEVEL=debug
+      - PORT=8080
+      - HOST=0.0.0.0
+    command: sh -c "npx prisma generate && yarn dev"

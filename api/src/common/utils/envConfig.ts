@@ -4,7 +4,7 @@ import { cleanEnv, host, num, port, str, testOnly, url } from "envalid"
 const envValues = yenv('env.yaml')
 
 export const env = cleanEnv(envValues, {
-  NODE_ENV: str({ devDefault: testOnly("test"), choices: ["development", "production", "test"] }),
+  NODE_ENV: str({ devDefault: testOnly("test"), choices: ["development", "production", "test", "docker"] }),
   HOST: host({ devDefault: testOnly("localhost") }),
   PORT: port({ devDefault: testOnly(3000) }),
   CORS_ORIGIN: str({ devDefault: testOnly("http://localhost:3000") }),
