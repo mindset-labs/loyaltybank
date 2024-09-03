@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {
   AppstoreOutlined,
+  FileOutlined,
   ShopOutlined,
   TransactionOutlined,
   UploadOutlined,
@@ -19,6 +20,7 @@ import Register from './pages/Register'
 import { useAppDispatch, useAppSelector } from './store'
 import { logout } from './store/auth'
 import NotFound from './pages/NotFound'
+import Events from './pages/Events'
 
 const { Header, Content, Footer, Sider } = Layout
 
@@ -65,6 +67,9 @@ const App: React.FC = () => {
         <Menu.Item key="/achievements" icon={<ShopOutlined />}>
           <Link to="/achievements">Achievements</Link>
         </Menu.Item>
+        <Menu.Item key="/events" icon={<FileOutlined />}>
+          <Link to="/events">Events</Link>
+        </Menu.Item>
       </Menu>
     )
   }
@@ -77,6 +82,7 @@ const App: React.FC = () => {
         <Route path="/users" element={<Users />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/achievements" element={<Achievements />} />
+        <Route path="/events" element={<Events />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     )

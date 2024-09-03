@@ -10,6 +10,7 @@ import usersReducer from './users'
 import transactionsReducer from './transactions'
 import achievementsReducer from './achievements'
 import aggregationsReducer from './aggregations'
+import eventsReducer from './events'
 
 const persistConfig = {
   key: 'root',
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   transactions: transactionsReducer,
   achievements: achievementsReducer,
   aggregations: aggregationsReducer,
+  events: eventsReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
