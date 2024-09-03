@@ -3,11 +3,12 @@ import express, { type Router } from "express"
 import { z } from "zod"
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
-import verifyJWT from "@/common/middleware/verifyJWT"
+import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { achievementController } from "./achievementController"
 import { AchievementRewardSchema, AchievementSchema } from '@zodSchema/index'
 import { ClaimRewardSchema, CreateAchievementSchema, IssueAchievementReward, UpdateAchievementSchema } from './achievementRequestValidation'
+import { Role } from '@prisma/client'
 
 export const achievementRegistry = new OpenAPIRegistry()
 export const achievementRouter: Router = express.Router()
@@ -16,6 +17,19 @@ export const achievementRouter: Router = express.Router()
 const AchievementWithoutMetadataSchema = AchievementSchema.omit({ metadata: true })
 
 achievementRegistry.register("Achievement", AchievementWithoutMetadataSchema)
+
+// Query all achievements
+achievementRegistry.registerPath({
+    method: "get",
+    path: "/achievements",
+    tags: ["Achievement"],
+    responses: createApiResponse(z.object({
+        achievements: z.array(AchievementWithoutMetadataSchema),
+        total: z.number()
+    }), "Success"),
+})
+
+achievementRouter.get("/", verifyJWTAndRole([Role.ADMIN]), achievementController.queryAllAchievements)
 
 // Query user's own transactions
 achievementRegistry.registerPath({

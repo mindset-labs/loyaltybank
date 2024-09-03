@@ -12,7 +12,7 @@ export class EventService {
      */
     async createEvent(userId: string, data: Prisma.EventUncheckedCreateInput): Promise<Event> {
         // check if the user is authorized to create an event
-        const community = await communityService.findByIdWithEditAccess(userId, data.communityId)
+        const community = await communityService.findByIdWithEditAccess(data.communityId, userId)
 
         if (!community) {
             throw new CustomError('Invalid community or access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {

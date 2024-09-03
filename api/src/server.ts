@@ -17,6 +17,7 @@ import { walletRouter } from './api/wallet/walletRouter'
 import { eventRouter } from './api/event/eventRouter'
 import { achievementRouter } from './api/achievement/achievementRouter'
 import { apiKeyRouter } from './api/apiKey/apiKeyRouter'
+import { aggregationRouter } from './api/aggregation/aggregationRouter'
 import verifyApiKey from './common/middleware/verifyApiKey'
 
 const logger = pino({ name: "server start", level: env.LOG_LEVEL })
@@ -65,6 +66,7 @@ app.use("/payments", paymentRouter)
 app.use("/events", eventRouter)
 app.use('/achievements', achievementRouter)
 app.use('/api-keys', apiKeyRouter)
+app.use('/aggregations', aggregationRouter)
 
 // Swagger UI
 app.use(openAPIRouter)

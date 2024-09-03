@@ -1,6 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { env } from "./common/utils/envConfig"
 import userModelExtension from "./common/models/userModelExtension"
+import { logger } from './server'
+import transactionModelExtension from './common/models/transactionModelExtension'
 
 const client = new PrismaClient({
   omit: {
@@ -11,10 +13,12 @@ const client = new PrismaClient({
     },
   },
   datasourceUrl: env.DATABASE_URL,
+  log: ['query'],
 }).$extends({
   model: {
     user: userModelExtension,
-  }
+    transaction: transactionModelExtension,
+  },
 })
 
 type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never

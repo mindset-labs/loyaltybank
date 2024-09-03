@@ -1,9 +1,10 @@
 import { handleErrorResponse, handleSuccessResponse } from "@/common/utils/httpHandlers"
 import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { communityService, QueryPaging } from "./communityService"
+import { communityService } from "./communityService"
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { CommunityStatus, MembershipStatus, Prisma } from '@prisma/client'
+import { QueryPaging } from '@/common/utils/commonTypes'
 
 class CommunityController {
     public communities: RequestHandler = async (req: Request, res: Response) => {

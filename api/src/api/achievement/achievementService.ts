@@ -6,6 +6,35 @@ import { logger } from '@/server'
 
 export class AchievementService {
     /**
+     * Query all achievements from the database.
+     * 
+     * @param where Optional filtering criteria
+     * @param include Optional related data to include
+     * @param paging Optional pagination information
+     * @returns Promise<{ achievements: Achievement[], total: number }>
+     */
+    async queryAllAchievements(
+        where?: Prisma.AchievementWhereInput,
+        include?: Prisma.AchievementInclude,
+        paging?: { skip?: number, take?: number }
+    ): Promise<{ achievements: Achievement[], total: number }> {
+        const [achievements, total] = await dbClient.$transaction([
+            dbClient.achievement.findMany({
+                where,
+                include,
+                skip: paging?.skip || 0,
+                take: paging?.take || 100,
+            }),
+            dbClient.achievement.count({ where })
+        ])
+
+        return {
+            achievements,
+            total,
+        }
+    }
+
+    /**
      * Create an achievement configuration for a certain community. 
      * This method will check if the user has edit access to the community (i.e. creator or admin).
      * 
