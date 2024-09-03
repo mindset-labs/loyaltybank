@@ -35,3 +35,31 @@
     transform: rotate(360deg);
   }
 }
+
+.dashboard {
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.controls {
+  margin-bottom: 20px;
+}
+
+.controls button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.ant-card {
+  margin-bottom: 20px;
+}
+
+.ant-card-body {
+  padding: 24px;
+}
+
+.ant-row {
+  margin-top: 20px;
+}
