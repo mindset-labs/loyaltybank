@@ -10,8 +10,8 @@ export const QueryAllCommunitiesSchema = z.object({
         include: CommunityIncludeSchema.optional(),
         where: CommunityWhereInputSchema.optional(),
         paging: z.object({
-            take: z.number().optional(),
-            skip: z.number().optional(),
+            take: z.string().optional(),
+            skip: z.string().optional(),
         }).optional(),
     })
 })

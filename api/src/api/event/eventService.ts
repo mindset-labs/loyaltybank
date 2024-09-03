@@ -2,8 +2,22 @@ import { EventLog, Event, Prisma, CommunityRole } from '@prisma/client'
 import dbClient from '@/db'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { communityService } from '../community/communityService'
+import { QueryPaging } from '@/common/utils/commonTypes'
 
 export class EventService {
+    /**
+     * Get all events
+     * @returns all events
+     */
+    async getAllEvents(where?: Prisma.EventWhereInput, include?: Prisma.EventInclude, paging?: QueryPaging): Promise<Event[]> {
+        return dbClient.event.findMany({
+            where,
+            include,
+            skip: paging?.skip || 0,
+            take: paging?.take || 10,
+        })
+    }
+
     /**
      * Create a new event
      * @param userId: the user performing the action

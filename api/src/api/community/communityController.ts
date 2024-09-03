@@ -8,11 +8,16 @@ import { QueryPaging } from '@/common/utils/commonTypes'
 
 class CommunityController {
     public communities: RequestHandler = async (req: Request, res: Response) => {
+        const paging = req.query.paging as Record<string, string>
+
         return communityService
             .queryCommunities(
                 (req.query.where || {}) as Prisma.CommunityWhereInput,
                 req.query.include as Prisma.CommunityInclude,
-                req.query.paging as QueryPaging
+                {
+                    skip: parseInt(paging?.skip || '0'),
+                    take: parseInt(paging?.take || '10'),
+                }
             )
             .then((communities) => handleSuccessResponse({ communities }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
