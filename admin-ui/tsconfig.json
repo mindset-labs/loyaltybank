@@ -21,7 +21,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@apiTypes": ["../api/prisma/schema/generated/zod"]
+      "@apiTypes": ["../api/prisma/schema/generated/zod"],
+      "@components": ["src/components"],
     }
   },
   "include": [
