@@ -25,6 +25,7 @@ export const handleErrorResponse = (error: CustomError, response: Response, code
       success: false,
       error: {
         ...error,
+        message: error.message,
         statusCode: error.statusCode || code,
       },
     })

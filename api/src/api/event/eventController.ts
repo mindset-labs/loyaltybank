@@ -19,7 +19,7 @@ export class EventController {
                     take: parseInt(paging?.take || '10'),
                 }
             )
-            .then(events => handleSuccessResponse({ events }, res, StatusCodes.OK))
+            .then(({ events, total }) => handleSuccessResponse({ events, total }, res, StatusCodes.OK))
             .catch(error => handleErrorResponse(error, res))
     };
 

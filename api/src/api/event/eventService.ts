@@ -9,13 +9,20 @@ export class EventService {
      * Get all events
      * @returns all events
      */
-    async getAllEvents(where?: Prisma.EventWhereInput, include?: Prisma.EventInclude, paging?: QueryPaging): Promise<Event[]> {
-        return dbClient.event.findMany({
-            where,
-            include,
-            skip: paging?.skip || 0,
-            take: paging?.take || 10,
-        })
+    async getAllEvents(where?: Prisma.EventWhereInput, include?: Prisma.EventInclude, paging?: QueryPaging): Promise<{ events: Event[], total: number }> {
+        const [events, total] = await dbClient.$transaction([
+            dbClient.event.findMany({
+                where,
+                include,
+                skip: paging?.skip || 0,
+                take: paging?.take || 10,
+            }),
+            dbClient.event.count({
+                where,
+            }),
+        ])
+
+        return { events, total }
     }
 
     /**
