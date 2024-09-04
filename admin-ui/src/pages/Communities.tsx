@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '../store'
 import PageLayout from '../components/PageLayout'
-import { Button, Form, Input, Modal, Row, Switch, Table, Tag, Tooltip, Typography } from 'antd'
+import { Button, Form, Input, Modal, notification, Row, Switch, Table, Tag, Tooltip, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { fetchMyCommunities } from '../store/communities'
 import { Community } from '@apiTypes'
@@ -10,9 +10,11 @@ import { debounce } from 'lodash'
 
 const Communities = () => {
     const dispatch = useAppDispatch()
+    const token = useAppSelector((state) => state.auth.token)
     const { communities, loading, error } = useAppSelector((state) => state.communities)
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [form] = Form.useForm()
+    const [notificationApi, notificationContextHolder] = notification.useNotification()
 
     useEffect(() => {
         const fetchCommunities = debounce(() => {
@@ -47,12 +49,14 @@ const Communities = () => {
             render: (text: string) => (
                 <Typography>{text}</Typography>
             ),
-            width: '12%',
         },
         {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
+            title: 'Publicity',
+            dataIndex: 'isPublic',
+            key: 'isPublic',
+            render: (isPublic: boolean) => (
+                <Tag color={isPublic ? 'green' : 'gray'}>{isPublic ? 'Public' : 'Private'}</Tag>
+            ),
         },
         {
             title: 'Status',
@@ -103,12 +107,32 @@ const Communities = () => {
         },
     ]
 
-    const handleSubmit = async (values: any) => {
-        console.log('Form values:', values)
+    const handleNewCommunitySubmit = async (values: any) => {
+        const response = await fetch(`/api/communities`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(values),
+        })
+
+        if (response.ok) {
+            dispatch(fetchMyCommunities())
+            notificationApi.success({
+                message: 'Community created successfully',
+            })
+        } else {
+            const { error } = await response.json()
+            throw new Error(`${error.code || 0} - ${error.message}` || 'Error creating community')
+        }
     }
 
-    const handleFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo)
+    const handleNewCommunitySubmitFailed = (errorInfo: any) => {
+        notificationApi.error({
+            message: 'Failed to create community',
+            description: errorInfo.message,
+        })
     }
 
     const renderNewCommunityModal = () => {
@@ -120,11 +144,11 @@ const Communities = () => {
                     form
                         .validateFields()
                         .then(async (values) => {
-                            await handleSubmit(values)
+                            await handleNewCommunitySubmit(values)
                             setIsModalVisible(false)
                             form.resetFields()
                         })
-                        .catch((error) => handleFinishFailed(error))
+                        .catch((error) => handleNewCommunitySubmitFailed(error))
                 }}
                 onCancel={() => {
                     form.resetFields()
@@ -149,16 +173,15 @@ const Communities = () => {
                     <Form.Item
                         name="isPublic"
                         label="Community Visibility"
-                        rules={[{ required: true, message: 'Please select the community visibility!' }]}
                     >
-                        <Switch checkedChildren="Public" unCheckedChildren="Private" defaultChecked={true} />
+                        <Switch checkedChildren="Public" unCheckedChildren="Private" />
                     </Form.Item>
                     <Form.Item
                         name="pointsTokenName"
                         label="Points Token Name"
                         rules={[{ required: true, message: 'Please input the points token name!' }]}
                     >
-                        <Input placeholder="e.g. Smiles Points" />
+                        <Input placeholder="e.g. SMILES" />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -180,6 +203,7 @@ const Communities = () => {
                 pagination={false}
             />
             {renderNewCommunityModal()}
+            {notificationContextHolder}
         </PageLayout>
     )
 }
