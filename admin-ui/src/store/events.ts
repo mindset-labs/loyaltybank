@@ -5,22 +5,24 @@ interface EventsState {
     events: Event[]
     loading: boolean
     error: string | null
+    total: number
 }
 
 const initialState: EventsState = {
     events: [],
     loading: false,
     error: null,
+    total: 0,
 }
 
 export const fetchEvents = createAsyncThunk(
     'events/fetchEvents',
-    async (_, { rejectWithValue, getState }) => {
+    async ({ take, skip }: { take: number; skip: number }, { rejectWithValue, getState }) => {
         try {
             const token = (getState() as RootState).auth.token
             const query = new URLSearchParams({
-                'paging[take]': '10',
-                'paging[skip]': '0',
+                'paging[take]': take.toString(),
+                'paging[skip]': skip.toString(),
                 'include[community][select][name]': 'true',
                 'include[community][select][id]': 'true',
                 'include[_count][select][eventLogs]': 'true',
@@ -34,8 +36,8 @@ export const fetchEvents = createAsyncThunk(
             if (!response.ok) {
                 throw new Error('Failed to fetch events')
             }
-            const { data }: { data: { events: Event[] } } = await response.json()
-            return data.events
+            const { data }: { data: { events: Event[], total: number } } = await response.json()
+            return { events: data.events, total: data.total }
         } catch (error) {
             return rejectWithValue('Failed to fetch events')
         }
@@ -45,16 +47,21 @@ export const fetchEvents = createAsyncThunk(
 const eventsSlice = createSlice({
     name: 'events',
     initialState,
-    reducers: {},
+    reducers: {
+        setIsLoading: (state, action: PayloadAction<boolean>) => {
+            state.loading = action.payload
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchEvents.pending, (state) => {
                 state.loading = true
                 state.error = null
             })
-            .addCase(fetchEvents.fulfilled, (state, action: PayloadAction<Event[]>) => {
+            .addCase(fetchEvents.fulfilled, (state, action: PayloadAction<{ events: Event[], total: number }>) => {
                 state.loading = false
-                state.events = action.payload
+                state.events = action.payload.events
+                state.total = action.payload.total
             })
             .addCase(fetchEvents.rejected, (state, action) => {
                 state.loading = false
@@ -62,5 +69,7 @@ const eventsSlice = createSlice({
             })
     },
 })
+
+export const { setIsLoading } = eventsSlice.actions
 
 export default eventsSlice.reducer;

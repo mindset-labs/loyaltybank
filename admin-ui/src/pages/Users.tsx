@@ -7,6 +7,7 @@ import { TableParams } from 'src/utils/common'
 import { RoleType, User } from '@apiTypes'
 import PageLayout from '../components/PageLayout'
 import DebounceSelect from '../components/DebounceSelect'
+import { debounce } from 'lodash'
 
 const Users = () => {
     const dispatch = useAppDispatch()
@@ -23,10 +24,18 @@ const Users = () => {
     })
 
     useEffect(() => {
-        dispatch(fetchAllUsers({
-            skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
-            take: tableParams.pagination?.pageSize ?? 10,
-        }))
+        const debouncedFetchUsers = debounce(() => {
+            dispatch(fetchAllUsers({
+                skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
+                take: tableParams.pagination?.pageSize ?? 10,
+            }))
+        }, 200)
+
+        debouncedFetchUsers()
+
+        return () => {
+            debouncedFetchUsers.cancel()
+        }
     }, [dispatch, tableParams.pagination])
 
     const handleTableChange = (pagination: TablePaginationConfig) => {

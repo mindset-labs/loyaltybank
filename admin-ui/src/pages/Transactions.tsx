@@ -5,6 +5,7 @@ import PageLayout from '../components/PageLayout'
 import { Button, Row, Table, TablePaginationConfig, Tag, Typography } from 'antd'
 import { Transaction, TransactionTypeType } from '@apiTypes'
 import { TableParams } from 'src/utils/common'
+import { debounce } from 'lodash'
 
 const Transactions = () => {
     const dispatch = useAppDispatch()
@@ -17,10 +18,18 @@ const Transactions = () => {
     })
 
     useEffect(() => {
-        dispatch(fetchAllTransactions({
-            skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
-            take: tableParams.pagination?.pageSize ?? 10,
-        }))
+        const debouncedFetchTransactions = debounce(() => {
+            dispatch(fetchAllTransactions({
+                skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
+                take: tableParams.pagination?.pageSize ?? 10,
+            }))
+        }, 200)
+
+        debouncedFetchTransactions()
+
+        return () => {
+            debouncedFetchTransactions.cancel()
+        }
     }, [dispatch, tableParams])
 
     const handleTableChange = (pagination: TablePaginationConfig) => {

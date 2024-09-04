@@ -3,9 +3,10 @@ import PageLayout from '../components/PageLayout'
 import { Button, Form, Input, Modal, Row, Switch, Table, Tag, Tooltip, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { fetchMyCommunities } from '../store/communities'
-import { Community, Membership } from '@apiTypes'
-import { EditOutlined, MailOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons'
+import { Community } from '@apiTypes'
+import { EditOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
+import { debounce } from 'lodash'
 
 const Communities = () => {
     const dispatch = useAppDispatch()
@@ -14,20 +15,39 @@ const Communities = () => {
     const [form] = Form.useForm()
 
     useEffect(() => {
-        dispatch(fetchMyCommunities())
+        const fetchCommunities = debounce(() => {
+            dispatch(fetchMyCommunities())
+        }, 200)
+
+        fetchCommunities()
+
+        return () => {
+            fetchCommunities.cancel()
+        }
     }, [dispatch])
 
     const columns = [
         {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            render: (text: string) => (
+                <Link to={`/communities/${text}`}>
+                    <Typography.Link copyable={{ text }} style={{ fontWeight: 'bold' }}>
+                        {text.substring(0, 6)}...
+                    </Typography.Link>
+                </Link>
+            ),
+            width: '12%',
+        },
+        {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (text: string, record: Community) => (
-                <Link to={`/communities/${record.id}`}>
-                    <Typography.Link style={{ fontWeight: 'bold' }}>{text}</Typography.Link>
-                </Link>
+            render: (text: string) => (
+                <Typography>{text}</Typography>
             ),
-            width: '15%',
+            width: '12%',
         },
         {
             title: 'Description',

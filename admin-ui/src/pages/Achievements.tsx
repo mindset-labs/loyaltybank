@@ -7,6 +7,7 @@ import { TableParams } from 'src/utils/common'
 import { PlusOutlined } from '@ant-design/icons'
 import { AchievementStatusType, Achievement } from '@apiTypes'
 import { Link } from 'react-router-dom'
+import { debounce } from 'lodash'
 
 const Achievements = () => {
     const dispatch = useAppDispatch()
@@ -19,10 +20,18 @@ const Achievements = () => {
     })
 
     useEffect(() => {
-        dispatch(fetchAchievements({
-            skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
-            take: tableParams.pagination?.pageSize ?? 10,
-        }))
+        const debouncedFetchAchievements = debounce(() => {
+            dispatch(fetchAchievements({
+                skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
+                take: tableParams.pagination?.pageSize ?? 10,
+            }))
+        }, 200)
+
+        debouncedFetchAchievements()
+
+        return () => {
+            debouncedFetchAchievements.cancel()
+        }
     }, [dispatch, tableParams])
 
     const handleTableChange = (pagination: TablePaginationConfig) => {

@@ -18,6 +18,7 @@ import {
   BarElement,
 } from 'chart.js'
 import { UserOutlined, TeamOutlined, TransactionOutlined, DollarOutlined, GiftOutlined } from '@ant-design/icons'
+import { debounce } from 'lodash'
 
 ChartJS.register(
   CategoryScale,
@@ -35,11 +36,19 @@ const Home = () => {
     const { transactions, overallStatistics, loading, error } = useSelector((state: RootState) => state.aggregations)
 
     useEffect(() => {
-        dispatch(fetchTransactionsAggregations({
-            from: weekStart(new Date()),
-            to: weekEnd(new Date())
-        }))
-        dispatch(fetchOverallStatistics())
+        const fetchData = debounce(() => {
+            dispatch(fetchTransactionsAggregations({
+                from: weekStart(new Date()),
+                to: weekEnd(new Date())
+            }))
+            dispatch(fetchOverallStatistics())
+        })
+
+        fetchData()
+
+        return () => {
+            fetchData.cancel()
+        }
     }, [dispatch])
 
     const transactionChartData = {
@@ -86,7 +95,6 @@ const Home = () => {
     return (
         <PageLayout>
             <div className="dashboard">
-                <h1>Dashboard</h1>
                 <Row gutter={16}>
                     <Col span={24}>
                         <Card title="Overall Statistics" bordered={true}>
