@@ -39,9 +39,18 @@ By using LoyaltyBank, developers can focus on creating unique user experiences w
 
 ---
 
+## Preview
+
+> Coming soon...
+
+![](./admin-ui/documentation/demo-1.png)
+
+
+---
+
 ## Project Components & Documentation
 
 - [API](./api)
-- Admin UI - coming soon..
+- [Admin UI](./admin-ui)
 - Mobile App - coming soon..
 
