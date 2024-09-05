@@ -1,0 +1,11 @@
+remote_theme: just-the-docs/just-the-docs
+
+# Additional theme settings
+title: LoyaltyBank
+description: A tool for creating points, loyalty and memberships programs by any business.
+# baseurl: "/your-repo-name"
+# url: "https://username.github.io"
+
+# Optional theme settings
+color_scheme: dark # or light
+search_enabled: true
