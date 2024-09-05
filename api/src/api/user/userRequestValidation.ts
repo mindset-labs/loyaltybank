@@ -2,7 +2,7 @@ import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi"
 import { z } from "zod"
 
 import { commonValidations } from "@/common/utils/commonValidation"
-import { UserIncludeSchema } from '@zodSchema/index'
+import { RoleSchema, UserIncludeSchema } from '@zodSchema/index'
 // import { Prisma } from '@prisma/client'
 
 extendZodWithOpenApi(z)
@@ -25,6 +25,8 @@ export const CreateUserSchema = z.object({
 export const CreateManagedUserSchema = z.object({
   body: z.object({
     name: z.string(),
+    email: z.string().email().optional(),
+    role: RoleSchema.optional(),
   }),
 })
 

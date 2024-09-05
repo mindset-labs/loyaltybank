@@ -63,8 +63,8 @@ class UserController {
     userService
       .createUser({
         name: req.body.name,
-        email: `${emailSplit?.[0]}+${generateUUID()}@${emailSplit?.[1]}`,
-        password: generateUUID(),
+        email: req.body.email || `${emailSplit?.[0]}+${generateUUID()}@${emailSplit?.[1]}`,
+        password: req.body.password || generateUUID(),
         managedById: req.userId!,
       })
       .then((user) => jwt.sign({ id: user.id, role: user.role }, env.JWT_AUTH_SECRET, {}))
