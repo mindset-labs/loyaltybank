@@ -51,6 +51,7 @@ const App: React.FC = () => {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[location.pathname]}
+        style={{ fontSize: 14 }}
       >
         <Menu.Item key="/" icon={<UserOutlined />}>
           <Link to="/">Home</Link>

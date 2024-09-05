@@ -1,13 +1,14 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import App from './App'
+import reportWebVitals from './reportWebVitals'
 import { ConfigProvider } from 'antd'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider as StateProvider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './store'
+import theme from './theme'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,7 +16,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ConfigProvider>
+    <ConfigProvider theme={theme}>
       <StateProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <Router>
