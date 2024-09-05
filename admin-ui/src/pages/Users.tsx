@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../store'
 import { fetchAllUsers } from '../store/users'
-import { Button, Form, Input, Modal, Row, Select, Space, Table, TablePaginationConfig, Tag, Typography } from 'antd'
+import { Breakpoint, Button, Dropdown, Form, Input, Modal, notification, Row, Select, Space, Table, TablePaginationConfig, Tag, Typography } from 'antd'
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { TableParams } from 'src/utils/common'
 import { RoleType, User } from '@apiTypes'
 import PageLayout from '../components/PageLayout'
-import DebounceSelect from '../components/DebounceSelect'
 import { debounce } from 'lodash'
 
 const Users = () => {
@@ -14,20 +13,22 @@ const Users = () => {
     const { users, loading, error, total } = useAppSelector((state) => state.users)
     const token = useAppSelector((state) => state.auth.token)
     const [isModalVisible, setIsModalVisible] = useState(false)
-    const [managedUserValue, setManagedUserValue] = useState<{ label: string; value: string }>()
     const [form] = Form.useForm()
-    const [tableParams, setTableParams] = useState<TableParams>({
+    const [tableParams, setTableParams] = useState<TableParams & { searchQuery?: string }>({
         pagination: {
             current: 1,
             pageSize: 10,
         },
+        searchQuery: undefined,
     })
+    const [notificationApi, notificationContextHolder] = notification.useNotification()
 
     useEffect(() => {
         const debouncedFetchUsers = debounce(() => {
             dispatch(fetchAllUsers({
                 skip: ((tableParams.pagination?.current ?? 1) - 1) * (tableParams.pagination?.pageSize ?? 10),
                 take: tableParams.pagination?.pageSize ?? 10,
+                searchQuery: tableParams.searchQuery,
             }))
         }, 200)
 
@@ -39,7 +40,10 @@ const Users = () => {
     }, [dispatch, tableParams.pagination])
 
     const handleTableChange = (pagination: TablePaginationConfig) => {
-        setTableParams({ pagination })
+        setTableParams({ 
+            ...tableParams,
+            pagination,
+        })
     }
 
     const columns = [
@@ -53,7 +57,7 @@ const Users = () => {
                         {text}
                     </Typography.Link>
                 </Button>
-            )
+            ),
         },
         {
             title: 'Email',
@@ -75,7 +79,7 @@ const Users = () => {
                     default:
                         return <Tag color="red">Unknown</Tag>
                 }
-            }
+            },
         },
         {
             title: 'Managed By',
@@ -83,7 +87,8 @@ const Users = () => {
             key: 'managedBy',
             render: (managedBy: User) => {
                 return managedBy?.name
-            }
+            },
+            responsive: ['md'] as Breakpoint[],
         },
         {
             title: 'Communities',
@@ -91,7 +96,8 @@ const Users = () => {
             key: 'communities',
             render: (count: number) => {
                 return count
-            }
+            },
+            responsive: ['md'] as Breakpoint[],
         },
         {
             title: 'Transactions',
@@ -99,7 +105,8 @@ const Users = () => {
             key: 'transactions',
             render: ({ transactionsSent, transactionsReceived }: { transactionsSent: number, transactionsReceived: number }) => {
                 return transactionsSent + transactionsReceived
-            }
+            },
+            responsive: ['md'] as Breakpoint[],
         },
         {
             title: 'Created At',
@@ -108,7 +115,8 @@ const Users = () => {
             render: (text: string) => {
                 const date = new Date(text)
                 return date.toLocaleDateString('en-GB')
-            }
+            },
+            responsive: ['md'] as Breakpoint[],
         },
         {
             title: 'Actions',
@@ -120,34 +128,36 @@ const Users = () => {
                     </Button>
                 </Space>
             ),
+            responsive: ['md'] as Breakpoint[],
         },
     ]
 
-    const fetchUserList = async (search: string): Promise<{ label: string; value: string }[]> => {
-        const query = new URLSearchParams({
-            'where[name][contains]': search,
-            'where[name][mode]': 'insensitive',
-            'select[id]': 'true',
-            'select[name]': 'true',
-            'select[email]': 'true',
-            'take': '10',
-            'skip': '0',
-        })
-        const res = await fetch(`/api/users?${query.toString()}`, {
+    const handleSubmit = async (values: any) => {
+        const response = await fetch('/api/users/managed', {
+            method: 'POST',
+            body: JSON.stringify(values),
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         })
-        const { data } = await res.json()
-        return data.users.map((user: User) => ({ label: user.name, value: user.id }))
-    }
 
-    const handleSubmit = async (values: any) => {
-        console.log('Form values:', values)
+        if (response.ok) {
+            notificationApi.success({
+                message: 'User created successfully',
+                description: 'The user has been successfully created.'
+            })
+        } else {
+            const { error } = await response.json()
+            throw new Error(`${error.code} - ${error.message}`)
+        }
     }
 
     const handleFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo)
+        notificationApi.error({
+            message: 'Failed to create user',
+            description: errorInfo.message,
+        })
     }
 
     const renderNewUserModal = () => {
@@ -165,7 +175,10 @@ const Users = () => {
                         })
                         .catch((error) => handleFinishFailed(error))
                 }}
-                onCancel={() => setIsModalVisible(false)}
+                onCancel={() => {
+                    setIsModalVisible(false)
+                    form.resetFields()
+                }}
             >
                 <Form form={form} layout="vertical">
                     <Form.Item
@@ -191,24 +204,9 @@ const Users = () => {
                         rules={[{ required: true, message: 'Please select a role!' }]}
                     >
                         <Select>
-                            <Select.Option value="user">User</Select.Option>
-                            <Select.Option value="admin">Admin</Select.Option>
+                            <Select.Option value="USER">User</Select.Option>
+                            <Select.Option value="ADMIN">Admin</Select.Option>
                         </Select>
-                    </Form.Item>
-                    <Form.Item
-                        name="managedBy"
-                        label="Managed By"
-                    >
-                        <DebounceSelect
-                            placeholder="Select manager"
-                            fetchOptions={fetchUserList}
-                            style={{ width: '100%' }}
-                            debounceTimeout={500}
-                            value={managedUserValue}
-                            onChange={(value) => setManagedUserValue(value as { label: string; value: string })}
-                            allowClear
-                            showSearch
-                        />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -219,9 +217,27 @@ const Users = () => {
         <PageLayout>
             <Row justify="space-between" align="middle">
                 <Typography.Title level={3}>Users</Typography.Title>
-                <Button type="primary" ghost onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />}>
-                    Add User
-                </Button>
+                <Space size="large">
+                    <Input.Search
+                        placeholder="Search by name or email" 
+                        loading={loading}
+                        style={{ width: 250 }}
+                        onChange={(e) => {
+                            setTableParams({
+                                ...tableParams,
+                                pagination: {
+                                    ...tableParams.pagination,
+                                    current: 1,
+                                },
+                                searchQuery: e.target.value,
+                            })
+                        }}
+                        allowClear
+                    />
+                    <Button type="primary" ghost onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />}>
+                        Add User
+                    </Button>
+                </Space>
             </Row>
             <Table
                 loading={loading}

@@ -18,7 +18,7 @@ const initialState: UsersState = {
 
 export const fetchAllUsers = createAsyncThunk(
   'users/fetchAllUsers',
-  async ({ skip, take }: { skip: number, take: number }, { rejectWithValue, getState }) => {
+  async ({ skip, take, searchQuery }: { skip: number, take: number, searchQuery?: string }, { rejectWithValue, getState }) => {
     try {
       const state = getState() as RootState
       const token = state.auth.token
@@ -30,6 +30,13 @@ export const fetchAllUsers = createAsyncThunk(
       URLParams.append('include[_count][select][myCommunities]', 'true')
       URLParams.append('include[_count][select][transactionsSent]', 'true')
       URLParams.append('include[_count][select][transactionsReceived]', 'true')
+
+      if (searchQuery) {
+        URLParams.append('where[OR][0][name][contains]', searchQuery)
+        URLParams.append('where[OR][0][name][mode]', 'insensitive')
+        URLParams.append('where[OR][1][email][contains]', searchQuery)
+        URLParams.append('where[OR][1][email][mode]', 'insensitive')
+      }
 
       const response = await fetch(`/api/users?${URLParams.toString()}`, {
         headers: {
