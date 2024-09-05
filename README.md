@@ -43,8 +43,8 @@ By using LoyaltyBank, developers can focus on creating unique user experiences w
 
 > Coming soon...
 
+![](./admin-ui/documentation/demo-2.png)
 ![](./admin-ui/documentation/demo-1.png)
-
 
 ---
 
