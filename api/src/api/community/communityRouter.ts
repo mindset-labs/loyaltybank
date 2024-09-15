@@ -6,8 +6,8 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
 import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { communityController } from "./communityController"
-import { CommunitySchema, MembershipSchema } from '@zodSchema/index'
-import { CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema, QueryAllCommunitiesSchema, UpdateMembershipSchema } from './communityRequestValidation'
+import { CommunitySchema, MembershipCreateInputSchema, MembershipSchema } from '@zodSchema/index'
+import { CreateMembershipSchema, CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema, QueryAllCommunitiesSchema, UpdateMembershipSchema } from './communityRequestValidation'
 import { Role } from '@prisma/client'
 
 export const communityRegistry = new OpenAPIRegistry()
@@ -58,6 +58,16 @@ communityRegistry.registerPath({
 })
 
 communityRouter.post("/", verifyJWT, validateRequest(CreateOrUpdateCommunitySchema), communityController.createCommunity)
+
+// Add a member to a community as a managed member
+communityRegistry.registerPath({
+    method: "post",
+    path: "/communities/{id}/add-member",
+    tags: ["Community"],
+    responses: createApiResponse(MembershipWithoutMetadata, "Success"),
+})
+
+communityRouter.post("/:id/add-member", verifyJWT, validateRequest(CreateMembershipSchema), communityController.addMembership)
 
 // Update a community
 communityRegistry.registerPath({

@@ -28,6 +28,7 @@ model User {
   eventLogs            EventLog[]
   createdEventLogs     EventLog[]          @relation("createdBy")
   rewards              AchievementReward[]
+  invites              Invite[]
 }
 
 enum Role {

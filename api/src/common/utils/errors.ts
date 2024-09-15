@@ -11,6 +11,7 @@ export enum CustomErrorCode {
   DATABASE_ERROR = 108,
   INVALID_QUERY = 109,
   INVALID_USER_FOR_API_KEY = 110,
+  USER_NOT_MANAGED = 111,
 
   // community errors
   INVALID_COMMUNITY = 200,
@@ -41,6 +42,11 @@ export enum CustomErrorCode {
   INVALID_ACHIEVEMENT = 601,
   INVALID_REWARD_CLAIM = 602,
   INVALID_ACHIEVEMENT_REWARD = 603,
+
+  // invite errors
+  INVITE_NOT_FOUND = 701,
+  INVITE_NOT_AVAILABLE = 702,
+  INVITE_MAX_USES_REACHED = 703,
 }
 
 export class CustomError extends Error {

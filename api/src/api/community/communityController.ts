@@ -130,6 +130,16 @@ class CommunityController {
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     }
 
+    public addMembership: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .createMembership(req.userId!, {
+                ...req.body,
+                communityId: req.params.id,
+            })
+            .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    }
+
     public updateMembership: RequestHandler = async (req: Request, res: Response) => {
         return communityService
             .updateMembership(req.userId!, req.params.communityId, req.params.membershipId, req.body)
