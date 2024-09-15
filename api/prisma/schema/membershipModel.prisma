@@ -5,6 +5,7 @@ model Membership {
     teir               MembershipTier   @default(BASIC)
     communityRole      CommunityRole    @default(MEMBER)
     tags               String[]         @default([])
+    inviteId           String?
     nftTokenId         String?
     nftMetadata        Json?
     membershipMetadata Json?
@@ -15,6 +16,7 @@ model Membership {
     // relationships
     user      User      @relation(fields: [userId], references: [id])
     community Community @relation(fields: [communityId], references: [id])
+    invite    Invite?   @relation(fields: [inviteId], references: [id])
 }
 
 enum MembershipTier {

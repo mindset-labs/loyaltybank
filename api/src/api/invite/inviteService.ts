@@ -56,6 +56,7 @@ export class InviteService {
             await communityService.joinCommunity(invite.communityId, userId, {
                 ignorePublicCheck: true,
                 createWallet: true,
+                inviteId: invite.id,
             })
 
             return updatedInvite

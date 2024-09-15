@@ -1,19 +1,20 @@
 model Invite {
-    id          String       @id @default(uuid())
-    code        String       @unique
-    email       String?
-    communityId String
-    walletId    String?
-    inviteById  String
-    status      InviteStatus @default(OPEN)
-    createdAt   DateTime     @default(now())
-    expiresAt   DateTime?
-    maxUses     Int?         @default(999)
-    uses        Int          @default(0)
-
+    id           String       @id @default(uuid())
+    code         String       @unique
+    email        String?
+    communityId  String
+    walletId     String?
+    inviteById   String
+    status       InviteStatus @default(OPEN)
+    createdAt    DateTime     @default(now())
+    expiresAt    DateTime?
+    maxUses      Int?         @default(999)
+    uses         Int          @default(0)
+    membershipId String?
     // relationships
-    community Community @relation(fields: [communityId], references: [id])
-    inviteBy  User      @relation(fields: [inviteById], references: [id])
+    community    Community    @relation(fields: [communityId], references: [id])
+    inviteBy     User         @relation(fields: [inviteById], references: [id])
+    memberships  Membership[]
 }
 
 enum InviteStatus {

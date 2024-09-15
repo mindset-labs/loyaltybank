@@ -9,6 +9,7 @@ type JoinCommunityOptions = {
     createWallet?: boolean,
     walletName?: string,
     ignorePublicCheck?: boolean,
+    inviteId?: string,
 }
 
 export class CommunityService {
@@ -178,6 +179,7 @@ export class CommunityService {
                 data: {
                     userId,
                     communityId: id,
+                    inviteId: options?.inviteId,
                 }
             })
 
