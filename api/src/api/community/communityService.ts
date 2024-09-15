@@ -8,6 +8,7 @@ import { type QueryPaging } from '@/common/utils/commonTypes'
 type JoinCommunityOptions = {
     createWallet?: boolean,
     walletName?: string,
+    ignorePublicCheck?: boolean,
 }
 
 export class CommunityService {
@@ -160,8 +161,6 @@ export class CommunityService {
             }
         })
 
-        // TODO: add ability to join community via invite code
-
         if (!community) {
             throw new CustomError('Community not found', CustomErrorCode.INVALID_COMMUNITY)
         } else if (community.memberships.length > 0) {
@@ -170,7 +169,7 @@ export class CommunityService {
             })
         } else if (community.status !== CommunityStatus.ACTIVE) {
             throw new CustomError('Community is not active', CustomErrorCode.COMMUNITY_NOT_ACTIVE)
-        } else if (!community.isPublic) {
+        } else if (!community.isPublic && !options?.ignorePublicCheck) {
             throw new CustomError('Community is not public', CustomErrorCode.COMMUNITY_NOT_PUBLIC)
         }
 
@@ -281,6 +280,63 @@ export class CommunityService {
         ])
 
         return transaction
+    }
+
+    /**
+     * Create a membership for a user in a community
+     * @param userId: the user performing the action
+     * @param data: the data to create the membership with
+     * @param data.userId: the user to create the membership for
+     * @param data.communityId: the community to create the membership for
+     * @param data.role: (optional) the role of the member in the community
+     * @param data.status: (optional) the status of the membership
+     * @param data.tags: (optional) the tags of the membership
+     * @returns the membership
+     */
+    async createMembership(userId: string, data: Prisma.MembershipUncheckedCreateInput): Promise<Membership> {
+        // check the user has access to the community
+        const community = await this.findByIdAndCheckAccess(data.communityId, userId)
+
+        if (!community) {
+            throw new CustomError('Community not found or user does not have access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                communityId: data.communityId,
+                userId,
+            })
+        }
+
+        // check if the user to be added is a managed user
+        const managedUser = await dbClient.user.findFirst({
+            where: {
+                id: data.userId,
+                managedById: userId,
+            }
+        })
+
+        if (!managedUser) {
+            throw new CustomError('User is not a managed user', CustomErrorCode.USER_NOT_MANAGED)
+        }
+
+        // check if the user is already a member of the community
+        const membership = await dbClient.membership.findFirst({
+            where: {
+                userId: data.userId,
+                communityId: data.communityId,
+            }
+        })
+
+        if (membership) {
+            throw new CustomError('User is already a member of the community', CustomErrorCode.USER_ALREADY_MEMBER, {
+                membership,
+            })
+        }
+
+        // create the membership
+        return dbClient.membership.create({
+            data: {
+                ...data,
+                communityRole: CommunityRole.MANAGED_MEMBER,
+            },
+        })
     }
 
     /**

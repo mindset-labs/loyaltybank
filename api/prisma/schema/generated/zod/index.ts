@@ -68,6 +68,8 @@ export const EventLogScalarFieldEnumSchema = z.enum(['id','type','value','descri
 
 export const EventScalarFieldEnumSchema = z.enum(['id','name','tag','description','communityId','createdById','createdAt','updatedAt']);
 
+export const InviteScalarFieldEnumSchema = z.enum(['id','code','email','communityId','walletId','inviteById','status','createdAt','expiresAt','maxUses','uses']);
+
 export const MembershipScalarFieldEnumSchema = z.enum(['id','userId','communityId','teir','communityRole','tags','nftTokenId','nftMetadata','membershipMetadata','membershipStatus','createdAt','updatedAt']);
 
 export const TransactionScalarFieldEnumSchema = z.enum(['id','amount','transactionType','transactionSubtype','status','description','tags','senderId','receiverId','senderWalletId','receiverWalletId','communityId','metadata','createdAt','updatedAt']);
@@ -120,11 +122,15 @@ export const EventTypeSchema = z.enum(['SYSTEM','COMMUNITY']);
 
 export type EventTypeType = `${z.infer<typeof EventTypeSchema>}`
 
+export const InviteStatusSchema = z.enum(['OPEN','CLOSED']);
+
+export type InviteStatusType = `${z.infer<typeof InviteStatusSchema>}`
+
 export const MembershipTierSchema = z.enum(['BASIC','PREMIUM','GOLD','PLATINUM']);
 
 export type MembershipTierType = `${z.infer<typeof MembershipTierSchema>}`
 
-export const CommunityRoleSchema = z.enum(['MEMBER','MODERATOR','ADMIN']);
+export const CommunityRoleSchema = z.enum(['MEMBER','MANAGED_MEMBER','MODERATOR','ADMIN']);
 
 export type CommunityRoleType = `${z.infer<typeof CommunityRoleSchema>}`
 
@@ -327,6 +333,34 @@ export type Event = z.infer<typeof EventSchema>
 export const EventPartialSchema = EventSchema.partial()
 
 export type EventPartial = z.infer<typeof EventPartialSchema>
+
+/////////////////////////////////////////
+// INVITE SCHEMA
+/////////////////////////////////////////
+
+export const InviteSchema = z.object({
+  status: InviteStatusSchema,
+  id: z.string(),
+  code: z.string(),
+  email: z.string().nullable(),
+  communityId: z.string(),
+  walletId: z.string().nullable(),
+  inviteById: z.string(),
+  createdAt: z.coerce.date(),
+  expiresAt: z.coerce.date().nullable(),
+  maxUses: z.number().int().nullable(),
+  uses: z.number().int(),
+})
+
+export type Invite = z.infer<typeof InviteSchema>
+
+/////////////////////////////////////////
+// INVITE PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const InvitePartialSchema = InviteSchema.partial()
+
+export type InvitePartial = z.infer<typeof InvitePartialSchema>
 
 /////////////////////////////////////////
 // MEMBERSHIP SCHEMA
@@ -593,6 +627,7 @@ export const CommunityIncludeSchema: z.ZodType<Prisma.CommunityInclude> = z.obje
   events: z.union([z.boolean(),z.lazy(() => EventFindManyArgsSchema)]).optional(),
   achievements: z.union([z.boolean(),z.lazy(() => AchievementFindManyArgsSchema)]).optional(),
   EventLog: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
+  invites: z.union([z.boolean(),z.lazy(() => InviteFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CommunityCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -612,6 +647,7 @@ export const CommunityCountOutputTypeSelectSchema: z.ZodType<Prisma.CommunityCou
   events: z.boolean().optional(),
   achievements: z.boolean().optional(),
   EventLog: z.boolean().optional(),
+  invites: z.boolean().optional(),
 }).strict();
 
 export const CommunitySelectSchema: z.ZodType<Prisma.CommunitySelect> = z.object({
@@ -633,6 +669,7 @@ export const CommunitySelectSchema: z.ZodType<Prisma.CommunitySelect> = z.object
   events: z.union([z.boolean(),z.lazy(() => EventFindManyArgsSchema)]).optional(),
   achievements: z.union([z.boolean(),z.lazy(() => AchievementFindManyArgsSchema)]).optional(),
   EventLog: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
+  invites: z.union([z.boolean(),z.lazy(() => InviteFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CommunityCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -714,6 +751,35 @@ export const EventSelectSchema: z.ZodType<Prisma.EventSelect> = z.object({
   eventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   achievements: z.union([z.boolean(),z.lazy(() => AchievementFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => EventCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// INVITE
+//------------------------------------------------------
+
+export const InviteIncludeSchema: z.ZodType<Prisma.InviteInclude> = z.object({
+  community: z.union([z.boolean(),z.lazy(() => CommunityArgsSchema)]).optional(),
+  inviteBy: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
+}).strict()
+
+export const InviteArgsSchema: z.ZodType<Prisma.InviteDefaultArgs> = z.object({
+  select: z.lazy(() => InviteSelectSchema).optional(),
+  include: z.lazy(() => InviteIncludeSchema).optional(),
+}).strict();
+
+export const InviteSelectSchema: z.ZodType<Prisma.InviteSelect> = z.object({
+  id: z.boolean().optional(),
+  code: z.boolean().optional(),
+  email: z.boolean().optional(),
+  communityId: z.boolean().optional(),
+  walletId: z.boolean().optional(),
+  inviteById: z.boolean().optional(),
+  status: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  expiresAt: z.boolean().optional(),
+  maxUses: z.boolean().optional(),
+  uses: z.boolean().optional(),
+  community: z.union([z.boolean(),z.lazy(() => CommunityArgsSchema)]).optional(),
+  inviteBy: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
 // MEMBERSHIP
@@ -815,6 +881,7 @@ export const UserIncludeSchema: z.ZodType<Prisma.UserInclude> = z.object({
   eventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   createdEventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   rewards: z.union([z.boolean(),z.lazy(() => AchievementRewardFindManyArgsSchema)]).optional(),
+  invites: z.union([z.boolean(),z.lazy(() => InviteFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -841,6 +908,7 @@ export const UserCountOutputTypeSelectSchema: z.ZodType<Prisma.UserCountOutputTy
   eventLogs: z.boolean().optional(),
   createdEventLogs: z.boolean().optional(),
   rewards: z.boolean().optional(),
+  invites: z.boolean().optional(),
 }).strict();
 
 export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
@@ -871,6 +939,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   eventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   createdEventLogs: z.union([z.boolean(),z.lazy(() => EventLogFindManyArgsSchema)]).optional(),
   rewards: z.union([z.boolean(),z.lazy(() => AchievementRewardFindManyArgsSchema)]).optional(),
+  invites: z.union([z.boolean(),z.lazy(() => InviteFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -1294,7 +1363,8 @@ export const CommunityWhereInputSchema: z.ZodType<Prisma.CommunityWhereInput> = 
   wallets: z.lazy(() => WalletListRelationFilterSchema).optional(),
   events: z.lazy(() => EventListRelationFilterSchema).optional(),
   achievements: z.lazy(() => AchievementListRelationFilterSchema).optional(),
-  EventLog: z.lazy(() => EventLogListRelationFilterSchema).optional()
+  EventLog: z.lazy(() => EventLogListRelationFilterSchema).optional(),
+  invites: z.lazy(() => InviteListRelationFilterSchema).optional()
 }).strict();
 
 export const CommunityOrderByWithRelationInputSchema: z.ZodType<Prisma.CommunityOrderByWithRelationInput> = z.object({
@@ -1315,7 +1385,8 @@ export const CommunityOrderByWithRelationInputSchema: z.ZodType<Prisma.Community
   wallets: z.lazy(() => WalletOrderByRelationAggregateInputSchema).optional(),
   events: z.lazy(() => EventOrderByRelationAggregateInputSchema).optional(),
   achievements: z.lazy(() => AchievementOrderByRelationAggregateInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogOrderByRelationAggregateInputSchema).optional()
+  EventLog: z.lazy(() => EventLogOrderByRelationAggregateInputSchema).optional(),
+  invites: z.lazy(() => InviteOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const CommunityWhereUniqueInputSchema: z.ZodType<Prisma.CommunityWhereUniqueInput> = z.object({
@@ -1342,7 +1413,8 @@ export const CommunityWhereUniqueInputSchema: z.ZodType<Prisma.CommunityWhereUni
   wallets: z.lazy(() => WalletListRelationFilterSchema).optional(),
   events: z.lazy(() => EventListRelationFilterSchema).optional(),
   achievements: z.lazy(() => AchievementListRelationFilterSchema).optional(),
-  EventLog: z.lazy(() => EventLogListRelationFilterSchema).optional()
+  EventLog: z.lazy(() => EventLogListRelationFilterSchema).optional(),
+  invites: z.lazy(() => InviteListRelationFilterSchema).optional()
 }).strict());
 
 export const CommunityOrderByWithAggregationInputSchema: z.ZodType<Prisma.CommunityOrderByWithAggregationInput> = z.object({
@@ -1584,6 +1656,108 @@ export const EventScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.EventSc
   createdById: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const InviteWhereInputSchema: z.ZodType<Prisma.InviteWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => InviteWhereInputSchema),z.lazy(() => InviteWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => InviteWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => InviteWhereInputSchema),z.lazy(() => InviteWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  email: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  communityId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  walletId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  inviteById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  status: z.union([ z.lazy(() => EnumInviteStatusFilterSchema),z.lazy(() => InviteStatusSchema) ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  expiresAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  maxUses: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  uses: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  community: z.union([ z.lazy(() => CommunityRelationFilterSchema),z.lazy(() => CommunityWhereInputSchema) ]).optional(),
+  inviteBy: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
+}).strict();
+
+export const InviteOrderByWithRelationInputSchema: z.ZodType<Prisma.InviteOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  email: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  communityId: z.lazy(() => SortOrderSchema).optional(),
+  walletId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  inviteById: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  expiresAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  maxUses: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional(),
+  community: z.lazy(() => CommunityOrderByWithRelationInputSchema).optional(),
+  inviteBy: z.lazy(() => UserOrderByWithRelationInputSchema).optional()
+}).strict();
+
+export const InviteWhereUniqueInputSchema: z.ZodType<Prisma.InviteWhereUniqueInput> = z.union([
+  z.object({
+    id: z.string(),
+    code: z.string()
+  }),
+  z.object({
+    id: z.string(),
+  }),
+  z.object({
+    code: z.string(),
+  }),
+])
+.and(z.object({
+  id: z.string().optional(),
+  code: z.string().optional(),
+  AND: z.union([ z.lazy(() => InviteWhereInputSchema),z.lazy(() => InviteWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => InviteWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => InviteWhereInputSchema),z.lazy(() => InviteWhereInputSchema).array() ]).optional(),
+  email: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  communityId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  walletId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  inviteById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  status: z.union([ z.lazy(() => EnumInviteStatusFilterSchema),z.lazy(() => InviteStatusSchema) ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  expiresAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  maxUses: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
+  uses: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  community: z.union([ z.lazy(() => CommunityRelationFilterSchema),z.lazy(() => CommunityWhereInputSchema) ]).optional(),
+  inviteBy: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
+}).strict());
+
+export const InviteOrderByWithAggregationInputSchema: z.ZodType<Prisma.InviteOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  email: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  communityId: z.lazy(() => SortOrderSchema).optional(),
+  walletId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  inviteById: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  expiresAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  maxUses: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => InviteCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => InviteAvgOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => InviteMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => InviteMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => InviteSumOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const InviteScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.InviteScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => InviteScalarWhereWithAggregatesInputSchema),z.lazy(() => InviteScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => InviteScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => InviteScalarWhereWithAggregatesInputSchema),z.lazy(() => InviteScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  email: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  communityId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  walletId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  inviteById: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  status: z.union([ z.lazy(() => EnumInviteStatusWithAggregatesFilterSchema),z.lazy(() => InviteStatusSchema) ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  expiresAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+  maxUses: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  uses: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
 }).strict();
 
 export const MembershipWhereInputSchema: z.ZodType<Prisma.MembershipWhereInput> = z.object({
@@ -1837,7 +2011,8 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   achievements: z.lazy(() => AchievementListRelationFilterSchema).optional(),
   eventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardListRelationFilterSchema).optional()
+  rewards: z.lazy(() => AchievementRewardListRelationFilterSchema).optional(),
+  invites: z.lazy(() => InviteListRelationFilterSchema).optional()
 }).strict();
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
@@ -1867,7 +2042,8 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   achievements: z.lazy(() => AchievementOrderByRelationAggregateInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogOrderByRelationAggregateInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogOrderByRelationAggregateInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardOrderByRelationAggregateInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardOrderByRelationAggregateInputSchema).optional(),
+  invites: z.lazy(() => InviteOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -1928,7 +2104,8 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   achievements: z.lazy(() => AchievementListRelationFilterSchema).optional(),
   eventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogListRelationFilterSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardListRelationFilterSchema).optional()
+  rewards: z.lazy(() => AchievementRewardListRelationFilterSchema).optional(),
+  invites: z.lazy(() => InviteListRelationFilterSchema).optional()
 }).strict());
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
@@ -2525,7 +2702,8 @@ export const CommunityCreateInputSchema: z.ZodType<Prisma.CommunityCreateInput> 
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateInput> = z.object({
@@ -2545,7 +2723,8 @@ export const CommunityUncheckedCreateInputSchema: z.ZodType<Prisma.CommunityUnch
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUpdateInputSchema: z.ZodType<Prisma.CommunityUpdateInput> = z.object({
@@ -2565,7 +2744,8 @@ export const CommunityUpdateInputSchema: z.ZodType<Prisma.CommunityUpdateInput> 
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateInput> = z.object({
@@ -2585,7 +2765,8 @@ export const CommunityUncheckedUpdateInputSchema: z.ZodType<Prisma.CommunityUnch
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityCreateManyInputSchema: z.ZodType<Prisma.CommunityCreateManyInput> = z.object({
@@ -2816,6 +2997,102 @@ export const EventUncheckedUpdateManyInputSchema: z.ZodType<Prisma.EventUnchecke
   createdById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const InviteCreateInputSchema: z.ZodType<Prisma.InviteCreateInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  walletId: z.string().optional().nullable(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional(),
+  community: z.lazy(() => CommunityCreateNestedOneWithoutInvitesInputSchema),
+  inviteBy: z.lazy(() => UserCreateNestedOneWithoutInvitesInputSchema)
+}).strict();
+
+export const InviteUncheckedCreateInputSchema: z.ZodType<Prisma.InviteUncheckedCreateInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  communityId: z.string(),
+  walletId: z.string().optional().nullable(),
+  inviteById: z.string(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional()
+}).strict();
+
+export const InviteUpdateInputSchema: z.ZodType<Prisma.InviteUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  community: z.lazy(() => CommunityUpdateOneRequiredWithoutInvitesNestedInputSchema).optional(),
+  inviteBy: z.lazy(() => UserUpdateOneRequiredWithoutInvitesNestedInputSchema).optional()
+}).strict();
+
+export const InviteUncheckedUpdateInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  communityId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  inviteById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const InviteCreateManyInputSchema: z.ZodType<Prisma.InviteCreateManyInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  communityId: z.string(),
+  walletId: z.string().optional().nullable(),
+  inviteById: z.string(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional()
+}).strict();
+
+export const InviteUpdateManyMutationInputSchema: z.ZodType<Prisma.InviteUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const InviteUncheckedUpdateManyInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  communityId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  inviteById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const MembershipCreateInputSchema: z.ZodType<Prisma.MembershipCreateInput> = z.object({
@@ -3072,7 +3349,8 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
@@ -3101,7 +3379,8 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
@@ -3130,7 +3409,8 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
@@ -3159,7 +3439,8 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
@@ -3973,6 +4254,12 @@ export const EventLogListRelationFilterSchema: z.ZodType<Prisma.EventLogListRela
   none: z.lazy(() => EventLogWhereInputSchema).optional()
 }).strict();
 
+export const InviteListRelationFilterSchema: z.ZodType<Prisma.InviteListRelationFilter> = z.object({
+  every: z.lazy(() => InviteWhereInputSchema).optional(),
+  some: z.lazy(() => InviteWhereInputSchema).optional(),
+  none: z.lazy(() => InviteWhereInputSchema).optional()
+}).strict();
+
 export const MembershipOrderByRelationAggregateInputSchema: z.ZodType<Prisma.MembershipOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -3994,6 +4281,10 @@ export const AchievementOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Ac
 }).strict();
 
 export const EventLogOrderByRelationAggregateInputSchema: z.ZodType<Prisma.EventLogOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const InviteOrderByRelationAggregateInputSchema: z.ZodType<Prisma.InviteOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -4172,6 +4463,75 @@ export const EventMinOrderByAggregateInputSchema: z.ZodType<Prisma.EventMinOrder
   createdById: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const EnumInviteStatusFilterSchema: z.ZodType<Prisma.EnumInviteStatusFilter> = z.object({
+  equals: z.lazy(() => InviteStatusSchema).optional(),
+  in: z.lazy(() => InviteStatusSchema).array().optional(),
+  notIn: z.lazy(() => InviteStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => NestedEnumInviteStatusFilterSchema) ]).optional(),
+}).strict();
+
+export const InviteCountOrderByAggregateInputSchema: z.ZodType<Prisma.InviteCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  email: z.lazy(() => SortOrderSchema).optional(),
+  communityId: z.lazy(() => SortOrderSchema).optional(),
+  walletId: z.lazy(() => SortOrderSchema).optional(),
+  inviteById: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  expiresAt: z.lazy(() => SortOrderSchema).optional(),
+  maxUses: z.lazy(() => SortOrderSchema).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const InviteAvgOrderByAggregateInputSchema: z.ZodType<Prisma.InviteAvgOrderByAggregateInput> = z.object({
+  maxUses: z.lazy(() => SortOrderSchema).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const InviteMaxOrderByAggregateInputSchema: z.ZodType<Prisma.InviteMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  email: z.lazy(() => SortOrderSchema).optional(),
+  communityId: z.lazy(() => SortOrderSchema).optional(),
+  walletId: z.lazy(() => SortOrderSchema).optional(),
+  inviteById: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  expiresAt: z.lazy(() => SortOrderSchema).optional(),
+  maxUses: z.lazy(() => SortOrderSchema).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const InviteMinOrderByAggregateInputSchema: z.ZodType<Prisma.InviteMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  email: z.lazy(() => SortOrderSchema).optional(),
+  communityId: z.lazy(() => SortOrderSchema).optional(),
+  walletId: z.lazy(() => SortOrderSchema).optional(),
+  inviteById: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  expiresAt: z.lazy(() => SortOrderSchema).optional(),
+  maxUses: z.lazy(() => SortOrderSchema).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const InviteSumOrderByAggregateInputSchema: z.ZodType<Prisma.InviteSumOrderByAggregateInput> = z.object({
+  maxUses: z.lazy(() => SortOrderSchema).optional(),
+  uses: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const EnumInviteStatusWithAggregatesFilterSchema: z.ZodType<Prisma.EnumInviteStatusWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => InviteStatusSchema).optional(),
+  in: z.lazy(() => InviteStatusSchema).array().optional(),
+  notIn: z.lazy(() => InviteStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => NestedEnumInviteStatusWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumInviteStatusFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumInviteStatusFilterSchema).optional()
 }).strict();
 
 export const EnumMembershipTierFilterSchema: z.ZodType<Prisma.EnumMembershipTierFilter> = z.object({
@@ -4897,6 +5257,13 @@ export const EventLogCreateNestedManyWithoutCommunityInputSchema: z.ZodType<Pris
   connect: z.union([ z.lazy(() => EventLogWhereUniqueInputSchema),z.lazy(() => EventLogWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
+export const InviteCreateNestedManyWithoutCommunityInputSchema: z.ZodType<Prisma.InviteCreateNestedManyWithoutCommunityInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutCommunityInputSchema),z.lazy(() => InviteCreateWithoutCommunityInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyCommunityInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const MembershipUncheckedCreateNestedManyWithoutCommunityInputSchema: z.ZodType<Prisma.MembershipUncheckedCreateNestedManyWithoutCommunityInput> = z.object({
   create: z.union([ z.lazy(() => MembershipCreateWithoutCommunityInputSchema),z.lazy(() => MembershipCreateWithoutCommunityInputSchema).array(),z.lazy(() => MembershipUncheckedCreateWithoutCommunityInputSchema),z.lazy(() => MembershipUncheckedCreateWithoutCommunityInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => MembershipCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => MembershipCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
@@ -4937,6 +5304,13 @@ export const EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema: z.Zod
   connectOrCreate: z.union([ z.lazy(() => EventLogCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => EventLogCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
   createMany: z.lazy(() => EventLogCreateManyCommunityInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => EventLogWhereUniqueInputSchema),z.lazy(() => EventLogWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const InviteUncheckedCreateNestedManyWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUncheckedCreateNestedManyWithoutCommunityInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutCommunityInputSchema),z.lazy(() => InviteCreateWithoutCommunityInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyCommunityInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const BoolFieldUpdateOperationsInputSchema: z.ZodType<Prisma.BoolFieldUpdateOperationsInput> = z.object({
@@ -5039,6 +5413,20 @@ export const EventLogUpdateManyWithoutCommunityNestedInputSchema: z.ZodType<Pris
   deleteMany: z.union([ z.lazy(() => EventLogScalarWhereInputSchema),z.lazy(() => EventLogScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
+export const InviteUpdateManyWithoutCommunityNestedInputSchema: z.ZodType<Prisma.InviteUpdateManyWithoutCommunityNestedInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutCommunityInputSchema),z.lazy(() => InviteCreateWithoutCommunityInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => InviteUpsertWithWhereUniqueWithoutCommunityInputSchema),z.lazy(() => InviteUpsertWithWhereUniqueWithoutCommunityInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyCommunityInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => InviteUpdateWithWhereUniqueWithoutCommunityInputSchema),z.lazy(() => InviteUpdateWithWhereUniqueWithoutCommunityInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => InviteUpdateManyWithWhereWithoutCommunityInputSchema),z.lazy(() => InviteUpdateManyWithWhereWithoutCommunityInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => InviteScalarWhereInputSchema),z.lazy(() => InviteScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
 export const MembershipUncheckedUpdateManyWithoutCommunityNestedInputSchema: z.ZodType<Prisma.MembershipUncheckedUpdateManyWithoutCommunityNestedInput> = z.object({
   create: z.union([ z.lazy(() => MembershipCreateWithoutCommunityInputSchema),z.lazy(() => MembershipCreateWithoutCommunityInputSchema).array(),z.lazy(() => MembershipUncheckedCreateWithoutCommunityInputSchema),z.lazy(() => MembershipUncheckedCreateWithoutCommunityInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => MembershipCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => MembershipCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
@@ -5121,6 +5509,20 @@ export const EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema: z.Zod
   update: z.union([ z.lazy(() => EventLogUpdateWithWhereUniqueWithoutCommunityInputSchema),z.lazy(() => EventLogUpdateWithWhereUniqueWithoutCommunityInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => EventLogUpdateManyWithWhereWithoutCommunityInputSchema),z.lazy(() => EventLogUpdateManyWithWhereWithoutCommunityInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => EventLogScalarWhereInputSchema),z.lazy(() => EventLogScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateManyWithoutCommunityNestedInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutCommunityInputSchema),z.lazy(() => InviteCreateWithoutCommunityInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema),z.lazy(() => InviteCreateOrConnectWithoutCommunityInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => InviteUpsertWithWhereUniqueWithoutCommunityInputSchema),z.lazy(() => InviteUpsertWithWhereUniqueWithoutCommunityInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyCommunityInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => InviteUpdateWithWhereUniqueWithoutCommunityInputSchema),z.lazy(() => InviteUpdateWithWhereUniqueWithoutCommunityInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => InviteUpdateManyWithWhereWithoutCommunityInputSchema),z.lazy(() => InviteUpdateManyWithWhereWithoutCommunityInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => InviteScalarWhereInputSchema),z.lazy(() => InviteScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const UserCreateNestedOneWithoutEventLogsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutEventLogsInput> = z.object({
@@ -5327,6 +5729,38 @@ export const AchievementUncheckedUpdateManyWithoutConditionEventNestedInputSchem
   update: z.union([ z.lazy(() => AchievementUpdateWithWhereUniqueWithoutConditionEventInputSchema),z.lazy(() => AchievementUpdateWithWhereUniqueWithoutConditionEventInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => AchievementUpdateManyWithWhereWithoutConditionEventInputSchema),z.lazy(() => AchievementUpdateManyWithWhereWithoutConditionEventInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => AchievementScalarWhereInputSchema),z.lazy(() => AchievementScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const CommunityCreateNestedOneWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityCreateNestedOneWithoutInvitesInput> = z.object({
+  create: z.union([ z.lazy(() => CommunityCreateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedCreateWithoutInvitesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => CommunityCreateOrConnectWithoutInvitesInputSchema).optional(),
+  connect: z.lazy(() => CommunityWhereUniqueInputSchema).optional()
+}).strict();
+
+export const UserCreateNestedOneWithoutInvitesInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutInvitesInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedCreateWithoutInvitesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutInvitesInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
+}).strict();
+
+export const EnumInviteStatusFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumInviteStatusFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => InviteStatusSchema).optional()
+}).strict();
+
+export const CommunityUpdateOneRequiredWithoutInvitesNestedInputSchema: z.ZodType<Prisma.CommunityUpdateOneRequiredWithoutInvitesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => CommunityCreateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedCreateWithoutInvitesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => CommunityCreateOrConnectWithoutInvitesInputSchema).optional(),
+  upsert: z.lazy(() => CommunityUpsertWithoutInvitesInputSchema).optional(),
+  connect: z.lazy(() => CommunityWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => CommunityUpdateToOneWithWhereWithoutInvitesInputSchema),z.lazy(() => CommunityUpdateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedUpdateWithoutInvitesInputSchema) ]).optional(),
+}).strict();
+
+export const UserUpdateOneRequiredWithoutInvitesNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutInvitesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedCreateWithoutInvitesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutInvitesInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutInvitesInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutInvitesInputSchema),z.lazy(() => UserUpdateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedUpdateWithoutInvitesInputSchema) ]).optional(),
 }).strict();
 
 export const MembershipCreatetagsInputSchema: z.ZodType<Prisma.MembershipCreatetagsInput> = z.object({
@@ -5614,6 +6048,13 @@ export const AchievementRewardCreateNestedManyWithoutUserInputSchema: z.ZodType<
   connect: z.union([ z.lazy(() => AchievementRewardWhereUniqueInputSchema),z.lazy(() => AchievementRewardWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
+export const InviteCreateNestedManyWithoutInviteByInputSchema: z.ZodType<Prisma.InviteCreateNestedManyWithoutInviteByInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutInviteByInputSchema),z.lazy(() => InviteCreateWithoutInviteByInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema),z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyInviteByInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const CommunityUncheckedCreateNestedManyWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateNestedManyWithoutCreatedByInput> = z.object({
   create: z.union([ z.lazy(() => CommunityCreateWithoutCreatedByInputSchema),z.lazy(() => CommunityCreateWithoutCreatedByInputSchema).array(),z.lazy(() => CommunityUncheckedCreateWithoutCreatedByInputSchema),z.lazy(() => CommunityUncheckedCreateWithoutCreatedByInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => CommunityCreateOrConnectWithoutCreatedByInputSchema),z.lazy(() => CommunityCreateOrConnectWithoutCreatedByInputSchema).array() ]).optional(),
@@ -5703,6 +6144,13 @@ export const AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema: z
   connectOrCreate: z.union([ z.lazy(() => AchievementRewardCreateOrConnectWithoutUserInputSchema),z.lazy(() => AchievementRewardCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
   createMany: z.lazy(() => AchievementRewardCreateManyUserInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => AchievementRewardWhereUniqueInputSchema),z.lazy(() => AchievementRewardWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const InviteUncheckedCreateNestedManyWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUncheckedCreateNestedManyWithoutInviteByInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutInviteByInputSchema),z.lazy(() => InviteCreateWithoutInviteByInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema),z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyInviteByInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const EnumRoleFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumRoleFieldUpdateOperationsInput> = z.object({
@@ -5901,6 +6349,20 @@ export const AchievementRewardUpdateManyWithoutUserNestedInputSchema: z.ZodType<
   deleteMany: z.union([ z.lazy(() => AchievementRewardScalarWhereInputSchema),z.lazy(() => AchievementRewardScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
+export const InviteUpdateManyWithoutInviteByNestedInputSchema: z.ZodType<Prisma.InviteUpdateManyWithoutInviteByNestedInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutInviteByInputSchema),z.lazy(() => InviteCreateWithoutInviteByInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema),z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => InviteUpsertWithWhereUniqueWithoutInviteByInputSchema),z.lazy(() => InviteUpsertWithWhereUniqueWithoutInviteByInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyInviteByInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => InviteUpdateWithWhereUniqueWithoutInviteByInputSchema),z.lazy(() => InviteUpdateWithWhereUniqueWithoutInviteByInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => InviteUpdateManyWithWhereWithoutInviteByInputSchema),z.lazy(() => InviteUpdateManyWithWhereWithoutInviteByInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => InviteScalarWhereInputSchema),z.lazy(() => InviteScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
 export const CommunityUncheckedUpdateManyWithoutCreatedByNestedInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateManyWithoutCreatedByNestedInput> = z.object({
   create: z.union([ z.lazy(() => CommunityCreateWithoutCreatedByInputSchema),z.lazy(() => CommunityCreateWithoutCreatedByInputSchema).array(),z.lazy(() => CommunityUncheckedCreateWithoutCreatedByInputSchema),z.lazy(() => CommunityUncheckedCreateWithoutCreatedByInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => CommunityCreateOrConnectWithoutCreatedByInputSchema),z.lazy(() => CommunityCreateOrConnectWithoutCreatedByInputSchema).array() ]).optional(),
@@ -6081,6 +6543,20 @@ export const AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema: z
   update: z.union([ z.lazy(() => AchievementRewardUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => AchievementRewardUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => AchievementRewardUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => AchievementRewardUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => AchievementRewardScalarWhereInputSchema),z.lazy(() => AchievementRewardScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateManyWithoutInviteByNestedInput> = z.object({
+  create: z.union([ z.lazy(() => InviteCreateWithoutInviteByInputSchema),z.lazy(() => InviteCreateWithoutInviteByInputSchema).array(),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema),z.lazy(() => InviteCreateOrConnectWithoutInviteByInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => InviteUpsertWithWhereUniqueWithoutInviteByInputSchema),z.lazy(() => InviteUpsertWithWhereUniqueWithoutInviteByInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => InviteCreateManyInviteByInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => InviteWhereUniqueInputSchema),z.lazy(() => InviteWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => InviteUpdateWithWhereUniqueWithoutInviteByInputSchema),z.lazy(() => InviteUpdateWithWhereUniqueWithoutInviteByInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => InviteUpdateManyWithWhereWithoutInviteByInputSchema),z.lazy(() => InviteUpdateManyWithWhereWithoutInviteByInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => InviteScalarWhereInputSchema),z.lazy(() => InviteScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const UserCreateNestedOneWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutSharedWalletsInput> = z.object({
@@ -6732,6 +7208,23 @@ export const NestedEnumEventTypeWithAggregatesFilterSchema: z.ZodType<Prisma.Nes
   _max: z.lazy(() => NestedEnumEventTypeFilterSchema).optional()
 }).strict();
 
+export const NestedEnumInviteStatusFilterSchema: z.ZodType<Prisma.NestedEnumInviteStatusFilter> = z.object({
+  equals: z.lazy(() => InviteStatusSchema).optional(),
+  in: z.lazy(() => InviteStatusSchema).array().optional(),
+  notIn: z.lazy(() => InviteStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => NestedEnumInviteStatusFilterSchema) ]).optional(),
+}).strict();
+
+export const NestedEnumInviteStatusWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumInviteStatusWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => InviteStatusSchema).optional(),
+  in: z.lazy(() => InviteStatusSchema).array().optional(),
+  notIn: z.lazy(() => InviteStatusSchema).array().optional(),
+  not: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => NestedEnumInviteStatusWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumInviteStatusFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumInviteStatusFilterSchema).optional()
+}).strict();
+
 export const NestedEnumMembershipTierFilterSchema: z.ZodType<Prisma.NestedEnumMembershipTierFilter> = z.object({
   equals: z.lazy(() => MembershipTierSchema).optional(),
   in: z.lazy(() => MembershipTierSchema).array().optional(),
@@ -6909,7 +7402,8 @@ export const UserCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserCrea
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutAchievementsInput> = z.object({
@@ -6937,7 +7431,8 @@ export const UserUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<Prisma
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutAchievementsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutAchievementsInput> = z.object({
@@ -6961,7 +7456,8 @@ export const CommunityCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.Com
   transactions: z.lazy(() => TransactionCreateNestedManyWithoutCommunityInputSchema).optional(),
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutAchievementsInput> = z.object({
@@ -6980,7 +7476,8 @@ export const CommunityUncheckedCreateWithoutAchievementsInputSchema: z.ZodType<P
   transactions: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutAchievementsInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutAchievementsInput> = z.object({
@@ -7079,7 +7576,8 @@ export const UserUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUpda
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutAchievementsInput> = z.object({
@@ -7107,7 +7605,8 @@ export const UserUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutAchievementsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutAchievementsInput> = z.object({
@@ -7137,7 +7636,8 @@ export const CommunityUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.Com
   transactions: z.lazy(() => TransactionUpdateManyWithoutCommunityNestedInputSchema).optional(),
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutAchievementsInput> = z.object({
@@ -7156,7 +7656,8 @@ export const CommunityUncheckedUpdateWithoutAchievementsInputSchema: z.ZodType<P
   transactions: z.lazy(() => TransactionUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const EventUpsertWithoutAchievementsInputSchema: z.ZodType<Prisma.EventUpsertWithoutAchievementsInput> = z.object({
@@ -7302,7 +7803,8 @@ export const UserCreateWithoutRewardsInputSchema: z.ZodType<Prisma.UserCreateWit
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
-  createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional()
+  createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutRewardsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutRewardsInput> = z.object({
@@ -7330,7 +7832,8 @@ export const UserUncheckedCreateWithoutRewardsInputSchema: z.ZodType<Prisma.User
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional()
+  createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutRewardsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutRewardsInput> = z.object({
@@ -7474,7 +7977,8 @@ export const UserUpdateWithoutRewardsInputSchema: z.ZodType<Prisma.UserUpdateWit
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
-  createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional()
+  createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutRewardsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutRewardsInput> = z.object({
@@ -7502,7 +8006,8 @@ export const UserUncheckedUpdateWithoutRewardsInputSchema: z.ZodType<Prisma.User
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional()
+  createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const WalletUpsertWithoutAchievementRewardInputSchema: z.ZodType<Prisma.WalletUpsertWithoutAchievementRewardInput> = z.object({
@@ -7575,7 +8080,8 @@ export const UserCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserCreateWit
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutApiKeysInput> = z.object({
@@ -7603,7 +8109,8 @@ export const UserUncheckedCreateWithoutApiKeysInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutApiKeysInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutApiKeysInput> = z.object({
@@ -7647,7 +8154,8 @@ export const UserUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUpdateWit
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutApiKeysInput> = z.object({
@@ -7675,7 +8183,8 @@ export const UserUncheckedUpdateWithoutApiKeysInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const MembershipCreateWithoutCommunityInputSchema: z.ZodType<Prisma.MembershipCreateWithoutCommunityInput> = z.object({
@@ -7741,7 +8250,8 @@ export const UserCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserCre
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutMyCommunitiesInput> = z.object({
@@ -7769,7 +8279,8 @@ export const UserUncheckedCreateWithoutMyCommunitiesInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutMyCommunitiesInput> = z.object({
@@ -8001,6 +8512,42 @@ export const EventLogCreateManyCommunityInputEnvelopeSchema: z.ZodType<Prisma.Ev
   skipDuplicates: z.boolean().optional()
 }).strict();
 
+export const InviteCreateWithoutCommunityInputSchema: z.ZodType<Prisma.InviteCreateWithoutCommunityInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  walletId: z.string().optional().nullable(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional(),
+  inviteBy: z.lazy(() => UserCreateNestedOneWithoutInvitesInputSchema)
+}).strict();
+
+export const InviteUncheckedCreateWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUncheckedCreateWithoutCommunityInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  walletId: z.string().optional().nullable(),
+  inviteById: z.string(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional()
+}).strict();
+
+export const InviteCreateOrConnectWithoutCommunityInputSchema: z.ZodType<Prisma.InviteCreateOrConnectWithoutCommunityInput> = z.object({
+  where: z.lazy(() => InviteWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => InviteCreateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema) ]),
+}).strict();
+
+export const InviteCreateManyCommunityInputEnvelopeSchema: z.ZodType<Prisma.InviteCreateManyCommunityInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => InviteCreateManyCommunityInputSchema),z.lazy(() => InviteCreateManyCommunityInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const MembershipUpsertWithWhereUniqueWithoutCommunityInputSchema: z.ZodType<Prisma.MembershipUpsertWithWhereUniqueWithoutCommunityInput> = z.object({
   where: z.lazy(() => MembershipWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => MembershipUpdateWithoutCommunityInputSchema),z.lazy(() => MembershipUncheckedUpdateWithoutCommunityInputSchema) ]),
@@ -8071,7 +8618,8 @@ export const UserUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUpd
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutMyCommunitiesInput> = z.object({
@@ -8099,7 +8647,8 @@ export const UserUncheckedUpdateWithoutMyCommunitiesInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const TransactionUpsertWithWhereUniqueWithoutCommunityInputSchema: z.ZodType<Prisma.TransactionUpsertWithWhereUniqueWithoutCommunityInput> = z.object({
@@ -8280,6 +8829,39 @@ export const EventLogScalarWhereInputSchema: z.ZodType<Prisma.EventLogScalarWher
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
 
+export const InviteUpsertWithWhereUniqueWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUpsertWithWhereUniqueWithoutCommunityInput> = z.object({
+  where: z.lazy(() => InviteWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => InviteUpdateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedUpdateWithoutCommunityInputSchema) ]),
+  create: z.union([ z.lazy(() => InviteCreateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedCreateWithoutCommunityInputSchema) ]),
+}).strict();
+
+export const InviteUpdateWithWhereUniqueWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUpdateWithWhereUniqueWithoutCommunityInput> = z.object({
+  where: z.lazy(() => InviteWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => InviteUpdateWithoutCommunityInputSchema),z.lazy(() => InviteUncheckedUpdateWithoutCommunityInputSchema) ]),
+}).strict();
+
+export const InviteUpdateManyWithWhereWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUpdateManyWithWhereWithoutCommunityInput> = z.object({
+  where: z.lazy(() => InviteScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => InviteUpdateManyMutationInputSchema),z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityInputSchema) ]),
+}).strict();
+
+export const InviteScalarWhereInputSchema: z.ZodType<Prisma.InviteScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => InviteScalarWhereInputSchema),z.lazy(() => InviteScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => InviteScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => InviteScalarWhereInputSchema),z.lazy(() => InviteScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  email: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  communityId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  walletId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  inviteById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  status: z.union([ z.lazy(() => EnumInviteStatusFilterSchema),z.lazy(() => InviteStatusSchema) ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  expiresAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  maxUses: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  uses: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+}).strict();
+
 export const UserCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserCreateWithoutEventLogsInput> = z.object({
   id: z.string().optional(),
   username: z.string().cuid().optional(),
@@ -8305,7 +8887,8 @@ export const UserCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserCreateW
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutEventLogsInput> = z.object({
@@ -8333,7 +8916,8 @@ export const UserUncheckedCreateWithoutEventLogsInputSchema: z.ZodType<Prisma.Us
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutEventLogsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutEventLogsInput> = z.object({
@@ -8366,7 +8950,8 @@ export const UserCreateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.User
   apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutCreatedEventLogsInput> = z.object({
@@ -8394,7 +8979,8 @@ export const UserUncheckedCreateWithoutCreatedEventLogsInputSchema: z.ZodType<Pr
   apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutCreatedEventLogsInput> = z.object({
@@ -8418,7 +9004,8 @@ export const CommunityCreateWithoutEventLogInputSchema: z.ZodType<Prisma.Communi
   transactions: z.lazy(() => TransactionCreateNestedManyWithoutCommunityInputSchema).optional(),
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
-  achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional()
+  achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutEventLogInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutEventLogInput> = z.object({
@@ -8437,7 +9024,8 @@ export const CommunityUncheckedCreateWithoutEventLogInputSchema: z.ZodType<Prism
   transactions: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutEventLogInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutEventLogInput> = z.object({
@@ -8590,7 +9178,8 @@ export const UserUpdateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserUpdateW
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutEventLogsInput> = z.object({
@@ -8618,7 +9207,8 @@ export const UserUncheckedUpdateWithoutEventLogsInputSchema: z.ZodType<Prisma.Us
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserUpsertWithoutCreatedEventLogsInput> = z.object({
@@ -8657,7 +9247,8 @@ export const UserUpdateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.User
   apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutCreatedEventLogsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutCreatedEventLogsInput> = z.object({
@@ -8685,7 +9276,8 @@ export const UserUncheckedUpdateWithoutCreatedEventLogsInputSchema: z.ZodType<Pr
   apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutEventLogInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutEventLogInput> = z.object({
@@ -8715,7 +9307,8 @@ export const CommunityUpdateWithoutEventLogInputSchema: z.ZodType<Prisma.Communi
   transactions: z.lazy(() => TransactionUpdateManyWithoutCommunityNestedInputSchema).optional(),
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional()
+  achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutEventLogInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutEventLogInput> = z.object({
@@ -8734,7 +9327,8 @@ export const CommunityUncheckedUpdateWithoutEventLogInputSchema: z.ZodType<Prism
   transactions: z.lazy(() => TransactionUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const TransactionUpsertWithoutEventLogInputSchema: z.ZodType<Prisma.TransactionUpsertWithoutEventLogInput> = z.object({
@@ -8889,7 +9483,8 @@ export const UserCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserCreateWith
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutEventsInput> = z.object({
@@ -8917,7 +9512,8 @@ export const UserUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.UserU
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutEventsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutEventsInput> = z.object({
@@ -8941,7 +9537,8 @@ export const CommunityCreateWithoutEventsInputSchema: z.ZodType<Prisma.Community
   transactions: z.lazy(() => TransactionCreateNestedManyWithoutCommunityInputSchema).optional(),
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutEventsInput> = z.object({
@@ -8960,7 +9557,8 @@ export const CommunityUncheckedCreateWithoutEventsInputSchema: z.ZodType<Prisma.
   transactions: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutEventsInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutEventsInput> = z.object({
@@ -9104,7 +9702,8 @@ export const UserUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUpdateWith
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutEventsInput> = z.object({
@@ -9132,7 +9731,8 @@ export const UserUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.UserU
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutEventsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutEventsInput> = z.object({
@@ -9162,7 +9762,8 @@ export const CommunityUpdateWithoutEventsInputSchema: z.ZodType<Prisma.Community
   transactions: z.lazy(() => TransactionUpdateManyWithoutCommunityNestedInputSchema).optional(),
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutEventsInput> = z.object({
@@ -9181,7 +9782,8 @@ export const CommunityUncheckedUpdateWithoutEventsInputSchema: z.ZodType<Prisma.
   transactions: z.lazy(() => TransactionUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const EventLogUpsertWithWhereUniqueWithoutEventInputSchema: z.ZodType<Prisma.EventLogUpsertWithWhereUniqueWithoutEventInput> = z.object({
@@ -9216,6 +9818,234 @@ export const AchievementUpdateManyWithWhereWithoutConditionEventInputSchema: z.Z
   data: z.union([ z.lazy(() => AchievementUpdateManyMutationInputSchema),z.lazy(() => AchievementUncheckedUpdateManyWithoutConditionEventInputSchema) ]),
 }).strict();
 
+export const CommunityCreateWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityCreateWithoutInvitesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  pointsTokenName: z.string().optional(),
+  isPublic: z.boolean().optional(),
+  status: z.lazy(() => CommunityStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  memberships: z.lazy(() => MembershipCreateNestedManyWithoutCommunityInputSchema).optional(),
+  createdBy: z.lazy(() => UserCreateNestedOneWithoutMyCommunitiesInputSchema),
+  transactions: z.lazy(() => TransactionCreateNestedManyWithoutCommunityInputSchema).optional(),
+  wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
+  events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
+  achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+}).strict();
+
+export const CommunityUncheckedCreateWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutInvitesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  pointsTokenName: z.string().optional(),
+  isPublic: z.boolean().optional(),
+  status: z.lazy(() => CommunityStatusSchema).optional(),
+  createdById: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  memberships: z.lazy(() => MembershipUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  transactions: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+}).strict();
+
+export const CommunityCreateOrConnectWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutInvitesInput> = z.object({
+  where: z.lazy(() => CommunityWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => CommunityCreateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedCreateWithoutInvitesInputSchema) ]),
+}).strict();
+
+export const UserCreateWithoutInvitesInputSchema: z.ZodType<Prisma.UserCreateWithoutInvitesInput> = z.object({
+  id: z.string().optional(),
+  username: z.string().cuid().optional(),
+  name: z.string(),
+  email: z.string(),
+  password: z.string(),
+  phoneNumber: z.string().optional().nullable(),
+  is2FAEnabled: z.boolean().optional(),
+  twoFactorSecret: z.string().optional().nullable(),
+  role: z.lazy(() => RoleSchema).optional(),
+  resetPasswordToken: z.string().optional().nullable(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  myCommunities: z.lazy(() => CommunityCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  memberships: z.lazy(() => MembershipCreateNestedManyWithoutUserInputSchema).optional(),
+  transactionsSent: z.lazy(() => TransactionCreateNestedManyWithoutSenderInputSchema).optional(),
+  transactionsReceived: z.lazy(() => TransactionCreateNestedManyWithoutReceiverInputSchema).optional(),
+  wallets: z.lazy(() => WalletCreateNestedManyWithoutOwnerInputSchema).optional(),
+  sharedWallets: z.lazy(() => UserOnWalletCreateNestedManyWithoutUserInputSchema).optional(),
+  managedBy: z.lazy(() => UserCreateNestedOneWithoutManagedUsersInputSchema).optional(),
+  managedUsers: z.lazy(() => UserCreateNestedManyWithoutManagedByInputSchema).optional(),
+  events: z.lazy(() => EventCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  apiKeys: z.lazy(() => ApiKeyCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
+  createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+}).strict();
+
+export const UserUncheckedCreateWithoutInvitesInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutInvitesInput> = z.object({
+  id: z.string().optional(),
+  username: z.string().cuid().optional(),
+  name: z.string(),
+  email: z.string(),
+  password: z.string(),
+  phoneNumber: z.string().optional().nullable(),
+  is2FAEnabled: z.boolean().optional(),
+  twoFactorSecret: z.string().optional().nullable(),
+  role: z.lazy(() => RoleSchema).optional(),
+  resetPasswordToken: z.string().optional().nullable(),
+  managedById: z.string().optional().nullable(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  myCommunities: z.lazy(() => CommunityUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  memberships: z.lazy(() => MembershipUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  transactionsSent: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutSenderInputSchema).optional(),
+  transactionsReceived: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutReceiverInputSchema).optional(),
+  wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutOwnerInputSchema).optional(),
+  sharedWallets: z.lazy(() => UserOnWalletUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  managedUsers: z.lazy(() => UserUncheckedCreateNestedManyWithoutManagedByInputSchema).optional(),
+  events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  apiKeys: z.lazy(() => ApiKeyUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+}).strict();
+
+export const UserCreateOrConnectWithoutInvitesInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutInvitesInput> = z.object({
+  where: z.lazy(() => UserWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => UserCreateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedCreateWithoutInvitesInputSchema) ]),
+}).strict();
+
+export const CommunityUpsertWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutInvitesInput> = z.object({
+  update: z.union([ z.lazy(() => CommunityUpdateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedUpdateWithoutInvitesInputSchema) ]),
+  create: z.union([ z.lazy(() => CommunityCreateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedCreateWithoutInvitesInputSchema) ]),
+  where: z.lazy(() => CommunityWhereInputSchema).optional()
+}).strict();
+
+export const CommunityUpdateToOneWithWhereWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityUpdateToOneWithWhereWithoutInvitesInput> = z.object({
+  where: z.lazy(() => CommunityWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => CommunityUpdateWithoutInvitesInputSchema),z.lazy(() => CommunityUncheckedUpdateWithoutInvitesInputSchema) ]),
+}).strict();
+
+export const CommunityUpdateWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityUpdateWithoutInvitesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  imageUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  pointsTokenName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  isPublic: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => CommunityStatusSchema),z.lazy(() => EnumCommunityStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  memberships: z.lazy(() => MembershipUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  createdBy: z.lazy(() => UserUpdateOneRequiredWithoutMyCommunitiesNestedInputSchema).optional(),
+  transactions: z.lazy(() => TransactionUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+}).strict();
+
+export const CommunityUncheckedUpdateWithoutInvitesInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutInvitesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  imageUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
+  pointsTokenName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  isPublic: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => CommunityStatusSchema),z.lazy(() => EnumCommunityStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  memberships: z.lazy(() => MembershipUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  transactions: z.lazy(() => TransactionUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+}).strict();
+
+export const UserUpsertWithoutInvitesInputSchema: z.ZodType<Prisma.UserUpsertWithoutInvitesInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedUpdateWithoutInvitesInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedCreateWithoutInvitesInputSchema) ]),
+  where: z.lazy(() => UserWhereInputSchema).optional()
+}).strict();
+
+export const UserUpdateToOneWithWhereWithoutInvitesInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutInvitesInput> = z.object({
+  where: z.lazy(() => UserWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => UserUpdateWithoutInvitesInputSchema),z.lazy(() => UserUncheckedUpdateWithoutInvitesInputSchema) ]),
+}).strict();
+
+export const UserUpdateWithoutInvitesInputSchema: z.ZodType<Prisma.UserUpdateWithoutInvitesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phoneNumber: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is2FAEnabled: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  twoFactorSecret: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  role: z.union([ z.lazy(() => RoleSchema),z.lazy(() => EnumRoleFieldUpdateOperationsInputSchema) ]).optional(),
+  resetPasswordToken: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  myCommunities: z.lazy(() => CommunityUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  memberships: z.lazy(() => MembershipUpdateManyWithoutUserNestedInputSchema).optional(),
+  transactionsSent: z.lazy(() => TransactionUpdateManyWithoutSenderNestedInputSchema).optional(),
+  transactionsReceived: z.lazy(() => TransactionUpdateManyWithoutReceiverNestedInputSchema).optional(),
+  wallets: z.lazy(() => WalletUpdateManyWithoutOwnerNestedInputSchema).optional(),
+  sharedWallets: z.lazy(() => UserOnWalletUpdateManyWithoutUserNestedInputSchema).optional(),
+  managedBy: z.lazy(() => UserUpdateOneWithoutManagedUsersNestedInputSchema).optional(),
+  managedUsers: z.lazy(() => UserUpdateManyWithoutManagedByNestedInputSchema).optional(),
+  events: z.lazy(() => EventUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  apiKeys: z.lazy(() => ApiKeyUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
+  createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+}).strict();
+
+export const UserUncheckedUpdateWithoutInvitesInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutInvitesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  username: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phoneNumber: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is2FAEnabled: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  twoFactorSecret: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  role: z.union([ z.lazy(() => RoleSchema),z.lazy(() => EnumRoleFieldUpdateOperationsInputSchema) ]).optional(),
+  resetPasswordToken: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  managedById: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  myCommunities: z.lazy(() => CommunityUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  memberships: z.lazy(() => MembershipUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  transactionsSent: z.lazy(() => TransactionUncheckedUpdateManyWithoutSenderNestedInputSchema).optional(),
+  transactionsReceived: z.lazy(() => TransactionUncheckedUpdateManyWithoutReceiverNestedInputSchema).optional(),
+  wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutOwnerNestedInputSchema).optional(),
+  sharedWallets: z.lazy(() => UserOnWalletUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  managedUsers: z.lazy(() => UserUncheckedUpdateManyWithoutManagedByNestedInputSchema).optional(),
+  events: z.lazy(() => EventUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  apiKeys: z.lazy(() => ApiKeyUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+}).strict();
+
 export const UserCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreateWithoutMembershipsInput> = z.object({
   id: z.string().optional(),
   username: z.string().cuid().optional(),
@@ -9241,7 +10071,8 @@ export const UserCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreat
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutMembershipsInput> = z.object({
@@ -9269,7 +10100,8 @@ export const UserUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutMembershipsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutMembershipsInput> = z.object({
@@ -9293,7 +10125,8 @@ export const CommunityCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.Comm
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutMembershipsInput> = z.object({
@@ -9312,7 +10145,8 @@ export const CommunityUncheckedCreateWithoutMembershipsInputSchema: z.ZodType<Pr
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutMembershipsInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutMembershipsInput> = z.object({
@@ -9356,7 +10190,8 @@ export const UserUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUpdat
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutMembershipsInput> = z.object({
@@ -9384,7 +10219,8 @@ export const UserUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutMembershipsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutMembershipsInput> = z.object({
@@ -9414,7 +10250,8 @@ export const CommunityUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.Comm
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutMembershipsInput> = z.object({
@@ -9433,7 +10270,8 @@ export const CommunityUncheckedUpdateWithoutMembershipsInputSchema: z.ZodType<Pr
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserCreateWithoutTransactionsSentInput> = z.object({
@@ -9461,7 +10299,8 @@ export const UserCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTransactionsSentInput> = z.object({
@@ -9489,7 +10328,8 @@ export const UserUncheckedCreateWithoutTransactionsSentInputSchema: z.ZodType<Pr
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTransactionsSentInput> = z.object({
@@ -9522,7 +10362,8 @@ export const UserCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutTransactionsReceivedInput> = z.object({
@@ -9550,7 +10391,8 @@ export const UserUncheckedCreateWithoutTransactionsReceivedInputSchema: z.ZodTyp
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutTransactionsReceivedInput> = z.object({
@@ -9574,7 +10416,8 @@ export const CommunityCreateWithoutTransactionsInputSchema: z.ZodType<Prisma.Com
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutTransactionsInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutTransactionsInput> = z.object({
@@ -9593,7 +10436,8 @@ export const CommunityUncheckedCreateWithoutTransactionsInputSchema: z.ZodType<P
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutTransactionsInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutTransactionsInput> = z.object({
@@ -9755,7 +10599,8 @@ export const UserUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutTransactionsSentInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTransactionsSentInput> = z.object({
@@ -9783,7 +10628,8 @@ export const UserUncheckedUpdateWithoutTransactionsSentInputSchema: z.ZodType<Pr
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUpsertWithoutTransactionsReceivedInput> = z.object({
@@ -9822,7 +10668,8 @@ export const UserUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutTransactionsReceivedInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutTransactionsReceivedInput> = z.object({
@@ -9850,7 +10697,8 @@ export const UserUncheckedUpdateWithoutTransactionsReceivedInputSchema: z.ZodTyp
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUpsertWithoutTransactionsInputSchema: z.ZodType<Prisma.CommunityUpsertWithoutTransactionsInput> = z.object({
@@ -9880,7 +10728,8 @@ export const CommunityUpdateWithoutTransactionsInputSchema: z.ZodType<Prisma.Com
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutTransactionsInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutTransactionsInput> = z.object({
@@ -9899,7 +10748,8 @@ export const CommunityUncheckedUpdateWithoutTransactionsInputSchema: z.ZodType<P
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const WalletUpsertWithoutSentTransactionsInputSchema: z.ZodType<Prisma.WalletUpsertWithoutSentTransactionsInput> = z.object({
@@ -10024,7 +10874,8 @@ export const CommunityCreateWithoutCreatedByInputSchema: z.ZodType<Prisma.Commun
   wallets: z.lazy(() => WalletCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutCreatedByInput> = z.object({
@@ -10043,7 +10894,8 @@ export const CommunityUncheckedCreateWithoutCreatedByInputSchema: z.ZodType<Pris
   wallets: z.lazy(() => WalletUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutCreatedByInput> = z.object({
@@ -10287,7 +11139,8 @@ export const UserCreateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserCrea
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutManagedUsersInput> = z.object({
@@ -10315,7 +11168,8 @@ export const UserUncheckedCreateWithoutManagedUsersInputSchema: z.ZodType<Prisma
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutManagedUsersInput> = z.object({
@@ -10348,7 +11202,8 @@ export const UserCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserCreateW
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutManagedByInput> = z.object({
@@ -10376,7 +11231,8 @@ export const UserUncheckedCreateWithoutManagedByInputSchema: z.ZodType<Prisma.Us
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutManagedByInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutManagedByInput> = z.object({
@@ -10623,6 +11479,42 @@ export const AchievementRewardCreateManyUserInputEnvelopeSchema: z.ZodType<Prism
   skipDuplicates: z.boolean().optional()
 }).strict();
 
+export const InviteCreateWithoutInviteByInputSchema: z.ZodType<Prisma.InviteCreateWithoutInviteByInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  walletId: z.string().optional().nullable(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional(),
+  community: z.lazy(() => CommunityCreateNestedOneWithoutInvitesInputSchema)
+}).strict();
+
+export const InviteUncheckedCreateWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUncheckedCreateWithoutInviteByInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  communityId: z.string(),
+  walletId: z.string().optional().nullable(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional()
+}).strict();
+
+export const InviteCreateOrConnectWithoutInviteByInputSchema: z.ZodType<Prisma.InviteCreateOrConnectWithoutInviteByInput> = z.object({
+  where: z.lazy(() => InviteWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => InviteCreateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema) ]),
+}).strict();
+
+export const InviteCreateManyInviteByInputEnvelopeSchema: z.ZodType<Prisma.InviteCreateManyInviteByInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => InviteCreateManyInviteByInputSchema),z.lazy(() => InviteCreateManyInviteByInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const CommunityUpsertWithWhereUniqueWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUpsertWithWhereUniqueWithoutCreatedByInput> = z.object({
   where: z.lazy(() => CommunityWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => CommunityUpdateWithoutCreatedByInputSchema),z.lazy(() => CommunityUncheckedUpdateWithoutCreatedByInputSchema) ]),
@@ -10787,7 +11679,8 @@ export const UserUpdateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserUpda
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutManagedUsersInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutManagedUsersInput> = z.object({
@@ -10815,7 +11708,8 @@ export const UserUncheckedUpdateWithoutManagedUsersInputSchema: z.ZodType<Prisma
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUpsertWithWhereUniqueWithoutManagedByInputSchema: z.ZodType<Prisma.UserUpsertWithWhereUniqueWithoutManagedByInput> = z.object({
@@ -10965,6 +11859,22 @@ export const AchievementRewardUpdateManyWithWhereWithoutUserInputSchema: z.ZodTy
   data: z.union([ z.lazy(() => AchievementRewardUpdateManyMutationInputSchema),z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserInputSchema) ]),
 }).strict();
 
+export const InviteUpsertWithWhereUniqueWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUpsertWithWhereUniqueWithoutInviteByInput> = z.object({
+  where: z.lazy(() => InviteWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => InviteUpdateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedUpdateWithoutInviteByInputSchema) ]),
+  create: z.union([ z.lazy(() => InviteCreateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedCreateWithoutInviteByInputSchema) ]),
+}).strict();
+
+export const InviteUpdateWithWhereUniqueWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUpdateWithWhereUniqueWithoutInviteByInput> = z.object({
+  where: z.lazy(() => InviteWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => InviteUpdateWithoutInviteByInputSchema),z.lazy(() => InviteUncheckedUpdateWithoutInviteByInputSchema) ]),
+}).strict();
+
+export const InviteUpdateManyWithWhereWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUpdateManyWithWhereWithoutInviteByInput> = z.object({
+  where: z.lazy(() => InviteScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => InviteUpdateManyMutationInputSchema),z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByInputSchema) ]),
+}).strict();
+
 export const UserCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCreateWithoutSharedWalletsInput> = z.object({
   id: z.string().optional(),
   username: z.string().cuid().optional(),
@@ -10990,7 +11900,8 @@ export const UserCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCre
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSharedWalletsInput> = z.object({
@@ -11018,7 +11929,8 @@ export const UserUncheckedCreateWithoutSharedWalletsInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSharedWalletsInput> = z.object({
@@ -11101,7 +12013,8 @@ export const UserUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUpd
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSharedWalletsInput> = z.object({
@@ -11129,7 +12042,8 @@ export const UserUncheckedUpdateWithoutSharedWalletsInputSchema: z.ZodType<Prism
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const WalletUpsertWithoutUsersInputSchema: z.ZodType<Prisma.WalletUpsertWithoutUsersInput> = z.object({
@@ -11202,7 +12116,8 @@ export const UserCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserCreateWit
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutWalletsInput> = z.object({
@@ -11230,7 +12145,8 @@ export const UserUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCreatedByInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutInviteByInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutWalletsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutWalletsInput> = z.object({
@@ -11346,7 +12262,8 @@ export const CommunityCreateWithoutWalletsInputSchema: z.ZodType<Prisma.Communit
   transactions: z.lazy(() => TransactionCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma.CommunityUncheckedCreateWithoutWalletsInput> = z.object({
@@ -11365,7 +12282,8 @@ export const CommunityUncheckedCreateWithoutWalletsInputSchema: z.ZodType<Prisma
   transactions: z.lazy(() => TransactionUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   events: z.lazy(() => EventUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedCreateNestedManyWithoutCommunityInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedCreateNestedManyWithoutCommunityInputSchema).optional()
 }).strict();
 
 export const CommunityCreateOrConnectWithoutWalletsInputSchema: z.ZodType<Prisma.CommunityCreateOrConnectWithoutWalletsInput> = z.object({
@@ -11507,7 +12425,8 @@ export const UserUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUpdateWit
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutWalletsInput> = z.object({
@@ -11535,7 +12454,8 @@ export const UserUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.User
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const TransactionUpsertWithWhereUniqueWithoutSenderWalletInputSchema: z.ZodType<Prisma.TransactionUpsertWithWhereUniqueWithoutSenderWalletInput> = z.object({
@@ -11597,7 +12517,8 @@ export const CommunityUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.Communit
   transactions: z.lazy(() => TransactionUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutWalletsInput> = z.object({
@@ -11616,7 +12537,8 @@ export const CommunityUncheckedUpdateWithoutWalletsInputSchema: z.ZodType<Prisma
   transactions: z.lazy(() => TransactionUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const UserOnWalletUpsertWithWhereUniqueWithoutWalletInputSchema: z.ZodType<Prisma.UserOnWalletUpsertWithWhereUniqueWithoutWalletInput> = z.object({
@@ -11789,6 +12711,19 @@ export const EventLogCreateManyCommunityInputSchema: z.ZodType<Prisma.EventLogCr
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
+}).strict();
+
+export const InviteCreateManyCommunityInputSchema: z.ZodType<Prisma.InviteCreateManyCommunityInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  walletId: z.string().optional().nullable(),
+  inviteById: z.string(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional()
 }).strict();
 
 export const MembershipUpdateWithoutCommunityInputSchema: z.ZodType<Prisma.MembershipUpdateWithoutCommunityInput> = z.object({
@@ -12083,6 +13018,45 @@ export const EventLogUncheckedUpdateManyWithoutCommunityInputSchema: z.ZodType<P
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const InviteUpdateWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUpdateWithoutCommunityInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  inviteBy: z.lazy(() => UserUpdateOneRequiredWithoutInvitesNestedInputSchema).optional()
+}).strict();
+
+export const InviteUncheckedUpdateWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateWithoutCommunityInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  inviteById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const InviteUncheckedUpdateManyWithoutCommunityInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateManyWithoutCommunityInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  inviteById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const EventLogCreateManyEventInputSchema: z.ZodType<Prisma.EventLogCreateManyEventInput> = z.object({
@@ -12486,6 +13460,19 @@ export const AchievementRewardCreateManyUserInputSchema: z.ZodType<Prisma.Achiev
   claimedAt: z.coerce.date().optional().nullable()
 }).strict();
 
+export const InviteCreateManyInviteByInputSchema: z.ZodType<Prisma.InviteCreateManyInviteByInput> = z.object({
+  id: z.string().optional(),
+  code: z.string(),
+  email: z.string().optional().nullable(),
+  communityId: z.string(),
+  walletId: z.string().optional().nullable(),
+  status: z.lazy(() => InviteStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  expiresAt: z.coerce.date().optional().nullable(),
+  maxUses: z.number().int().optional().nullable(),
+  uses: z.number().int().optional()
+}).strict();
+
 export const CommunityUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUpdateWithoutCreatedByInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -12502,7 +13489,8 @@ export const CommunityUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.Commun
   wallets: z.lazy(() => WalletUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateWithoutCreatedByInput> = z.object({
@@ -12521,7 +13509,8 @@ export const CommunityUncheckedUpdateWithoutCreatedByInputSchema: z.ZodType<Pris
   wallets: z.lazy(() => WalletUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   events: z.lazy(() => EventUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
-  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
+  EventLog: z.lazy(() => EventLogUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutCommunityNestedInputSchema).optional()
 }).strict();
 
 export const CommunityUncheckedUpdateManyWithoutCreatedByInputSchema: z.ZodType<Prisma.CommunityUncheckedUpdateManyWithoutCreatedByInput> = z.object({
@@ -12789,7 +13778,8 @@ export const UserUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUpdateW
   achievements: z.lazy(() => AchievementUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutManagedByInput> = z.object({
@@ -12817,7 +13807,8 @@ export const UserUncheckedUpdateWithoutManagedByInputSchema: z.ZodType<Prisma.Us
   achievements: z.lazy(() => AchievementUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
   eventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   createdEventLogs: z.lazy(() => EventLogUncheckedUpdateManyWithoutCreatedByNestedInputSchema).optional(),
-  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  rewards: z.lazy(() => AchievementRewardUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  invites: z.lazy(() => InviteUncheckedUpdateManyWithoutInviteByNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateManyWithoutManagedByInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyWithoutManagedByInput> = z.object({
@@ -13091,6 +14082,45 @@ export const AchievementRewardUncheckedUpdateManyWithoutUserInputSchema: z.ZodTy
   walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   claimedAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const InviteUpdateWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUpdateWithoutInviteByInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  community: z.lazy(() => CommunityUpdateOneRequiredWithoutInvitesNestedInputSchema).optional()
+}).strict();
+
+export const InviteUncheckedUpdateWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateWithoutInviteByInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  communityId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const InviteUncheckedUpdateManyWithoutInviteByInputSchema: z.ZodType<Prisma.InviteUncheckedUpdateManyWithoutInviteByInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  communityId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  walletId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  status: z.union([ z.lazy(() => InviteStatusSchema),z.lazy(() => EnumInviteStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  expiresAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  maxUses: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  uses: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const TransactionCreateManySenderWalletInputSchema: z.ZodType<Prisma.TransactionCreateManySenderWalletInput> = z.object({
@@ -13745,6 +14775,68 @@ export const EventFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.EventFindUniqueO
   where: EventWhereUniqueInputSchema,
 }).strict() ;
 
+export const InviteFindFirstArgsSchema: z.ZodType<Prisma.InviteFindFirstArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereInputSchema.optional(),
+  orderBy: z.union([ InviteOrderByWithRelationInputSchema.array(),InviteOrderByWithRelationInputSchema ]).optional(),
+  cursor: InviteWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ InviteScalarFieldEnumSchema,InviteScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const InviteFindFirstOrThrowArgsSchema: z.ZodType<Prisma.InviteFindFirstOrThrowArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereInputSchema.optional(),
+  orderBy: z.union([ InviteOrderByWithRelationInputSchema.array(),InviteOrderByWithRelationInputSchema ]).optional(),
+  cursor: InviteWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ InviteScalarFieldEnumSchema,InviteScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const InviteFindManyArgsSchema: z.ZodType<Prisma.InviteFindManyArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereInputSchema.optional(),
+  orderBy: z.union([ InviteOrderByWithRelationInputSchema.array(),InviteOrderByWithRelationInputSchema ]).optional(),
+  cursor: InviteWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ InviteScalarFieldEnumSchema,InviteScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const InviteAggregateArgsSchema: z.ZodType<Prisma.InviteAggregateArgs> = z.object({
+  where: InviteWhereInputSchema.optional(),
+  orderBy: z.union([ InviteOrderByWithRelationInputSchema.array(),InviteOrderByWithRelationInputSchema ]).optional(),
+  cursor: InviteWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const InviteGroupByArgsSchema: z.ZodType<Prisma.InviteGroupByArgs> = z.object({
+  where: InviteWhereInputSchema.optional(),
+  orderBy: z.union([ InviteOrderByWithAggregationInputSchema.array(),InviteOrderByWithAggregationInputSchema ]).optional(),
+  by: InviteScalarFieldEnumSchema.array(),
+  having: InviteScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const InviteFindUniqueArgsSchema: z.ZodType<Prisma.InviteFindUniqueArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereUniqueInputSchema,
+}).strict() ;
+
+export const InviteFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.InviteFindUniqueOrThrowArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereUniqueInputSchema,
+}).strict() ;
+
 export const MembershipFindFirstArgsSchema: z.ZodType<Prisma.MembershipFindFirstArgs> = z.object({
   select: MembershipSelectSchema.optional(),
   include: MembershipIncludeSchema.optional(),
@@ -14329,6 +15421,52 @@ export const EventUpdateManyArgsSchema: z.ZodType<Prisma.EventUpdateManyArgs> = 
 
 export const EventDeleteManyArgsSchema: z.ZodType<Prisma.EventDeleteManyArgs> = z.object({
   where: EventWhereInputSchema.optional(),
+}).strict() ;
+
+export const InviteCreateArgsSchema: z.ZodType<Prisma.InviteCreateArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  data: z.union([ InviteCreateInputSchema,InviteUncheckedCreateInputSchema ]),
+}).strict() ;
+
+export const InviteUpsertArgsSchema: z.ZodType<Prisma.InviteUpsertArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereUniqueInputSchema,
+  create: z.union([ InviteCreateInputSchema,InviteUncheckedCreateInputSchema ]),
+  update: z.union([ InviteUpdateInputSchema,InviteUncheckedUpdateInputSchema ]),
+}).strict() ;
+
+export const InviteCreateManyArgsSchema: z.ZodType<Prisma.InviteCreateManyArgs> = z.object({
+  data: z.union([ InviteCreateManyInputSchema,InviteCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const InviteCreateManyAndReturnArgsSchema: z.ZodType<Prisma.InviteCreateManyAndReturnArgs> = z.object({
+  data: z.union([ InviteCreateManyInputSchema,InviteCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const InviteDeleteArgsSchema: z.ZodType<Prisma.InviteDeleteArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  where: InviteWhereUniqueInputSchema,
+}).strict() ;
+
+export const InviteUpdateArgsSchema: z.ZodType<Prisma.InviteUpdateArgs> = z.object({
+  select: InviteSelectSchema.optional(),
+  include: InviteIncludeSchema.optional(),
+  data: z.union([ InviteUpdateInputSchema,InviteUncheckedUpdateInputSchema ]),
+  where: InviteWhereUniqueInputSchema,
+}).strict() ;
+
+export const InviteUpdateManyArgsSchema: z.ZodType<Prisma.InviteUpdateManyArgs> = z.object({
+  data: z.union([ InviteUpdateManyMutationInputSchema,InviteUncheckedUpdateManyInputSchema ]),
+  where: InviteWhereInputSchema.optional(),
+}).strict() ;
+
+export const InviteDeleteManyArgsSchema: z.ZodType<Prisma.InviteDeleteManyArgs> = z.object({
+  where: InviteWhereInputSchema.optional(),
 }).strict() ;
 
 export const MembershipCreateArgsSchema: z.ZodType<Prisma.MembershipCreateArgs> = z.object({

@@ -1,8 +1,6 @@
 import { userService } from "@/api/user/userService"
 import { env } from "@/common/utils/envConfig"
-import { CustomError, CustomErrorCode } from '@/common/utils/errors'
 import { handleErrorResponse, handleSuccessResponse } from "@/common/utils/httpHandlers"
-import { UserIncludeSchema } from '@zodSchema/index'
 import type { Request, RequestHandler, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import jwt from "jsonwebtoken"

@@ -19,6 +19,7 @@ model Community {
     events       Event[]
     achievements Achievement[]
     EventLog     EventLog[]
+    invites      Invite[]
 }
 
 enum CommunityStatus {

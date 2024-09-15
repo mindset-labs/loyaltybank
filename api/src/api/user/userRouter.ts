@@ -86,7 +86,7 @@ userRegistry.registerPath({
   responses: createApiResponse(UserSchema, "Success"),
 })
 
-userRouter.post("/managed", verifyJWT, validateRequest(CreateManagedUserSchema), userController.createManagedUser)
+userRouter.post("/managed", verifyJWTAndRole([Role.ADMIN]), validateRequest(CreateManagedUserSchema), userController.createManagedUser)
 
 // Login a user
 userRegistry.registerPath({
