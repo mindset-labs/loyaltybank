@@ -1,4 +1,4 @@
-import { Prisma, Invite, InviteStatus } from '@prisma/client'
+import { Prisma, Invite, InviteStatus, CommunityRole } from '@prisma/client'
 import dbClient from '@/db'
 import { QueryPaging } from '@/common/utils/commonTypes'
 import { CustomError, CustomErrorCode } from '@/common/utils/errors'
@@ -95,6 +95,59 @@ export class InviteService {
             invites: results[0],
             total: results[1],
         }
+    }
+
+    /**
+     * Update an invite
+     * @param userId: the id of the user updating the invite
+     * @param inviteId: the id of the invite to update
+     * @param updateData: the data to update the invite with
+     * @returns the updated invite
+     */
+    async updateInvite(
+        userId: string,
+        inviteId: string,
+        updateData: Pick<Prisma.InviteUpdateInput, 'status' | 'expiresAt' | 'maxUses'>
+    ): Promise<Invite> {
+        // Find the invite and ensure it's either created by the user or the user is an admin of the community
+        const invite = await dbClient.invite.findFirst({
+            where: {
+                id: inviteId,
+                OR: [
+                    {
+                        inviteBy: {
+                            id: userId,
+                        },
+                    },
+                    {
+                        community: {
+                            OR: [
+                                {
+                                    memberships: {
+                                        some: {
+                                            id: userId,
+                                            communityRole: CommunityRole.ADMIN
+                                        },
+                                    },
+                                },
+                                {
+                                    createdById: userId,
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+        })
+
+        if (!invite) {
+            throw new CustomError('Invite not found or user does not have permission to update', CustomErrorCode.INVALID_INVITE_OR_USER_NOT_ADMIN)
+        }
+
+        return dbClient.invite.update({
+            where: { id: inviteId },
+            data: updateData,
+        })
     }
 }
 

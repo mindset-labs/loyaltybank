@@ -47,6 +47,7 @@ export enum CustomErrorCode {
   INVITE_NOT_FOUND = 701,
   INVITE_NOT_AVAILABLE = 702,
   INVITE_MAX_USES_REACHED = 703,
+  INVALID_INVITE_OR_USER_NOT_ADMIN = 704,
 }
 
 export class CustomError extends Error {

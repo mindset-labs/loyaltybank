@@ -7,7 +7,7 @@ import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { inviteController } from "./inviteController"
 import { InviteSchema } from '@zodSchema/index'
 import { Role } from '@prisma/client'
-import { AcceptInviteSchema, QueryInviteSchema } from './inviteRequestValidation'
+import { AcceptInviteSchema, QueryInviteSchema, UpdateInviteSchema } from './inviteRequestValidation'
 import { validateRequest } from '@/common/utils/httpHandlers'
 
 export const inviteRegistry = new OpenAPIRegistry()
@@ -49,3 +49,15 @@ inviteRegistry.registerPath({
 })
 
 inviteRouter.post("/accept", verifyJWT, validateRequest(AcceptInviteSchema), inviteController.acceptInvite)
+
+// Update an invite
+inviteRegistry.registerPath({
+    method: "put",
+    path: "/invites/{inviteId}",
+    tags: ["Invite"],
+    responses: createApiResponse(z.object({
+        invite: InviteSchema,
+    }), "Success"),
+})
+
+inviteRouter.put("/:inviteId", verifyJWT, validateRequest(UpdateInviteSchema), inviteController.updateInvite)

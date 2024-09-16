@@ -37,6 +37,16 @@ export class InviteController {
             .then((invite) => handleSuccessResponse({ invite }, res))
             .catch((error) => handleErrorResponse(error, res))
     }
+
+    updateInvite: RequestHandler = async (req: Request, res: Response) => {
+        const { inviteId } = req.params
+        const { status, expiresAt, maxUses } = req.body
+
+        return inviteService
+            .updateInvite(req.userId!, inviteId, { status, expiresAt, maxUses })
+            .then((invite) => handleSuccessResponse({ invite }, res))
+            .catch((error) => handleErrorResponse(error, res))
+    }
 }
 
 export const inviteController = new InviteController()

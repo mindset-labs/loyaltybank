@@ -13,6 +13,7 @@ The API provides a comprehensive set of endpoints that allow you to:
 5. Log and retrieve detailed transaction histories
 6. Set up and trigger achievements and rewards
 7. Implement event logging for user actions
+8. Create and manage invites for communities
 
 LoyaltyBank also includes the ability to have wallet balances and log transactions which can support a fully functional points system, among other use cases. Whether you're building a loyalty program, gamification features, or a complex rewards ecosystem, LoyaltyBank's API offers the flexibility and functionality to bring your vision to life.
 
