@@ -1,7 +1,7 @@
 import type { Request, RequestHandler, Response } from "express"
 import { inviteService } from "./inviteService"
 import { handleSuccessResponse, handleErrorResponse } from '@/common/utils/httpHandlers'
-import { generateApiKey, generateUUID } from '@/common/utils/random'
+import { generateApiKey } from '@/common/utils/random'
 
 export class InviteController {
     queryInvites: RequestHandler = async (req: Request, res: Response) => {

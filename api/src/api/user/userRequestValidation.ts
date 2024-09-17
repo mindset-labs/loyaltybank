@@ -18,6 +18,7 @@ export const CreateUserSchema = z.object({
     name: z.string(),
     email: z.string().email(),
     password: z.string(),
+    phoneNumber: z.string().optional(),
   }),
 })
 
@@ -44,5 +45,14 @@ export type LoginUserDataType = z.infer<typeof LoginUserSchema.shape.body>
 export const MeQuerySchema = z.object({
   query: z.object({
     include: UserIncludeSchema.optional(),
+  }),
+})
+
+// Update user schema
+export const UpdateUserSchema = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    email: z.string().email().optional(),
+    phoneNumber: z.string().optional(),
   }),
 })

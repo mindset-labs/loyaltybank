@@ -12,6 +12,7 @@ export enum CustomErrorCode {
   INVALID_QUERY = 109,
   INVALID_USER_FOR_API_KEY = 110,
   USER_NOT_MANAGED = 111,
+  INVALID_PHONE_NUMBER_CODE = 112,
 
   // community errors
   INVALID_COMMUNITY = 200,

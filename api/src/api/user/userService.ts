@@ -110,8 +110,43 @@ export class UserService {
     throw new Error("Not implemented")
   }
 
-  async updateMe(data: Prisma.UserUncheckedUpdateInput): Promise<ServiceResponse<null>> {
-    throw new Error("Not implemented")
+  /**
+   * Update a user's information
+   * @param userId - The ID of the user to update
+   * @param data - The data to update the user with
+   * @returns The updated user
+   */
+  async updateUser(userId: string, data: Prisma.UserUncheckedUpdateInput): Promise<UserWithoutSecrets> {
+    const user = await dbClient.user.update({
+      where: { id: userId },
+      data,
+    })
+
+    return user
+  }
+
+  async verifyPhoneNumber(phoneNumber: string, code: string): Promise<boolean> {
+    const user = await dbClient.user.findFirst({
+      where: { phoneNumber },
+    })
+
+    if (!user) {
+      throw new CustomError("User not found", CustomErrorCode.USER_NOT_FOUND)
+    }
+
+    if (user.phoneNumberCode !== code) {
+      throw new CustomError("Invalid code", CustomErrorCode.INVALID_PHONE_NUMBER_CODE)
+    }
+
+    await dbClient.user.update({
+      where: { id: user.id },
+      data: {
+        isPhoneNumberVerified: true,
+        phoneNumberCode: null,
+      },
+    })
+
+    return true
   }
 
   async myInfo(userId: string, include?: Prisma.UserInclude): Promise<UserWithoutSecrets | null> {

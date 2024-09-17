@@ -3,7 +3,7 @@ import express, { type Router } from "express"
 import { z } from "zod"
 
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
-import { CreateManagedUserSchema, CreateUserSchema, GetUserSchema, LoginUserSchema, MeQuerySchema } from "@/api/user/userRequestValidation"
+import { CreateManagedUserSchema, CreateUserSchema, GetUserSchema, LoginUserSchema, MeQuerySchema, UpdateUserSchema } from "@/api/user/userRequestValidation"
 import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { UserSchema } from "@zodSchema/index"
@@ -66,6 +66,27 @@ userRegistry.registerPath({
 })
 
 userRouter.post("/", validateRequest(CreateUserSchema), userController.register)
+
+// Set the user's phone number
+userRegistry.registerPath({
+  method: "put",
+  path: "/users",
+  tags: ["User"],
+  request: {
+    body: {
+      description: 'object containing user information',
+      content: {
+        'application/json': {
+          schema: UpdateUserSchema.shape.body,
+        },
+      },
+      required: true,
+    }
+  },
+  responses: createApiResponse(UserSchema, "Success"),
+})
+
+userRouter.put("/", validateRequest(UpdateUserSchema), userController.updateUser)
 
 // Get a managed user by ID
 userRegistry.registerPath({

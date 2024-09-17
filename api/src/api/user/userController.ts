@@ -69,6 +69,18 @@ class UserController {
       .then((token) => handleSuccessResponse({ token }, res, StatusCodes.OK))
       .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
+
+  public updateUser: RequestHandler = async (req: Request, res: Response) => {
+    // allow overriding userId for admin users
+    const isAdmin = ([Role.SYSTEM_ADMIN, Role.SYSTEM, Role.ADMIN] as Role[]).includes(req.user?.role as Role)
+    // otherwise use the userId of the logged in user
+    const userId = isAdmin ? req.body.userId : req.userId
+
+    userService
+      .updateUser(userId, req.body)
+      .then((user) => handleSuccessResponse({ user }, res, StatusCodes.OK))
+      .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+  };
 }
 
 export const userController = new UserController()
