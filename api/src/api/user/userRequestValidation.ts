@@ -56,3 +56,11 @@ export const UpdateUserSchema = z.object({
     phoneNumber: z.string().optional(),
   }),
 })
+
+// Verify phone number schema
+export const VerifyPhoneNumberSchema = z.object({
+  body: z.object({
+    phoneNumber: z.string(),
+    code: z.string(),
+  }),
+})

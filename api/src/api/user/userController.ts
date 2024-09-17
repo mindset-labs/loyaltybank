@@ -81,6 +81,13 @@ class UserController {
       .then((user) => handleSuccessResponse({ user }, res, StatusCodes.OK))
       .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
+
+  public verifyPhoneNumber: RequestHandler = async (req: Request, res: Response) => {
+    userService
+      .verifyPhoneNumber(req.body.phoneNumber, req.body.code)
+      .then((isVerified) => handleSuccessResponse({ isVerified }, res, StatusCodes.OK))
+      .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+  };
 }
 
 export const userController = new UserController()
