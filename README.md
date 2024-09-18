@@ -18,7 +18,12 @@ LoyaltyBank also includes the ability to have wallet balances and log transactio
 
 Best of all, it's open source and free!
 
----
+## 💻 The Stack
+
+LoyaltyBank is built using the following technologies:
+
+- **API**: Node (Typescript), Express, Postgres, Prisma, Redis
+- **Admin UI**: React (Typescript), Ant Design, Redux
 
 
 ## 💡 Motivation
