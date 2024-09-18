@@ -18,7 +18,7 @@ export const CreateUserSchema = z.object({
     name: z.string(),
     email: z.string().email(),
     password: z.string(),
-    phoneNumber: z.string().optional(),
+    phoneNumber: z.string().regex(/^\+?\d{1,14}$/).optional(),
   }),
 })
 

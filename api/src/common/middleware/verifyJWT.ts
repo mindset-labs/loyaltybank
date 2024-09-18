@@ -2,6 +2,7 @@ import { env } from "@/common/utils/envConfig"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import { handleErrorResponse, handleSuccessResponse } from "@/common/utils/httpHandlers"
 import db from "@/db"
+import { logger } from '@/server'
 import { Role } from '@prisma/client'
 import type { NextFunction, Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"

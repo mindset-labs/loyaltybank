@@ -10,6 +10,7 @@ const client = new PrismaClient({
       password: true,
       twoFactorSecret: true,
       resetPasswordToken: true,
+      phoneNumber2FACode: true,
     },
   },
   datasourceUrl: env.DATABASE_URL,

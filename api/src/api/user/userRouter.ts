@@ -30,7 +30,7 @@ userRegistry.registerPath({
   method: "get",
   path: "/users/me",
   tags: ["User"],
-  responses: createApiResponse(z.array(UserSchema), "Success"),
+  responses: createApiResponse(z.object({ user: UserSchema }), "Success"),
 })
 
 userRouter.get("/me", verifyJWT, validateRequest(MeQuerySchema), userController.myInfo)
@@ -62,7 +62,10 @@ userRegistry.registerPath({
       required: true,
     }
   },
-  responses: createApiResponse(UserSchema, "Success"),
+  responses: createApiResponse(z.object({
+    token: z.string(),
+    user: UserSchema
+  }), "Success"),
 })
 
 userRouter.post("/", validateRequest(CreateUserSchema), userController.register)
@@ -86,28 +89,27 @@ userRegistry.registerPath({
   responses: createApiResponse(UserSchema, "Success"),
 })
 
-userRouter.put("/", validateRequest(UpdateUserSchema), userController.updateUser)
+userRouter.put("/", verifyJWT, validateRequest(UpdateUserSchema), userController.updateUser)
+
+// Verify the user's phone number
+userRegistry.registerPath({
+  method: "put",
+  path: "/users/request-verify-phone-number",
+  tags: ["User"],
+  responses: createApiResponse(z.object({ codeSent: z.boolean() }), "Success"),
+})
+
+userRouter.put("/request-verify-phone-number", verifyJWT, userController.requestVerifyPhoneNumber)
 
 // Verify the user's phone number
 userRegistry.registerPath({
   method: "put",
   path: "/users/verify-phone-number",
   tags: ["User"],
-  request: {
-    body: {
-      description: 'object containing user information',
-      content: {
-        'application/json': {
-          schema: VerifyPhoneNumberSchema.shape.body,
-        },
-      },
-      required: true,
-    }
-  },
   responses: createApiResponse(UserSchema, "Success"),
 })
 
-userRouter.put("/", validateRequest(VerifyPhoneNumberSchema), userController.verifyPhoneNumber)
+userRouter.put("/verify-phone-number", verifyJWT, validateRequest(VerifyPhoneNumberSchema), userController.verifyPhoneNumber)
 
 // Get a managed user by ID
 userRegistry.registerPath({

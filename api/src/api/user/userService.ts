@@ -1,15 +1,16 @@
 import type { ServiceResponse } from "@/common/models/serviceResponse"
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient, { prismaExclude } from "@/db"
-import { logger } from "@/server"
 import { type Prisma } from "@prisma/client"
 import bcrypt from "bcrypt"
 import { StatusCodes } from "http-status-codes"
 import type { LoginUserDataType } from "./userRequestValidation"
 import { QueryPaging } from '@/common/utils/commonTypes'
+import { env } from '@/common/utils/envConfig'
+import { logger } from '@/server'
 
 // Omit the password and twoFactorSecret fields from the User type
-const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret", "resetPasswordToken"])
+const userOmitSecrets = prismaExclude("User", ["password", "twoFactorSecret", "resetPasswordToken", "phoneNumber2FACode"])
 export type UserWithoutSecrets = Prisma.UserGetPayload<{
   select: typeof userOmitSecrets
 }>
@@ -125,24 +126,68 @@ export class UserService {
     return user
   }
 
-  async verifyPhoneNumber(phoneNumber: string, code: string): Promise<boolean> {
+  /**
+   * Request a verification code for a phone number
+   * @param userId - The ID of the user to request a verification code for
+   * @returns True if the verification code was sent, false otherwise
+   */
+  async requestVerifyPhoneNumber(userId: string): Promise<boolean> {
     const user = await dbClient.user.findFirst({
-      where: { phoneNumber },
+      where: { id: userId },
     })
 
     if (!user) {
       throw new CustomError("User not found", CustomErrorCode.USER_NOT_FOUND)
     }
 
-    if (user.phoneNumberCode !== code) {
-      throw new CustomError("Invalid code", CustomErrorCode.INVALID_PHONE_NUMBER_CODE)
+    // TODO: send SMS with code to user here
+    await dbClient.user.update({
+      where: { id: userId },
+      data: {
+        phoneNumber2FACode: env.SMS_VERIFY_OVERRIDE || Math.floor(10000 + Math.random() * 90000).toString(),
+      },
+    })
+
+    return true
+  }
+
+  /**
+   * Verify a phone number
+   * @param userId - The ID of the user to verify
+   * @param phoneNumber - The phone number to verify
+   * @param code - The verification code
+   * @returns True if the phone number is verified, false otherwise
+   */
+  async verifyPhoneNumber(userId: string, phoneNumber: string, code: string): Promise<boolean> {
+    const user = await dbClient.user.findFirst({
+      where: { id: userId },
+      select: {
+        id: true,
+        phoneNumber2FACode: true,
+        phoneNumber: true,
+      },
+    })
+
+    logger.info(`user: ${JSON.stringify(user, null, 2)}`)
+    logger.info(`code: ${code}`)
+
+    if (!user) {
+      throw new CustomError("User not found", CustomErrorCode.USER_NOT_FOUND)
+    }
+
+    if (user.phoneNumber2FACode !== code) {
+      throw new CustomError("Invalid phone number 2FA code", CustomErrorCode.INVALID_PHONE_NUMBER_CODE)
+    }
+
+    if (user.phoneNumber !== phoneNumber) {
+      throw new CustomError("Invalid phone number", CustomErrorCode.INVALID_PHONE_NUMBER)
     }
 
     await dbClient.user.update({
       where: { id: user.id },
       data: {
         isPhoneNumberVerified: true,
-        phoneNumberCode: null,
+        phoneNumber2FACode: null,
       },
     })
 

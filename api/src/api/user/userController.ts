@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken"
 import { generateUUID } from '@/common/utils/random'
 import { logger } from '@/server'
 import { Prisma, Role } from '@prisma/client'
+import { omit } from 'lodash'
 
 class UserController {
   public queryUsers: RequestHandler = async (req: Request, res: Response) => {
@@ -41,8 +42,10 @@ class UserController {
   public register: RequestHandler = async (req: Request, res: Response) => {
     userService
       .createUser(req.body)
-      .then((user) => jwt.sign({ id: user.id, role: user.role }, env.JWT_AUTH_SECRET, {}))
-      .then((token) => handleSuccessResponse({ token }, res, StatusCodes.OK))
+      .then((user) => handleSuccessResponse({
+        token: jwt.sign({ id: user.id, role: user.role }, env.JWT_AUTH_SECRET, {}),
+        user
+      }, res, StatusCodes.CREATED))
       .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
 
@@ -74,17 +77,24 @@ class UserController {
     // allow overriding userId for admin users
     const isAdmin = ([Role.SYSTEM_ADMIN, Role.SYSTEM, Role.ADMIN] as Role[]).includes(req.user?.role as Role)
     // otherwise use the userId of the logged in user
-    const userId = isAdmin ? req.body.userId : req.userId
+    const userId = isAdmin && req.body.userId ? req.body.userId : req.userId!
 
     userService
-      .updateUser(userId, req.body)
+      .updateUser(userId, omit(req.body, ["userId"]))
       .then((user) => handleSuccessResponse({ user }, res, StatusCodes.OK))
+      .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+  };
+
+  public requestVerifyPhoneNumber: RequestHandler = async (req: Request, res: Response) => {
+    userService
+      .requestVerifyPhoneNumber(req.userId!)
+      .then((codeSent) => handleSuccessResponse({ codeSent }, res, StatusCodes.OK))
       .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };
 
   public verifyPhoneNumber: RequestHandler = async (req: Request, res: Response) => {
     userService
-      .verifyPhoneNumber(req.body.phoneNumber, req.body.code)
+      .verifyPhoneNumber(req.userId!, req.body.phoneNumber, req.body.code)
       .then((isVerified) => handleSuccessResponse({ isVerified }, res, StatusCodes.OK))
       .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
   };

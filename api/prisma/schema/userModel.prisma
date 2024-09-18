@@ -6,7 +6,7 @@ model User {
   password              String
   phoneNumber           String?  @unique
   isPhoneNumberVerified Boolean  @default(false)
-  phoneNumberCode       String?
+  phoneNumber2FACode    String?
   is2FAEnabled          Boolean  @default(false)
   twoFactorSecret       String?
   role                  Role     @default(USER)
