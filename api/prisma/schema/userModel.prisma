@@ -18,19 +18,20 @@ model User {
   // relationships
   myCommunities        Community[]
   memberships          Membership[]
-  transactionsSent     Transaction[]       @relation("sender")
-  transactionsReceived Transaction[]       @relation("receiver")
+  transactionsSent     Transaction[]           @relation("sender")
+  transactionsReceived Transaction[]           @relation("receiver")
   wallets              Wallet[]
   sharedWallets        UserOnWallet[]
-  managedBy            User?               @relation("managedBy", fields: [managedById], references: [id])
-  managedUsers         User[]              @relation("managedBy")
+  managedBy            User?                   @relation("managedBy", fields: [managedById], references: [id])
+  managedUsers         User[]                  @relation("managedBy")
   events               Event[]
   apiKeys              ApiKey[]
   achievements         Achievement[]
   eventLogs            EventLog[]
-  createdEventLogs     EventLog[]          @relation("createdBy")
+  createdEventLogs     EventLog[]              @relation("createdBy")
   rewards              AchievementReward[]
   invites              Invite[]
+  createdAnnouncements CommunityAnnouncement[]
 }
 
 enum Role {

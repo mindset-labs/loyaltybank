@@ -12,14 +12,15 @@ model Community {
     updatedAt       DateTime        @default(now())
 
     // relationships
-    memberships  Membership[]
-    createdBy    User          @relation(fields: [createdById], references: [id])
-    transactions Transaction[]
-    wallets      Wallet[]
-    events       Event[]
-    achievements Achievement[]
-    EventLog     EventLog[]
-    invites      Invite[]
+    memberships   Membership[]
+    createdBy     User                    @relation(fields: [createdById], references: [id])
+    transactions  Transaction[]
+    wallets       Wallet[]
+    events        Event[]
+    achievements  Achievement[]
+    EventLog      EventLog[]
+    invites       Invite[]
+    announcements CommunityAnnouncement[]
 }
 
 enum CommunityStatus {

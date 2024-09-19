@@ -68,7 +68,7 @@ class CommunityController {
         if (!canEdit) {
             return handleErrorResponse(
                 new CustomError('Invalid community or access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
-                    communityId: req.params.communityId,
+                    communityId: req.params.id,
                     userId: req.userId,
                 }),
                 res,
@@ -142,8 +142,22 @@ class CommunityController {
 
     public updateMembership: RequestHandler = async (req: Request, res: Response) => {
         return communityService
-            .updateMembership(req.userId!, req.params.communityId, req.params.membershipId, req.body)
+            .updateMembership(req.userId!, req.params.id, req.params.membershipId, req.body)
             .then((membership) => handleSuccessResponse({ membership }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    }
+
+    public createCommunityAnnouncement: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .createCommunityAnnouncement(req.userId!, req.params.id, req.body)
+            .then((announcement) => handleSuccessResponse({ announcement }, res, StatusCodes.OK))
+            .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
+    }
+
+    public updateCommunityAnnouncement: RequestHandler = async (req: Request, res: Response) => {
+        return communityService
+            .updateCommunityAnnouncement(req.userId!, req.params.id, req.params.announcementId, req.body)
+            .then((announcement) => handleSuccessResponse({ announcement }, res, StatusCodes.OK))
             .catch((error) => handleErrorResponse(error, res, StatusCodes.INTERNAL_SERVER_ERROR))
     }
 }

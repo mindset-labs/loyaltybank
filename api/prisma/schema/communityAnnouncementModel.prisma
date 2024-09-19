@@ -1,0 +1,28 @@
+model CommunityAnnouncement {
+    id             String                          @id @default(uuid())
+    communityId    String
+    title          String
+    content        String                          @db.Text
+    imageUrl       String?
+    imageType      CommunityAnnouncementImageType?
+    actionMetadata Json?
+    status         CommunityAnnouncementStatus     @default(DRAFT)
+    createdById    String
+    createdAt      DateTime                        @default(now())
+    expiresAt      DateTime?
+
+    // Relationships
+    community Community @relation(fields: [communityId], references: [id])
+    createdBy User      @relation(fields: [createdById], references: [id])
+}
+
+enum CommunityAnnouncementStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+
+enum CommunityAnnouncementImageType {
+    URL
+    BASE64
+}

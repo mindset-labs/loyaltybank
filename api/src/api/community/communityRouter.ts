@@ -6,9 +6,22 @@ import { createApiResponse } from "@/api-docs/openAPIResponseBuilders"
 import verifyJWT, { verifyJWTAndRole } from "@/common/middleware/verifyJWT"
 import { validateRequest } from "@/common/utils/httpHandlers"
 import { communityController } from "./communityController"
-import { CommunitySchema, MembershipCreateInputSchema, MembershipSchema } from '@zodSchema/index'
-import { CreateMembershipSchema, CreateOrUpdateCommunitySchema, GetCommunitySchema, IssueCommunityPointsSchema, QueryAllCommunitiesSchema, UpdateMembershipSchema } from './communityRequestValidation'
-import { Role } from '@prisma/client'
+import {
+    CommunityAnnouncementSchema,
+    CommunitySchema,
+    MembershipSchema,
+} from "@zodSchema/index"
+import {
+    CreateCommunityAnnouncementSchema,
+    CreateMembershipSchema,
+    CreateOrUpdateCommunitySchema,
+    GetCommunitySchema,
+    IssueCommunityPointsSchema,
+    QueryAllCommunitiesSchema,
+    UpdateCommunityAnnouncementSchema,
+    UpdateMembershipSchema,
+} from "./communityRequestValidation"
+import { Role } from "@prisma/client"
 
 export const communityRegistry = new OpenAPIRegistry()
 export const communityRouter: Router = express.Router()
@@ -16,6 +29,7 @@ export const communityRouter: Router = express.Router()
 // open API zod schemas
 const CommunityWithoutMetadata = CommunitySchema.omit({ metadata: true })
 const MembershipWithoutMetadata = MembershipSchema.omit({ nftMetadata: true, membershipMetadata: true })
+const CommunityAnnouncementWithoutMetadata = CommunityAnnouncementSchema.omit({ actionMetadata: true })
 
 communityRegistry.register("Community", CommunityWithoutMetadata)
 
@@ -118,3 +132,33 @@ communityRegistry.registerPath({
 })
 
 communityRouter.put("/:id/archive", verifyJWT, communityController.archiveCommunity)
+
+// Create a community announcement
+communityRegistry.registerPath({
+    method: "post",
+    path: "/communities/{id}/announcements",
+    tags: ["Community"],
+    responses: createApiResponse(CommunityAnnouncementWithoutMetadata, "Success"),
+})
+
+communityRouter.post(
+    "/:id/announcements",
+    verifyJWT,
+    validateRequest(CreateCommunityAnnouncementSchema),
+    communityController.createCommunityAnnouncement
+)
+
+// Update a community announcement
+communityRegistry.registerPath({
+    method: "put",
+    path: "/communities/{id}/announcements/{announcementId}",
+    tags: ["Community"],
+    responses: createApiResponse(CommunityAnnouncementWithoutMetadata, "Success"),
+})
+
+communityRouter.put(
+    "/:id/announcements/:announcementId",
+    verifyJWT,
+    validateRequest(UpdateCommunityAnnouncementSchema),
+    communityController.updateCommunityAnnouncement
+)

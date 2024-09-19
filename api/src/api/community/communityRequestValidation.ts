@@ -1,6 +1,6 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import { CommunityRole, MembershipStatus, MembershipTier } from '@prisma/client'
-import { CommunityIncludeSchema, CommunityWhereInputSchema } from '@zodSchema/index'
+import { CommunityAnnouncementCreateInputSchema, CommunityAnnouncementUpdateInputSchema, CommunityIncludeSchema, CommunityWhereInputSchema } from '@zodSchema/index'
 import { z } from 'zod'
 
 extendZodWithOpenApi(z)
@@ -70,5 +70,20 @@ export const CreateMembershipSchema = z.object({
         role: z.nativeEnum(CommunityRole).default(CommunityRole.MEMBER),
         tags: z.array(z.string()).optional(),
         status: z.nativeEnum(MembershipStatus).default(MembershipStatus.ACTIVE),
+    })
+})
+
+export const CreateCommunityAnnouncementSchema = z.object({
+    body: CommunityAnnouncementCreateInputSchema,
+    params: z.object({
+        communityId: z.string().uuid(),
+    })
+})
+
+export const UpdateCommunityAnnouncementSchema = z.object({
+    body: CommunityAnnouncementUpdateInputSchema,
+    params: z.object({
+        communityId: z.string().uuid(),
+        announcementId: z.string().uuid(),
     })
 })

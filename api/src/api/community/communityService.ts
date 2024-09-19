@@ -1,6 +1,6 @@
 import { CustomError, CustomErrorCode } from "@/common/utils/errors"
 import dbClient from "@/db"
-import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole, Transaction, TransactionType, TransactionSubtype, MembershipStatus } from "@prisma/client"
+import { type Prisma, type Community, Membership, CommunityStatus, CommunityRole, Transaction, TransactionType, TransactionSubtype, MembershipStatus, CommunityAnnouncement } from "@prisma/client"
 import { env } from '@/common/utils/envConfig'
 import { round } from 'lodash'
 import { type QueryPaging } from '@/common/utils/commonTypes'
@@ -365,6 +365,63 @@ export class CommunityService {
             where: {
                 id: membershipId,
                 communityId,
+            },
+            data,
+        })
+    }
+
+    /**
+     * Create a community announcement
+     * @param userId: the user performing the action
+     * @param data: the data to create the announcement with
+     * @returns the announcement
+     */
+    async createCommunityAnnouncement(userId: string, communityId: string, data: Prisma.CommunityAnnouncementUncheckedCreateInput): Promise<CommunityAnnouncement> {
+        // check the user has access to the community
+        const community = await this.findByIdWithEditAccess(communityId, userId)
+
+        if (!community) {
+            throw new CustomError('Community not found or user does not have access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                communityId,
+                userId,
+            })
+        }
+
+        return dbClient.communityAnnouncement.create({
+            data: {
+                ...data,
+                communityId,
+                createdById: userId,
+            },
+        })
+    }
+
+    /**
+     * Update a community announcement
+     * @param userId: the user performing the action
+     * @param announcementId: the announcement to update
+     * @param data: the data to update the announcement with
+     * @returns the updated announcement
+     */
+    async updateCommunityAnnouncement(
+        userId: string,
+        communityId: string,
+        announcementId: string,
+        data: Prisma.CommunityAnnouncementUpdateInput
+    ): Promise<CommunityAnnouncement> {
+        // check the user has access to the community
+        const community = await this.findByIdWithEditAccess(communityId, userId)
+
+        if (!community) {
+            throw new CustomError('Community not found or user does not have access', CustomErrorCode.INVALID_COMMUNITY_ACCESS, {
+                communityId,
+                userId,
+            })
+        }
+
+        return dbClient.communityAnnouncement.update({
+            where: {
+                id: announcementId,
             },
             data,
         })
