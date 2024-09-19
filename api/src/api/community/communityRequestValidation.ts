@@ -1,7 +1,7 @@
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
-import { CommunityRole, MembershipStatus, MembershipTier } from '@prisma/client'
-import { CommunityAnnouncementCreateInputSchema, CommunityAnnouncementUpdateInputSchema, CommunityIncludeSchema, CommunityWhereInputSchema } from '@zodSchema/index'
 import { z } from 'zod'
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
+import { CommunityAnnouncementImageType, CommunityAnnouncementStatus, CommunityRole, MembershipStatus, MembershipTier } from '@prisma/client'
+import { CommunityIncludeSchema, CommunityWhereInputSchema } from '@zodSchema/index'
 
 extendZodWithOpenApi(z)
 
@@ -73,17 +73,37 @@ export const CreateMembershipSchema = z.object({
     })
 })
 
+export const CommunityAnnouncementCreateSchema = z.object({
+    title: z.string(),
+    content: z.string(),
+    imageUrl: z.string().optional(),
+    imageType: z.nativeEnum(CommunityAnnouncementImageType).optional(),
+    actionMetadata: z.record(z.string()).optional(),
+    status: z.nativeEnum(CommunityAnnouncementStatus).default(CommunityAnnouncementStatus.DRAFT),
+    expiresAt: z.coerce.date().optional(),
+})
+
 export const CreateCommunityAnnouncementSchema = z.object({
-    body: CommunityAnnouncementCreateInputSchema,
+    body: CommunityAnnouncementCreateSchema,
     params: z.object({
-        communityId: z.string().uuid(),
+        id: z.string().uuid(),
     })
 })
 
+export const CommunityAnnouncementUpdateSchema = z.object({
+    title: z.string().optional(),
+    content: z.string().optional(),
+    imageUrl: z.string().optional(),
+    imageType: z.nativeEnum(CommunityAnnouncementImageType).optional(),
+    actionMetadata: z.record(z.string()).optional(),
+    status: z.nativeEnum(CommunityAnnouncementStatus).optional(),
+    expiresAt: z.coerce.date().optional(),
+})
+
 export const UpdateCommunityAnnouncementSchema = z.object({
-    body: CommunityAnnouncementUpdateInputSchema,
+    body: CommunityAnnouncementUpdateSchema,
     params: z.object({
-        communityId: z.string().uuid(),
+        id: z.string().uuid(),
         announcementId: z.string().uuid(),
     })
 })
